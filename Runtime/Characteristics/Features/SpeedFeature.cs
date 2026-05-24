@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
 namespace unigame.staticecs.features {
-    public class HealthFeature<TWorld> : CharacteristicFeature<TWorld, HealthCharacteristic>
+    public class SpeedFeature<TWorld> : CharacteristicFeature<TWorld, SpeedCharacteristic>
         where TWorld : struct, IWorldType { }
 }

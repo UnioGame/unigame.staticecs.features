@@ -3,6 +3,7 @@
     "rootNamespace": "unigame.staticecs.features",
     "references": [
         "unigame.staticecs",
+        "unigame.staticecs.unity",
         "FFS.StaticEcs"
     ],
     "includePlatforms": [],
