@@ -8,4 +8,6 @@ namespace unigame.staticecs.features.Tests {
     public struct TestDamageWorld : IWorldType { }
 
     public struct TestEffectsWorld : IWorldType { }
+    public struct TestAbilityWorld : IWorldType { }
+    public struct TestTargetIndexWorld : IWorldType { }
 }
