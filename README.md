@@ -25,7 +25,7 @@ Each feature is redesigned before implementation with explicit review of:
 | Stun effect | Done | `StunEffectFeature` — bridges effect lifetime to `StunOperations` source counter; respects manual stun sources. |
 | Modification effect | Done | `ModificationEffectFeature<TStat>` + `ModificationEffectOperations.Apply` — installs a time-bounded characteristic modifier keyed by source; auto-removes via `ModifierBackRef` on source destroy. |
 | TargetSelection | Done | `TargetSelectionFeature<TWorld>`, `TargetableTag`, `ITargetIndex<TWorld>`, managed `KdTreeTargetIndex<TWorld>` v1, `TargetIndexRebuildSystem`; used by ability AoE queries and reusable by AI/projectiles. |
-| Ability | Done | Data-driven step pipeline: `AbilityRegistry<TWorld>` stores `AbilityDefinition` + root `IAbilityStepConfig`; `AbilityCastSystem`, `AbilityWaitSystem`, `AbilityStepProgressionSystem`; leaves (`Wait`, `ApplyDamage`, `AoeQuery`, `SetPrimaryTargetFromAoe`, `ApplyEffect`), composites (`Sequence`, `Parallel`, `Conditional`, `Repeat`), conditions (`Always`, `Never`, `AoeNonEmpty`, `PrimaryTargetAlive`). |
+| Ability | Done | Data-driven step pipeline: `AbilityRegistry<TWorld>` stores `AbilityDefinition` + root `IAbilityStepConfig`; `AbilityAsset`, `AbilityDatabase`, `AbilityDatabaseFeature<TWorld>` for ScriptableObject authoring; `AbilityCastSystem`, `AbilityWaitSystem`, `AbilityStepProgressionSystem`; leaves (`Wait`, `ApplyDamage`, `AoeQuery`, `SetPrimaryTargetFromAoe`, `ApplyEffect`), composites (`Sequence`, `Parallel`, `Conditional`, `Repeat`), conditions (`Always`, `Never`, `AoeNonEmpty`, `PrimaryTargetAlive`). |
 | Death | Pending | Owned by the [Death slice](../../../docs/context/static-ecs-feature-death.md) — `ApplyDamageSystem` only sets `DeathPendingTag`. |
 
 ## Usage
@@ -66,7 +66,30 @@ ModificationEffectOperations.Apply<SpeedCharacteristic>(
     target: ally, source: caster, op: CharacteristicModifierOp.Mul, value: 1.5f, duration: 5f);
 ```
 
-Registering a data-driven ability:
+Registering authored ability assets:
+
+```csharp
+public sealed class GameEcsFeature : StaticEcsFeature<Main> {
+    private readonly AbilityDatabase _abilityDatabase;
+
+    public GameEcsFeature(AbilityDatabase abilityDatabase) {
+        _abilityDatabase = abilityDatabase;
+    }
+
+    public override void RegisterTypes(World<Main>.TypeRegistrar types) {
+        new AbilityFeature(registerSystems: false).RegisterTypes(types);
+        new AbilityDatabaseFeature(_abilityDatabase).RegisterTypes(types);
+    }
+}
+```
+
+`AbilityDatabaseFeature<TWorld>` instantiates each `AbilityAsset` by default before
+registering its `AbilityDefinition` and root `IAbilityStepConfig`. This keeps
+runtime state isolated from the source ScriptableObject asset and avoids per-step
+clone methods.
+
+Code-defined abilities remain supported for tests, generated content, and small
+bootstrap scenarios:
 
 ```csharp
 var registry = World<Main>.GetResource<AbilityRegistry<Main>>();
@@ -97,6 +120,7 @@ Required co-registrations:
 - `EffectFeature(maxStacks, refreshOnReapply, tickOrder, registerTickSystem)` ctor controls stacking policy and tick ordering. Pass `registerTickSystem: false` if the project wires systems imperatively and prefers to add `EffectTickSystem<TWorld, TEffect>` by hand.
 - Every concrete effect-type struct must declare `[EffectFlag(EffectFlag.X)]` with a single-bit value. The bit is reserved by the framework (one slot per effect family) and consumed by `EffectBackRef` + `EffectSourceTracker` for source-destroy cleanup. Generic `ModificationEffect<TStat>` shares one flag for every TStat closure — granular removal still goes through typed `EffectOperations.Remove<TWorld, ModificationEffect<TStat>>`. Reserved bits `Reserved0..Reserved3` are available for project- or test-side effects.
 - `AbilityFeature<TWorld>` requires `EcsTimeFeature<TWorld>` for `WaitStepConfig` and timed effects. Ability AoE leaves require `TargetSelectionFeature<TWorld>` and entities with `TransformBindingComponent`.
+- `AbilityDatabaseFeature<TWorld>` registers ScriptableObject-authored abilities into `AbilityRegistry<TWorld>`. Register `AbilityFeature<TWorld>` first so the registry and default activators exist.
 - `AbilityEffectDispatchRegistry<TWorld>` maps `EffectId` to concrete effect operations for `ApplyEffectStepConfig`. Register custom dispatchers after effect features register their `EffectId`.
 - Cooldown and resource-cost validation are intentionally outside the ability runtime. Business/gameplay code checks `CooldownOperations` or resource state before calling `AbilityOperations.TryStartCast`; the ability slice executes once it receives a cast request.
 
@@ -121,6 +145,10 @@ Leaf steps are activated through `AbilityStepActivatorRegistry<TWorld>`.
 Long-running leaves write state components such as `AbilityWaitState`; synchronous
 leaves return `StepStatus.Success` or `StepStatus.Failed` immediately.
 
+The ScriptableObject authoring layer stores the same step tree in an `AbilityAsset`
+using `[SerializeReference]`. An `AbilityDatabase` groups assets for registration,
+and the non-generic `AbilityDatabaseFeature` alias targets the default `Main` world.
+
 ## Tests
 
 EditMode tests live in `Tests/Editor` and compile into
@@ -134,7 +162,8 @@ For Unity Test Runner discovery in this project:
 - Tests that create entities with `TransformBindingComponent` must register it explicitly in the test world before `World<TWorld>.Initialize()`.
 
 Current EditMode coverage includes characteristics, modifiers, damage, effects,
-target selection, ability operations, leaf steps, composite steps, and ability
-pipeline smoke tests. The latest full `unigame.staticecs.features.tests` run is green.
+target selection, ability operations, leaf steps, composite steps, ScriptableObject
+ability database registration, and ability pipeline smoke tests. The latest full
+`unigame.staticecs.features.tests` run is green.
 
 Documentation rules for the package live in [AGENTS.md](../../../AGENTS.md) and [docs/knowledge/static-ecs/conventions/documentation.md](../../../docs/knowledge/static-ecs/conventions/documentation.md).
