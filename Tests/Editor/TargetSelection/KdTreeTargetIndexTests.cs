@@ -5,6 +5,7 @@ using UnityEngine;
 using unigame.staticecs.unity;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class KdTreeTargetIndexTests {
         private GameObject[] _hosts;
 

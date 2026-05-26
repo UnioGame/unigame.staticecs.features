@@ -2,6 +2,7 @@ using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class StunSourceTests {
         [SetUp]
         public void SetUp() {

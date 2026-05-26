@@ -3,6 +3,7 @@ using NUnit.Framework;
 using unigame.staticecs.Time;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class ModificationEffectTests {
         private EffectTickSystem<TestEffectsWorld, ModificationEffect<SpeedCharacteristic>> _tick;
 

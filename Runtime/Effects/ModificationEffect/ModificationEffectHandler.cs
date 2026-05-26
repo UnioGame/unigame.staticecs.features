@@ -20,6 +20,10 @@ namespace unigame.staticecs.features {
             }
 
             var data = entity.Read<ModificationEffectData<TStat>>();
+            if (previousStacks > 0) {
+                CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TStat>(target, source);
+            }
+
             CharacteristicModifierExtensions.ApplyModifier<TWorld, TStat>(target, source, data.Op, data.Value);
         }
 

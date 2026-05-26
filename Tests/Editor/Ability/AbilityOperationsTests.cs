@@ -3,6 +3,7 @@ using NUnit.Framework;
 using unigame.staticecs.Time;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class AbilityOperationsTests {
         private static readonly AbilityId AbilityA = new(1);
         private static readonly AbilityId AbilityB = new(2);
@@ -21,6 +22,8 @@ namespace unigame.staticecs.features.Tests {
                 World<TestAbilityWorld>.Destroy();
             }
         }
+
+        private static IAbilityStepConfig InstantTree() => new WaitStepConfig(0f);
 
         [Test]
         public void Equip_AddsRosterEntry_DuplicateIgnored() {
@@ -52,9 +55,18 @@ namespace unigame.staticecs.features.Tests {
         }
 
         [Test]
-        public void IsReady_ReturnsTrue_WhenEquippedRegisteredAndOffCooldown() {
+        public void IsReady_ReturnsFalse_WhenNotEquipped() {
             var registry = World<TestAbilityWorld>.GetResource<AbilityRegistry<TestAbilityWorld>>();
-            registry.Register(new AbilityDefinition(AbilityA, 0f, 0f, 0f, 1f), (_, _) => { });
+            registry.Register(new AbilityDefinition(AbilityA), InstantTree());
+
+            var caster = World<TestAbilityWorld>.NewEntity<Default>();
+            Assert.IsFalse(AbilityOperations.IsReady<TestAbilityWorld>(caster.GID, AbilityA));
+        }
+
+        [Test]
+        public void IsReady_ReturnsTrue_WhenEquippedAndRegistered() {
+            var registry = World<TestAbilityWorld>.GetResource<AbilityRegistry<TestAbilityWorld>>();
+            registry.Register(new AbilityDefinition(AbilityA), InstantTree());
 
             var caster = World<TestAbilityWorld>.NewEntity<Default>();
             AbilityOperations.Equip<TestAbilityWorld>(caster.GID, AbilityA);
@@ -63,9 +75,24 @@ namespace unigame.staticecs.features.Tests {
         }
 
         [Test]
+        public void IsReady_IgnoresCooldown_BusinessLayerResponsibility() {
+            // §1b: ability slice does not gate on cooldown. CooldownOperations is consulted by
+            // the caller before TryStartCast, but IsReady itself stays cooldown-agnostic.
+            var registry = World<TestAbilityWorld>.GetResource<AbilityRegistry<TestAbilityWorld>>();
+            registry.Register(new AbilityDefinition(AbilityA), InstantTree());
+
+            var caster = World<TestAbilityWorld>.NewEntity<Default>();
+            AbilityOperations.Equip<TestAbilityWorld>(caster.GID, AbilityA);
+            CooldownOperations.Trigger<TestAbilityWorld>(caster.GID, AbilityA, 5f);
+
+            Assert.IsTrue(AbilityOperations.IsReady<TestAbilityWorld>(caster.GID, AbilityA));
+            Assert.IsFalse(CooldownOperations.IsReady<TestAbilityWorld>(caster.GID, AbilityA));
+        }
+
+        [Test]
         public void TryStartCast_FailsIfNotReady_AndQueuesEvent() {
             var registry = World<TestAbilityWorld>.GetResource<AbilityRegistry<TestAbilityWorld>>();
-            registry.Register(new AbilityDefinition(AbilityA, 0f, 0f, 0f, 1f), (_, _) => { });
+            registry.Register(new AbilityDefinition(AbilityA), InstantTree());
 
             var caster = World<TestAbilityWorld>.NewEntity<Default>();
             Assert.IsFalse(AbilityOperations.TryStartCast<TestAbilityWorld>(caster.GID, AbilityA));
@@ -85,29 +112,12 @@ namespace unigame.staticecs.features.Tests {
         }
 
         [Test]
-        public void Cancel_DeletesActiveCastAndEmitsEvent() {
+        public void IsCasting_TrueWhileActiveCastRefPresent() {
             var caster = World<TestAbilityWorld>.NewEntity<Default>();
-            caster.Set(new AbilityCastComponent {
-                AbilityId = AbilityA,
-                Phase = AbilityPhase.Charging,
-                TimeLeft = 1f,
-            });
+            Assert.IsFalse(AbilityOperations.IsCasting<TestAbilityWorld>(caster.GID));
 
-            var receiver = World<TestAbilityWorld>.RegisterEventReceiver<AbilityStateChangedEvent>();
-            try {
-                Assert.IsTrue(AbilityOperations.Cancel<TestAbilityWorld>(caster.GID));
-                Assert.IsFalse(caster.Has<AbilityCastComponent>());
-
-                var cancelledEvents = 0;
-                foreach (var e in receiver) {
-                    if (e.Value.Reason == AbilityChangeReason.Cancelled) {
-                        cancelledEvents++;
-                    }
-                }
-                Assert.AreEqual(1, cancelledEvents);
-            } finally {
-                World<TestAbilityWorld>.DeleteEventReceiver(ref receiver);
-            }
+            caster.Set(new AbilityActiveCastRef { Cast = caster.GID });
+            Assert.IsTrue(AbilityOperations.IsCasting<TestAbilityWorld>(caster.GID));
         }
     }
 }

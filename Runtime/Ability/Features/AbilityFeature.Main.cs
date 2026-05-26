@@ -5,8 +5,9 @@ namespace unigame.staticecs.features {
         public AbilityFeature(
             bool registerSystems = true,
             short castOrder = DefaultCastOrder,
-            short tickOrder = DefaultTickOrder)
-            : base(registerSystems, castOrder, tickOrder) {
+            short waitOrder = DefaultWaitOrder,
+            short progressionOrder = DefaultProgressionOrder)
+            : base(registerSystems, castOrder, waitOrder, progressionOrder) {
         }
     }
 }

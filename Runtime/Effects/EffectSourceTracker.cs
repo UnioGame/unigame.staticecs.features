@@ -32,8 +32,14 @@ namespace unigame.staticecs.features {
             ref var registry = ref World<TWorld>.GetResource<EffectRegistry>();
             EntityGID sourceGid = self.GID;
 
-            for (var i = 0; i < refs.Length; i++) {
-                ref var entry = ref refs[i];
+            System.Span<EffectBackRef> snapshot = stackalloc EffectBackRef[64];
+            var count = refs.Length < snapshot.Length ? refs.Length : snapshot.Length;
+            for (var i = 0; i < count; i++) {
+                snapshot[i] = refs[i];
+            }
+
+            for (var i = 0; i < count; i++) {
+                var entry = snapshot[i];
                 registry.InvokeMask(entry.Mask, sourceGid, entry.Target);
             }
         }

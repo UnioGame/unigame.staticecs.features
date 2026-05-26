@@ -4,69 +4,66 @@ using FFS.Libraries.StaticEcs;
 
 namespace unigame.staticecs.features {
     /// <summary>
-    /// World-scoped resource that maps <see cref="AbilityId"/> to its <see cref="AbilityDefinition"/>
-    /// and a cast handler. Two registration overloads are exposed: a lightweight
-    /// <see cref="AbilityCastDelegate"/> for one-off scripts and a full
-    /// <see cref="IAbilityHandler{TWorld}"/> for stateful or DI-resolved handlers.
+    /// World-scoped resource pairing each <see cref="AbilityId"/> with its
+    /// <see cref="AbilityDefinition"/> and the root <see cref="IAbilityStepConfig"/> of its
+    /// step pipeline. Replaces the legacy handler/delegate dictionary — runtime behaviour now
+    /// lives in the step graph; the registry holds only configuration.
     /// </summary>
     public sealed class AbilityRegistry<TWorld> : IResource
         where TWorld : struct, IWorldType {
-        private readonly Dictionary<int, AbilityDefinition> _defs = new();
-        private readonly Dictionary<int, IAbilityHandler<TWorld>> _handlers = new();
-        private readonly Dictionary<int, AbilityCastDelegate> _delegates = new();
+        private readonly Dictionary<int, Entry> _entries = new();
 
-        public int Count => _defs.Count;
+        public int Count => _entries.Count;
 
-        public void Register(AbilityDefinition definition, IAbilityHandler<TWorld> handler) {
+        public void Register(AbilityDefinition definition, IAbilityStepConfig root) {
             if (definition == null) throw new ArgumentNullException(nameof(definition));
-            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            if (root == null) throw new ArgumentNullException(nameof(root));
 
-            _defs[definition.Id.Value] = definition;
-            _handlers[definition.Id.Value] = handler;
-            _delegates.Remove(definition.Id.Value);
-        }
-
-        public void Register(AbilityDefinition definition, AbilityCastDelegate onCast) {
-            if (definition == null) throw new ArgumentNullException(nameof(definition));
-            if (onCast == null) throw new ArgumentNullException(nameof(onCast));
-
-            _defs[definition.Id.Value] = definition;
-            _delegates[definition.Id.Value] = onCast;
-            _handlers.Remove(definition.Id.Value);
+            _entries[definition.Id.Value] = new Entry(definition, root);
         }
 
         public bool Unregister(AbilityId id) {
-            var key = id.Value;
-            var removed = _defs.Remove(key);
-            _handlers.Remove(key);
-            _delegates.Remove(key);
-            return removed;
+            return _entries.Remove(id.Value);
         }
 
-        public bool Contains(AbilityId id) => _defs.ContainsKey(id.Value);
+        public bool Contains(AbilityId id) => _entries.ContainsKey(id.Value);
 
-        public bool TryGet(AbilityId id, out AbilityDefinition definition) {
-            return _defs.TryGetValue(id.Value, out definition);
-        }
-
-        public AbilityDefinition Get(AbilityId id) {
-            if (!_defs.TryGetValue(id.Value, out var def)) {
-                throw new InvalidOperationException($"AbilityRegistry<{typeof(TWorld).Name}>: ability {id} is not registered.");
-            }
-            return def;
-        }
-
-        public bool Invoke(AbilityId id, EntityGID caster, ReadOnlySpan<EntityGID> targets) {
-            var key = id.Value;
-            if (_handlers.TryGetValue(key, out var handler)) {
-                handler.OnCast(caster, targets);
+        public bool TryGet(AbilityId id, out AbilityDefinition definition, out IAbilityStepConfig root) {
+            if (_entries.TryGetValue(id.Value, out var entry)) {
+                definition = entry.Definition;
+                root = entry.Root;
                 return true;
             }
-            if (_delegates.TryGetValue(key, out var del)) {
-                del(caster, targets);
-                return true;
-            }
+
+            definition = null;
+            root = null;
             return false;
+        }
+
+        public AbilityDefinition GetDefinition(AbilityId id) {
+            if (_entries.TryGetValue(id.Value, out var entry)) {
+                return entry.Definition;
+            }
+            throw new InvalidOperationException(
+                $"AbilityRegistry<{typeof(TWorld).Name}>: ability {id} is not registered.");
+        }
+
+        public IAbilityStepConfig GetRoot(AbilityId id) {
+            if (_entries.TryGetValue(id.Value, out var entry)) {
+                return entry.Root;
+            }
+            throw new InvalidOperationException(
+                $"AbilityRegistry<{typeof(TWorld).Name}>: ability {id} is not registered.");
+        }
+
+        private readonly struct Entry {
+            public readonly AbilityDefinition Definition;
+            public readonly IAbilityStepConfig Root;
+
+            public Entry(AbilityDefinition definition, IAbilityStepConfig root) {
+                Definition = definition;
+                Root = root;
+            }
         }
     }
 }

@@ -24,6 +24,8 @@ Each feature is redesigned before implementation with explicit review of:
 | HealOverTime effect | Done | `HealOverTimeFeature` + `HealOverTimeOperations.Apply` — periodic healing through `DamageOperations.RaiseHealing`, scales by stacks. |
 | Stun effect | Done | `StunEffectFeature` — bridges effect lifetime to `StunOperations` source counter; respects manual stun sources. |
 | Modification effect | Done | `ModificationEffectFeature<TStat>` + `ModificationEffectOperations.Apply` — installs a time-bounded characteristic modifier keyed by source; auto-removes via `ModifierBackRef` on source destroy. |
+| TargetSelection | Done | `TargetSelectionFeature<TWorld>`, `TargetableTag`, `ITargetIndex<TWorld>`, managed `KdTreeTargetIndex<TWorld>` v1, `TargetIndexRebuildSystem`; used by ability AoE queries and reusable by AI/projectiles. |
+| Ability | Done | Data-driven step pipeline: `AbilityRegistry<TWorld>` stores `AbilityDefinition` + root `IAbilityStepConfig`; `AbilityCastSystem`, `AbilityWaitSystem`, `AbilityStepProgressionSystem`; leaves (`Wait`, `ApplyDamage`, `AoeQuery`, `SetPrimaryTargetFromAoe`, `ApplyEffect`), composites (`Sequence`, `Parallel`, `Conditional`, `Repeat`), conditions (`Always`, `Never`, `AoeNonEmpty`, `PrimaryTargetAlive`). |
 | Death | Pending | Owned by the [Death slice](../../../docs/context/static-ecs-feature-death.md) — `ApplyDamageSystem` only sets `DeathPendingTag`. |
 
 ## Usage
@@ -64,6 +66,20 @@ ModificationEffectOperations.Apply<SpeedCharacteristic>(
     target: ally, source: caster, op: CharacteristicModifierOp.Mul, value: 1.5f, duration: 5f);
 ```
 
+Registering a data-driven ability:
+
+```csharp
+var registry = World<Main>.GetResource<AbilityRegistry<Main>>();
+registry.Register(
+    new AbilityDefinition(DemoAbilityIds.StunNova),
+    new SequenceStepConfig(new IAbilityStepConfig[] {
+        new WaitStepConfig(0.4f),
+        new AoeQueryStepConfig(radius: 4f, maxTargets: 16, excludeCaster: true),
+        new ApplyEffectStepConfig(effectIds.Get<StunEffect>(), AbilityTargetMode.AoeBroadcast, duration: 2f),
+        new WaitStepConfig(0.3f),
+    }));
+```
+
 The `Main`-default aliases (`HealthFeature`, `DamageFeature`, …) follow the [world-default aliases convention](../../../docs/knowledge/static-ecs/conventions/world-default-aliases.md). Explicitly typed generic forms (`HealthFeature<TWorld>`, `DamageFeature<TWorld>`) stay available for tests and multi-world scenarios.
 
 ## Configuration
@@ -80,5 +96,45 @@ Required co-registrations:
 - Each `EffectFeature<TWorld, TEffect>` registers exactly one `IEffectHandler<TWorld, TEffect>` resource. Concrete effect features set the default handler; project code may override by calling `World<TWorld>.SetResource<IEffectHandler<TWorld, TEffect>>(custom)` before the feature registers.
 - `EffectFeature(maxStacks, refreshOnReapply, tickOrder, registerTickSystem)` ctor controls stacking policy and tick ordering. Pass `registerTickSystem: false` if the project wires systems imperatively and prefers to add `EffectTickSystem<TWorld, TEffect>` by hand.
 - Every concrete effect-type struct must declare `[EffectFlag(EffectFlag.X)]` with a single-bit value. The bit is reserved by the framework (one slot per effect family) and consumed by `EffectBackRef` + `EffectSourceTracker` for source-destroy cleanup. Generic `ModificationEffect<TStat>` shares one flag for every TStat closure — granular removal still goes through typed `EffectOperations.Remove<TWorld, ModificationEffect<TStat>>`. Reserved bits `Reserved0..Reserved3` are available for project- or test-side effects.
+- `AbilityFeature<TWorld>` requires `EcsTimeFeature<TWorld>` for `WaitStepConfig` and timed effects. Ability AoE leaves require `TargetSelectionFeature<TWorld>` and entities with `TransformBindingComponent`.
+- `AbilityEffectDispatchRegistry<TWorld>` maps `EffectId` to concrete effect operations for `ApplyEffectStepConfig`. Register custom dispatchers after effect features register their `EffectId`.
+- Cooldown and resource-cost validation are intentionally outside the ability runtime. Business/gameplay code checks `CooldownOperations` or resource state before calling `AbilityOperations.TryStartCast`; the ability slice executes once it receives a cast request.
 
-Documentation rules for the package live in [AGENTS.md](AGENTS.md) and [docs/knowledge/static-ecs/conventions/documentation.md](../../../docs/knowledge/static-ecs/conventions/documentation.md).
+## Ability Pipeline
+
+Ability runtime is a "dumb executor" over a tree of `IAbilityStepConfig`.
+The registry stores data, not handlers:
+
+```csharp
+registry.Register(new AbilityDefinition(abilityId), rootStepConfig);
+```
+
+`AbilityCastSystem` spawns a cast-entity, then `AbilityStepProgressionSystem`
+walks the step tree:
+
+- `Sequence` executes children in order.
+- `Conditional` evaluates an `IAbilityStepCondition` and descends into the selected branch.
+- `Repeat` runs a body up to `MaxIterations`, optionally guarded by a condition.
+- `Parallel` spawns branch cast-entities with `AbilityInlineRootConfig` and joins them through `AbilityBranchCompletedEvent` using `AllSuccess` or `AnySuccess`.
+
+Leaf steps are activated through `AbilityStepActivatorRegistry<TWorld>`.
+Long-running leaves write state components such as `AbilityWaitState`; synchronous
+leaves return `StepStatus.Success` or `StepStatus.Failed` immediately.
+
+## Tests
+
+EditMode tests live in `Tests/Editor` and compile into
+`unigame.staticecs.features.tests`.
+
+For Unity Test Runner discovery in this project:
+
+- `GameClient/Packages/manifest.json` includes `com.unigame.staticecs.features` in `testables`.
+- `Tests/Editor/unigame.staticecs.features.tests.asmdef` uses `optionalUnityReferences: ["TestAssemblies"]`.
+- Test classes are marked with `[TestFixture]`.
+- Tests that create entities with `TransformBindingComponent` must register it explicitly in the test world before `World<TWorld>.Initialize()`.
+
+Current EditMode coverage includes characteristics, modifiers, damage, effects,
+target selection, ability operations, leaf steps, composite steps, and ability
+pipeline smoke tests. The latest full `unigame.staticecs.features.tests` run is green.
+
+Documentation rules for the package live in [AGENTS.md](../../../AGENTS.md) and [docs/knowledge/static-ecs/conventions/documentation.md](../../../docs/knowledge/static-ecs/conventions/documentation.md).

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using unigame.staticecs.Modifiers;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class ModifierRegistryFlagTests {
         [Test]
         public void Register_RejectsZero() {

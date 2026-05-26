@@ -3,6 +3,7 @@ using NUnit.Framework;
 using unigame.staticecs.Time;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class HealOverTimeTests {
         private EffectTickSystem<TestEffectsWorld, HealOverTimeEffect> _tick;
         private ApplyDamageSystem<TestEffectsWorld> _apply;

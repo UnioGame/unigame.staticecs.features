@@ -2,9 +2,13 @@ using FFS.Libraries.StaticEcs;
 
 namespace unigame.staticecs.features {
     /// <summary>
-    /// Validates incoming <see cref="CastAbilityEvent"/>s and starts a cast by attaching
-    /// <see cref="AbilityCastComponent"/>. Re-checks roster, cooldown and concurrent-cast guards
-    /// because events queued in the same frame may invalidate one another.
+    /// Receives <see cref="CastAbilityEvent"/>s, re-validates ability-internal invariants
+    /// (the requesting business layer may have queued the event in a previous tick — state
+    /// can have shifted), spawns a cast-entity with runtime + owner components, sets
+    /// <see cref="AbilityActiveCastRef"/> on the caster, and arms
+    /// <see cref="AbilityStepProgressionSystem{TWorld}"/> by setting
+    /// <see cref="AbilityStepReadyTag"/> with status Success — the progression system then
+    /// descends into the root step in the same frame (it is scheduled right after this system).
     /// </summary>
     public sealed class AbilityCastSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType {
@@ -27,93 +31,22 @@ namespace unigame.staticecs.features {
                 if (!ev.Caster.TryUnpack<TWorld>(out var caster)) {
                     continue;
                 }
-                if (caster.Has<AbilityCastComponent>()) {
+                if (caster.Has<AbilityActiveCastRef>()) {
                     continue;
                 }
                 if (!AbilityOperations.HasAbility<TWorld>(ev.Caster, ev.AbilityId)) {
                     continue;
                 }
-                if (!registry.TryGet(ev.AbilityId, out var def)) {
-                    continue;
-                }
-                if (!CooldownOperations.IsReady<TWorld>(ev.Caster, ev.AbilityId)) {
+                if (!registry.Contains(ev.AbilityId)) {
                     continue;
                 }
 
-                ResolveStartingPhase(def, out var phase, out var duration);
-
-                if (duration <= 0f && phase == AbilityPhase.Recovering) {
-                    InvokeHandler(registry, ev.AbilityId, ev.Caster, ev.Target);
-                    if (def.Cooldown > 0f) {
-                        CooldownOperations.Trigger<TWorld>(ev.Caster, ev.AbilityId, def.Cooldown);
-                    }
-                    World<TWorld>.SendEvent(new AbilityStateChangedEvent {
-                        Caster = ev.Caster,
-                        AbilityId = ev.AbilityId,
-                        Phase = phase,
-                        Reason = AbilityChangeReason.Started,
-                    });
-                    World<TWorld>.SendEvent(new AbilityStateChangedEvent {
-                        Caster = ev.Caster,
-                        AbilityId = ev.AbilityId,
-                        Phase = phase,
-                        Reason = AbilityChangeReason.Completed,
-                    });
-                    continue;
-                }
-
-                var component = new AbilityCastComponent {
-                    AbilityId = ev.AbilityId,
-                    Phase = phase,
-                    TimeLeft = duration,
-                    Target = ev.Target,
-                };
-                caster.Set(component);
-
-                World<TWorld>.SendEvent(new AbilityStateChangedEvent {
-                    Caster = ev.Caster,
-                    AbilityId = ev.AbilityId,
-                    Phase = phase,
-                    Reason = AbilityChangeReason.Started,
-                });
-
-                if (phase != AbilityPhase.Charging) {
-                    InvokeHandler(registry, ev.AbilityId, ev.Caster, ev.Target);
-                }
-            }
-        }
-
-        private static void InvokeHandler(
-            AbilityRegistry<TWorld> registry,
-            AbilityId abilityId,
-            EntityGID caster,
-            EntityGID target) {
-            if (target.TryUnpack<TWorld>(out _)) {
-                System.Span<EntityGID> buffer = stackalloc EntityGID[1];
-                buffer[0] = target;
-                registry.Invoke(abilityId, caster, buffer);
-            } else {
-                registry.Invoke(abilityId, caster, System.ReadOnlySpan<EntityGID>.Empty);
+                AbilityCastFactory.SpawnRoot<TWorld>(ev.Caster, ev.AbilityId, ev.Target);
             }
         }
 
         public void Destroy() {
             World<TWorld>.DeleteEventReceiver(ref _receiver);
-        }
-
-        private static void ResolveStartingPhase(AbilityDefinition def, out AbilityPhase phase, out float duration) {
-            if (def.ChargeDuration > 0f) {
-                phase = AbilityPhase.Charging;
-                duration = def.ChargeDuration;
-                return;
-            }
-            if (def.CastDuration > 0f) {
-                phase = AbilityPhase.Casting;
-                duration = def.CastDuration;
-                return;
-            }
-            phase = AbilityPhase.Recovering;
-            duration = def.RecoverDuration;
         }
     }
 }

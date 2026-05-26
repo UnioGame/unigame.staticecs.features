@@ -3,6 +3,7 @@ using NUnit.Framework;
 using unigame.staticecs.Time;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class EffectStackingTests {
         private RecordingEffectHandler<TestEffectsWorld, TestEffectMarker> _handler;
 

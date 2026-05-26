@@ -3,6 +3,7 @@ using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class ModifierFlagTests {
         [SetUp]
         public void SetUp() {

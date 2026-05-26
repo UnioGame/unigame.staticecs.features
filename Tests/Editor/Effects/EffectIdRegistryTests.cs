@@ -1,6 +1,7 @@
 using NUnit.Framework;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class EffectIdRegistryTests {
         [Test]
         public void Register_AssignsStableIds_AndReverseLookupYieldsType() {
@@ -25,6 +26,7 @@ namespace unigame.staticecs.features.Tests {
         }
     }
 
+    [TestFixture]
     public sealed class EffectFlagOfTests {
         [Test]
         public void Resolve_ReadsAttribute_FromOpenGenericDefinition() {

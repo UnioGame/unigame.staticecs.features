@@ -1,7 +1,10 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
-namespace unigame.staticecs.features.Tests {
+namespace unigame.staticecs.features {
+    using Tests;
+
+    [TestFixture]
     public sealed class ModifierStackTests {
         [SetUp]
         public void SetUp() {

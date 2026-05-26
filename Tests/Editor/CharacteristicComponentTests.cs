@@ -2,6 +2,7 @@ using NUnit.Framework;
 using unigame.staticecs.features;
 
 namespace unigame.staticecs.features.Tests {
+    [TestFixture]
     public sealed class CharacteristicComponentTests {
         [Test]
         public void Create_Clamps_Initial_Value_To_Range() {
