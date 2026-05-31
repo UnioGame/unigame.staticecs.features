@@ -1,0 +1,20 @@
+{
+    "name": "unigame.staticecs.features.abilitygraph.editor",
+    "rootNamespace": "unigame.staticecs.features.Editor.AbilityGraph",
+    "references": [
+        "unigame.staticecs.features",
+        "unigame.staticecs.unity",
+        "FFS.StaticEcs"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
