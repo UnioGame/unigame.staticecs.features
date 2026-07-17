@@ -1,12 +1,12 @@
 {
-    "name": "unigame.staticecs.features.tests",
-    "rootNamespace": "unigame.staticecs.features.Tests",
+    "name": "unigame.staticecs.features.movement.astar.tests",
+    "rootNamespace": "unigame.staticecs.features.Tests.Movement.Astar",
     "references": [
+        "unigame.staticecs.features.movement.astar",
         "unigame.staticecs.features",
         "unigame.staticecs",
         "unigame.staticecs.unity",
         "FFS.StaticEcs",
-        "unigame.staticecs.features.movement.astar",
         "AstarPathfindingProject",
         "PackageTools",
         "Drawing"
@@ -19,8 +19,16 @@
     "overrideReferences": false,
     "precompiledReferences": [],
     "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
+    "defineConstraints": [
+        "STATIC_ECS_ASTAR"
+    ],
+    "versionDefines": [
+        {
+            "name": "com.arongranberg.astar",
+            "expression": "5.0.0",
+            "define": "STATIC_ECS_ASTAR"
+        }
+    ],
     "optionalUnityReferences": [
         "TestAssemblies"
     ],
