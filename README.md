@@ -71,15 +71,21 @@ Registering A* movement when `com.arongranberg.astar` 5.x is installed:
 
 ```csharp
 new SpeedFeature().RegisterTypes(types);
-new AstarMovementFeature().RegisterTypes(types);
+var astar = new AstarMovementFeature();
+astar.RegisterTypes(types);
 
-service.AddUpdateSystem(new AstarMovementSystem());
+astar.RegisterSystems(new StaticEcsSystemsBuilder<Main, StaticEcsUpdateSystems>());
 MovementOperations.SetDestination(playerGid, destination);
 ```
 
-The entity GameObject must have an `IAstarAI` implementation such as `AIPath`,
-the A* `Seeker`, and `AstarMovementConverter`. The movement system synchronizes
-the ECS destination, stop state, and `SpeedCharacteristic` with the agent.
+The graph host uses `StaticEcsEntityProvider`, `AstarPath`, and
+`AstarGridGraphConverter`. Obstacle hosts use their own providers and
+`AstarObstacleConverter` linked to the graph provider. Agent entities use an
+`IAstarAI` implementation such as `AIPath`, the A* `Seeker`, and
+`AstarMovementConverter` linked to the same graph provider. ECS creates and
+validates the grid before agents can request paths, updates dynamic obstacle
+bounds, assigns the owned graph to `Seeker.graphMask`, disables automatic
+repath, and then synchronizes destination, stop state, and speed.
 
 Registering authored ability assets:
 
@@ -138,7 +144,7 @@ Required co-registrations:
 - `AbilityDatabaseFeature<TWorld>` registers ScriptableObject-authored abilities into `AbilityRegistry<TWorld>`. Register `AbilityFeature<TWorld>` first so the registry and default activators exist.
 - `AbilityEffectDispatchRegistry<TWorld>` maps `EffectId` to concrete effect operations for `ApplyEffectStepConfig`. Register custom dispatchers after effect features register their `EffectId`.
 - Cooldown and resource-cost validation are intentionally outside the ability runtime. Business/gameplay code checks `CooldownOperations` or resource state before calling `AbilityOperations.TryStartCast`; the ability slice executes once it receives a cast request.
-- `AstarMovementFeature<TWorld>` requires A* Pathfinding Project 5.x and is compiled only with `STATIC_ECS_ASTAR`. Register `SpeedFeature<TWorld>` to drive agent speed, add `AstarMovementSystem<TWorld>` to the update pipeline, and provide a scanned A* graph before movement requests are issued.
+- `AstarMovementFeature<TWorld>` requires A* Pathfinding Project 5.x and is compiled only with `STATIC_ECS_ASTAR`. Register `SpeedFeature<TWorld>` to drive agent speed. Its default system registration runs `AstarGraphSystem<TWorld>` before `AstarMovementSystem<TWorld>`; constructor flags allow either system to be wired manually.
 
 ## Ability Pipeline
 

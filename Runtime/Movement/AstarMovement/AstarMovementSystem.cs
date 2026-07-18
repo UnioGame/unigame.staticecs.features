@@ -1,10 +1,7 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+using Pathfinding;
 
 namespace unigame.staticecs.features {
-    /// <summary>Main-world alias for <see cref="AstarMovementSystem{TWorld}"/>.</summary>
-    public sealed class AstarMovementSystem : AstarMovementSystem<Main> { }
-
     /// <summary>
     /// Drives A* Pathfinding Project <see cref="Pathfinding.IAstarAI"/> from
     /// <see cref="MovementDestinationComponent"/> and <see cref="CharacteristicComponent{SpeedCharacteristic}"/>.
@@ -26,12 +23,21 @@ namespace unigame.staticecs.features {
                     continue;
                 }
 
+                // Explicit ECS requests are the only path request source, including while the graph is initializing.
+                astar.AI.canSearch = false;
+
                 if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>()) {
                     astar.AI.maxSpeed = entity.Read<CharacteristicComponent<SpeedCharacteristic>>().Value;
                 }
 
                 if (dest.IsActive) {
                     astar.AI.destination = dest.Destination;
+
+                    if (!TryPrepareGraph(ref astar)) {
+                        astar.AI.isStopped = true;
+                        continue;
+                    }
+
                     astar.AI.isStopped = false;
 
                     var destinationChanged = !astar.HasRequestedDestination
@@ -49,6 +55,32 @@ namespace unigame.staticecs.features {
                     astar.HasRequestedDestination = false;
                 }
             }
+        }
+
+        private static bool TryPrepareGraph(ref AstarAIComponent astar) {
+            if (astar.Seeker == null
+                || !astar.GraphEntity.TryUnpack<TWorld>(out var graphEntity)
+                || !graphEntity.Has<AstarGraphInitializedTag>()
+                || !graphEntity.Has<AstarPathComponent>()
+                || !graphEntity.Has<AstarGridGraphRuntimeComponent>()) {
+                return false;
+            }
+
+            var backend = graphEntity.Read<AstarPathComponent>().Backend;
+            var graph = graphEntity.Read<AstarGridGraphRuntimeComponent>().Graph;
+            if (backend == null || backend != AstarPath.active || backend.data == null
+                || graph == null || graph.active != backend || !graph.isScanned
+                || System.Array.IndexOf(backend.data.graphs, graph) < 0) {
+                return false;
+            }
+
+            var graphMask = GraphMask.FromGraph(graph);
+            astar.Seeker.graphMask = graphMask;
+
+            var constraint = NearestNodeConstraint.Walkable;
+            constraint.graphMask = graphMask;
+            var nearest = backend.GetNearest(astar.AI.position, constraint).node;
+            return nearest != null && nearest.Walkable;
         }
     }
 }

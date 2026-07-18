@@ -7,6 +7,7 @@
         "unigame.staticecs",
         "unigame.staticecs.unity",
         "FFS.StaticEcs",
+        "FFS.StaticEcs.Unity",
         "AstarPathfindingProject",
         "PackageTools",
         "Drawing"
