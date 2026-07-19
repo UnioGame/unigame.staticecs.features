@@ -1,3 +1,5 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
  
 
@@ -44,13 +46,16 @@ namespace UniGame.StaticEcs.Features {
         }
 
         /// <summary>Registers graph synchronization before agent movement.</summary>
-        public void RegisterSystems(StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems) {
+        public UniTask RegisterSystemsAsync(
+            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
+            CancellationToken cancellationToken) {
             if (_registerGraphSystem) {
                 systems.Add(new AstarGraphSystem<TWorld>(), _graphOrder);
             }
             if (_registerMovementSystem) {
                 systems.Add(new AstarMovementSystem<TWorld>(), _movementOrder);
             }
+            return UniTask.CompletedTask;
         }
     }
 }

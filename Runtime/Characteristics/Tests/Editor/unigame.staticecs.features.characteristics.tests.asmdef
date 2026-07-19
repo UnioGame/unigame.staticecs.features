@@ -1,0 +1,13 @@
+{
+    "name": "unigame.staticecs.features.characteristics.tests",
+    "rootNamespace": "UniGame.StaticEcs.Features.Tests",
+    "references": [
+        "unigame.staticecs.features.characteristics",
+        "unigame.staticecs",
+        "unigame.staticecs.unity",
+        "FFS.StaticEcs"
+    ],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "noEngineReferences": false
+}

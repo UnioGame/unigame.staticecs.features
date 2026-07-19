@@ -1,3 +1,5 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
 
 namespace UniGame.StaticEcs.Features
@@ -24,14 +26,17 @@ namespace UniGame.StaticEcs.Features
             types.Component<ManaRegenComponent>();
         }
 
-        public void RegisterSystems(StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems)
+        public UniTask RegisterSystemsAsync(
+            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
+            CancellationToken cancellationToken)
         {
             if (!_registerRegen)
             {
-                return;
+                return UniTask.CompletedTask;
             }
 
             systems.Add(new ManaRegenSystem<TWorld>(), _regenOrder);
+            return UniTask.CompletedTask;
         }
     }
 }

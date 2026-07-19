@@ -47,12 +47,12 @@ namespace UniGame.StaticEcs.Features
             var n = _ids.Count;
             if (_indices.Length < n)
             {
-                _indices = new int[Math.Max(8, n)];
+                _indices = new int[System.Math.Max(8, n)];
             }
 
             if (_nodes.Length < n)
             {
-                _nodes = new KdNode[Math.Max(8, n)];
+                _nodes = new KdNode[System.Math.Max(8, n)];
             }
 
             for (var i = 0; i < n; i++)

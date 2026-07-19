@@ -77,10 +77,14 @@ namespace UniGame.StaticEcs.Features {
             var graphMask = GraphMask.FromGraph(graph);
             astar.Seeker.graphMask = graphMask;
 
-            var constraint = NearestNodeConstraint.Walkable;
-            constraint.graphMask = graphMask;
-            var nearest = backend.GetNearest(astar.AI.position, constraint).node;
-            return nearest != null && nearest.Walkable;
+            // IAstarAI.position can depend on AIBase's private transform cache, which is not
+            // initialized for disabled authoring/test components. Seeker is already required
+            // and provides the same agent transform without that lifecycle coupling.
+            var agentPosition = astar.Seeker.transform.position;
+            // Use the backend query so its max-nearest-node distance remains authoritative.
+            // The graph index check keeps this feature isolated to its configured graph.
+            var nearest = backend.GetNearest(agentPosition, NearestNodeConstraint.None).node;
+            return nearest != null && nearest.Walkable && nearest.GraphIndex == graph.graphIndex;
         }
     }
 }

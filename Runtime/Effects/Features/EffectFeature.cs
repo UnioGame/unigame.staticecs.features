@@ -1,3 +1,5 @@
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using FFS.Libraries.StaticEcs;
 
 namespace UniGame.StaticEcs.Features {
@@ -83,12 +85,15 @@ namespace UniGame.StaticEcs.Features {
             }
         }
 
-        public void RegisterSystems(StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems) {
+        public UniTask RegisterSystemsAsync(
+            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
+            CancellationToken cancellationToken) {
             if (!_registerTickSystem) {
-                return;
+                return UniTask.CompletedTask;
             }
 
             systems.Add(new EffectTickSystem<TWorld, TEffect>(), _tickOrder);
+            return UniTask.CompletedTask;
         }
 
         private static void RemoveOnSourceCleanup(EntityGID source, EntityGID target) {

@@ -1,21 +1,21 @@
 {
-    "name": "unigame.staticecs.features.movement.astar",
-    "rootNamespace": "unigame.staticecs.features",
+    "name": "unigame.staticecs.features.movement.astar.tests",
+    "rootNamespace": "unigame.staticecs.features.Tests.Movement.Astar",
     "references": [
-        "unigame.staticecs",
+        "unigame.staticecs.features.movement.astar",
         "unigame.staticecs.features.movement",
         "unigame.staticecs.features.characteristics",
+        "unigame.staticecs",
         "unigame.staticecs.unity",
         "FFS.StaticEcs",
         "FFS.StaticEcs.Unity",
-        "GUID:8e4577c9194c10845984cf27eb974fd1",
-        "GUID:2ed7c5348d9801a40a9fd7480dd6b981",
-        "GUID:f51ebe6a0ceec4240a699833d6309b23",
+        "AstarPathfindingProject",
         "PackageTools",
-        "Drawing",
-        "GUID:efa45043feb7e4147a305b73b5cea642"
+        "Drawing"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
@@ -30,6 +30,9 @@
             "expression": "5.0.0",
             "define": "STATIC_ECS_ASTAR"
         }
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
     ],
     "noEngineReferences": false
 }
