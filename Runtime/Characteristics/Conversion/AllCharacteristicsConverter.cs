@@ -12,7 +12,7 @@ namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// MonoBehaviour converter that applies all nine standard characteristic components
     /// to an entity in a single step. Attach to a GameObject alongside <see cref="EcsEntityProvider{TWorld}"/>,
-    /// or instantiate in code and call <see cref="Apply"/> directly.
+    /// or use <see cref="ApplySettings"/> for entities created directly from code.
     /// </summary>
     public class AllCharacteristicsConverter<TWorld> : EcsMonoConverter<TWorld>
         where TWorld : struct, IWorldType {
@@ -27,17 +27,32 @@ namespace UniGame.StaticEcs.Features {
         [SerializeField] public CharacteristicSettings CritChance      = new CharacteristicSettings(0f,   0f, 1f);
         [SerializeField] public CharacteristicSettings CritMultiplier  = new CharacteristicSettings(2f,   1f, 10f);
 
+        /// <summary>Applies all nine standard characteristic settings without creating a MonoBehaviour.</summary>
+        public static void ApplySettings(
+            World<TWorld>.Entity entity,
+            CharacteristicSettings health,
+            CharacteristicSettings mana,
+            CharacteristicSettings speed,
+            CharacteristicSettings shield,
+            CharacteristicSettings armorResist,
+            CharacteristicSettings blockChance,
+            CharacteristicSettings dodgeChance,
+            CharacteristicSettings critChance,
+            CharacteristicSettings critMultiplier) {
+            entity.Set(new CharacteristicComponent<HealthCharacteristic>(health.value, health.min, health.max, health.value));
+            entity.Set(new CharacteristicComponent<ManaCharacteristic>(mana.value, mana.min, mana.max, mana.value));
+            entity.Set(new CharacteristicComponent<SpeedCharacteristic>(speed.value, speed.min, speed.max, speed.value));
+            entity.Set(new CharacteristicComponent<ShieldCharacteristic>(shield.value, shield.min, shield.max, shield.value));
+            entity.Set(new CharacteristicComponent<ArmorResistCharacteristic>(armorResist.value, armorResist.min, armorResist.max, armorResist.value));
+            entity.Set(new CharacteristicComponent<BlockChanceCharacteristic>(blockChance.value, blockChance.min, blockChance.max, blockChance.value));
+            entity.Set(new CharacteristicComponent<DodgeChanceCharacteristic>(dodgeChance.value, dodgeChance.min, dodgeChance.max, dodgeChance.value));
+            entity.Set(new CharacteristicComponent<CriticalChanceCharacteristic>(critChance.value, critChance.min, critChance.max, critChance.value));
+            entity.Set(new CharacteristicComponent<CriticalMultiplierCharacteristic>(critMultiplier.value, critMultiplier.min, critMultiplier.max, critMultiplier.value));
+        }
+
         /// <inheritdoc/>
         public override void Apply(World<TWorld>.Entity entity, GameObject host) {
-            entity.Set(new CharacteristicComponent<HealthCharacteristic>(Health.value,         Health.min,         Health.max,         Health.value));
-            entity.Set(new CharacteristicComponent<ManaCharacteristic>(Mana.value,             Mana.min,           Mana.max,           Mana.value));
-            entity.Set(new CharacteristicComponent<SpeedCharacteristic>(Speed.value,           Speed.min,          Speed.max,          Speed.value));
-            entity.Set(new CharacteristicComponent<ShieldCharacteristic>(Shield.value,         Shield.min,         Shield.max,         Shield.value));
-            entity.Set(new CharacteristicComponent<ArmorResistCharacteristic>(ArmorResist.value,   ArmorResist.min,    ArmorResist.max,    ArmorResist.value));
-            entity.Set(new CharacteristicComponent<BlockChanceCharacteristic>(BlockChance.value,   BlockChance.min,    BlockChance.max,    BlockChance.value));
-            entity.Set(new CharacteristicComponent<DodgeChanceCharacteristic>(DodgeChance.value,   DodgeChance.min,    DodgeChance.max,    DodgeChance.value));
-            entity.Set(new CharacteristicComponent<CriticalChanceCharacteristic>(CritChance.value, CritChance.min,     CritChance.max,     CritChance.value));
-            entity.Set(new CharacteristicComponent<CriticalMultiplierCharacteristic>(CritMultiplier.value, CritMultiplier.min, CritMultiplier.max, CritMultiplier.value));
+            ApplySettings(entity, Health, Mana, Speed, Shield, ArmorResist, BlockChance, DodgeChance, CritChance, CritMultiplier);
         }
     }
 }

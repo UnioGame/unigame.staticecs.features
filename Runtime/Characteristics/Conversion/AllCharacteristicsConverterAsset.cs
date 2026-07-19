@@ -48,23 +48,17 @@ namespace UniGame.StaticEcs.Features
         /// <inheritdoc/>
         public override void Apply(World<TWorld>.Entity entity, GameObject host)
         {
-            entity.Set(new CharacteristicComponent<HealthCharacteristic>(health.value, health.min, health.max,
-                health.value));
-            entity.Set(new CharacteristicComponent<ManaCharacteristic>(mana.value, mana.min, mana.max, mana.value));
-            entity.Set(new CharacteristicComponent<SpeedCharacteristic>(speed.value, speed.min, speed.max,
-                speed.value));
-            entity.Set(new CharacteristicComponent<ShieldCharacteristic>(shield.value, shield.min, shield.max,
-                shield.value));
-            entity.Set(new CharacteristicComponent<ArmorResistCharacteristic>(armorResist.value, armorResist.min,
-                armorResist.max, armorResist.value));
-            entity.Set(new CharacteristicComponent<BlockChanceCharacteristic>(blockChance.value, blockChance.min,
-                blockChance.max, blockChance.value));
-            entity.Set(new CharacteristicComponent<DodgeChanceCharacteristic>(dodgeChance.value, dodgeChance.min,
-                dodgeChance.max, dodgeChance.value));
-            entity.Set(new CharacteristicComponent<CriticalChanceCharacteristic>(critChance.value, critChance.min,
-                critChance.max, critChance.value));
-            entity.Set(new CharacteristicComponent<CriticalMultiplierCharacteristic>(critMultiplier.value,
-                critMultiplier.min, critMultiplier.max, critMultiplier.value));
+            AllCharacteristicsConverter<TWorld>.ApplySettings(
+                entity,
+                health,
+                mana,
+                speed,
+                shield,
+                armorResist,
+                blockChance,
+                dodgeChance,
+                critChance,
+                critMultiplier);
         }
     }
 }

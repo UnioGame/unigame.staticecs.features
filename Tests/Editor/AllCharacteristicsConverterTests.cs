@@ -1,9 +1,12 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class AllCharacteristicsConverterTests {
+        private GameObject _host;
+
         [SetUp]
         public void SetUp() {
             World<TestAllCharacteristicsWorld>.Create(WorldConfig.Default());
@@ -19,10 +22,12 @@ namespace UniGame.StaticEcs.Features.Tests {
             new CharacteristicFeature<TestAllCharacteristicsWorld, CriticalChanceCharacteristic>().RegisterTypes(types);
             new CharacteristicFeature<TestAllCharacteristicsWorld, CriticalMultiplierCharacteristic>().RegisterTypes(types);
             World<TestAllCharacteristicsWorld>.Initialize();
+            _host = new GameObject(nameof(AllCharacteristicsConverterTests));
         }
 
         [TearDown]
         public void TearDown() {
+            Object.DestroyImmediate(_host);
             if (World<TestAllCharacteristicsWorld>.Status != WorldStatus.NotCreated) {
                 World<TestAllCharacteristicsWorld>.Destroy();
             }
@@ -31,17 +36,16 @@ namespace UniGame.StaticEcs.Features.Tests {
         [Test]
         public void Apply_SetsAllNineCharacteristics() {
             var entity = World<TestAllCharacteristicsWorld>.NewEntity<Default>();
-            var converter = new AllCharacteristicsConverter<TestAllCharacteristicsWorld> {
-                Health         = new CharacteristicSettings(80f,  10f, 120f),
-                Mana           = new CharacteristicSettings(50f,  0f,  100f),
-                Speed          = new CharacteristicSettings(5f,   0f,  20f),
-                Shield         = new CharacteristicSettings(30f,  0f,  200f),
-                ArmorResist    = new CharacteristicSettings(0.3f, 0f,  1f),
-                BlockChance    = new CharacteristicSettings(0.1f, 0f,  1f),
-                DodgeChance    = new CharacteristicSettings(0.2f, 0f,  1f),
-                CritChance     = new CharacteristicSettings(0.15f,0f,  1f),
-                CritMultiplier = new CharacteristicSettings(2.5f, 1f,  10f),
-            };
+            var converter = _host.AddComponent<TestAllCharacteristicsConverter>();
+            converter.Health         = new CharacteristicSettings(80f,  10f, 120f);
+            converter.Mana           = new CharacteristicSettings(50f,  0f,  100f);
+            converter.Speed          = new CharacteristicSettings(5f,   0f,  20f);
+            converter.Shield         = new CharacteristicSettings(30f,  0f,  200f);
+            converter.ArmorResist    = new CharacteristicSettings(0.3f, 0f,  1f);
+            converter.BlockChance    = new CharacteristicSettings(0.1f, 0f,  1f);
+            converter.DodgeChance    = new CharacteristicSettings(0.2f, 0f,  1f);
+            converter.CritChance     = new CharacteristicSettings(0.15f,0f,  1f);
+            converter.CritMultiplier = new CharacteristicSettings(2.5f, 1f,  10f);
 
             converter.Apply(entity, null);
 
@@ -62,7 +66,7 @@ namespace UniGame.StaticEcs.Features.Tests {
         [Test]
         public void Apply_DefaultSettings_ValuesMatchDefaults() {
             var entity    = World<TestAllCharacteristicsWorld>.NewEntity<Default>();
-            var converter = new AllCharacteristicsConverter<TestAllCharacteristicsWorld>();
+            var converter = _host.AddComponent<TestAllCharacteristicsConverter>();
 
             converter.Apply(entity, null);
 
@@ -76,17 +80,16 @@ namespace UniGame.StaticEcs.Features.Tests {
         [Test]
         public void Apply_AssetVariant_SetsAllNineCharacteristics() {
             var entity = World<TestAllCharacteristicsWorld>.NewEntity<Default>();
-            var asset  = new AllCharacteristicsConverterAsset<TestAllCharacteristicsWorld> {
-                health         = new CharacteristicSettings(60f, 0f, 100f),
-                mana           = new CharacteristicSettings(40f, 0f, 80f),
-                speed          = new CharacteristicSettings(3f,  0f, 15f),
-                shield         = new CharacteristicSettings(10f, 0f, 150f),
-                armorResist    = new CharacteristicSettings(0.1f,0f, 1f),
-                blockChance    = new CharacteristicSettings(0.05f,0f,1f),
-                dodgeChance    = new CharacteristicSettings(0f,  0f, 1f),
-                critChance     = new CharacteristicSettings(0.1f,0f, 1f),
-                critMultiplier = new CharacteristicSettings(3f,  1f, 5f),
-            };
+            var asset  = ScriptableObject.CreateInstance<TestAllCharacteristicsConverterAsset>();
+            asset.health         = new CharacteristicSettings(60f, 0f, 100f);
+            asset.mana           = new CharacteristicSettings(40f, 0f, 80f);
+            asset.speed          = new CharacteristicSettings(3f,  0f, 15f);
+            asset.shield         = new CharacteristicSettings(10f, 0f, 150f);
+            asset.armorResist    = new CharacteristicSettings(0.1f,0f, 1f);
+            asset.blockChance    = new CharacteristicSettings(0.05f,0f,1f);
+            asset.dodgeChance    = new CharacteristicSettings(0f,  0f, 1f);
+            asset.critChance     = new CharacteristicSettings(0.1f,0f, 1f);
+            asset.critMultiplier = new CharacteristicSettings(3f,  1f, 5f);
 
             asset.Apply(entity, null);
 
@@ -99,6 +102,12 @@ namespace UniGame.StaticEcs.Features.Tests {
             Assert.AreEqual(0f,    entity.Read<CharacteristicComponent<DodgeChanceCharacteristic>>().Value,    1e-5f);
             Assert.AreEqual(0.1f,  entity.Read<CharacteristicComponent<CriticalChanceCharacteristic>>().Value, 1e-5f);
             Assert.AreEqual(3f,    entity.Read<CharacteristicComponent<CriticalMultiplierCharacteristic>>().Value, 1e-5f);
+
+            Object.DestroyImmediate(asset);
         }
     }
+
+    internal sealed class TestAllCharacteristicsConverter : AllCharacteristicsConverter<TestAllCharacteristicsWorld> { }
+
+    internal sealed class TestAllCharacteristicsConverterAsset : AllCharacteristicsConverterAsset<TestAllCharacteristicsWorld> { }
 }
