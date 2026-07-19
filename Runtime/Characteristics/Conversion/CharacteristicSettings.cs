@@ -1,6 +1,6 @@
 using System;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>Value, min, and max settings for a single characteristic stat used by group converters.</summary>
     [Serializable]
     public struct CharacteristicSettings {

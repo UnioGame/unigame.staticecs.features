@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-target lifetime state for a single effect type. Owned by <c>EffectTickSystem</c>
     /// which decrements timers, fires periodic ticks, and removes the component on expiry.

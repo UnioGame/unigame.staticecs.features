@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Emitted whenever the progression system retires the current leaf on a cast-entity.
     /// <see cref="FinalStatus"/> is always Success or Failed (Running is never observed here).

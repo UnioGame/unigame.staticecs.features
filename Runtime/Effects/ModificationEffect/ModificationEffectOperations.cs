@@ -1,7 +1,8 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>
     /// Convenience entry point: stamps <see cref="ModificationEffectData{TStat}"/> on the target
     /// and forwards to <c>EffectOperations.Apply</c> for <see cref="ModificationEffect{TStat}"/>.

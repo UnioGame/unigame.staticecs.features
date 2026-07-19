@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     public sealed class AbilityGraphEditorWindow : EditorWindow {
         private static class OdinNodeInspectorBridge {
             private static readonly Type PropertyTreeType = Type.GetType("Sirenix.OdinInspector.Editor.PropertyTree, Sirenix.OdinInspector.Editor");

@@ -1,7 +1,9 @@
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     [AddComponentMenu("Static ECS/Characteristics/Armor Resist Converter")]
     public sealed class ArmorResistConverter : CharacteristicConverter<Main, ArmorResistCharacteristic> { }
 }

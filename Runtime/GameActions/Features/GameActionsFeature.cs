@@ -1,7 +1,6 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Registers the <see cref="ActionMaskComponent"/> type that gates
     /// <see cref="GameActionOperations.Raise{TWorld,TAction}"/> calls.

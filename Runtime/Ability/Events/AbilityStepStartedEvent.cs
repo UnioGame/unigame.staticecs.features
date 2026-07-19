@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Emitted whenever a leaf step becomes the active step on a cast-entity. Drives VFX /
     /// animation hooks via <see cref="NodeGuid"/> (designer-stable handle) or

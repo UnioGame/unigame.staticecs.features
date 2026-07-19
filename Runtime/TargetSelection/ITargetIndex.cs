@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Spatial index over targetable entities. The current implementation is rebuilt by
     /// <c>TargetIndexRebuildSystem</c>; abilities and AoE queries call <see cref="FillSphere"/>

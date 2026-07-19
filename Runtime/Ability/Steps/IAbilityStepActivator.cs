@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Stateless singleton that activates a leaf step config. Composite steps are handled
     /// directly by <c>AbilityStepProgressionSystem</c> and do not need an activator.

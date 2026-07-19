@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Responds to <see cref="StunChangedEvent"/>s and keeps <see cref="ActionMaskComponent"/>
     /// in sync with stun state:

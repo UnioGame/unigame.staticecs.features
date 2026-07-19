@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Composite step that runs its <see cref="Children"/> one after another. On a child Failed
     /// the sequence propagates Failed up the stack. The progression system advances cursor on
@@ -10,6 +11,7 @@ namespace unigame.staticecs.features {
     /// <c>AbilityStepProgressionSystem</c>).
     /// </summary>
     [Serializable]
+    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
     public sealed class SequenceStepConfig : IAbilityStepConfig {
         [SerializeField] private string _nodeGuid;
         [SerializeReference] private List<IAbilityStepConfig> _children = new();

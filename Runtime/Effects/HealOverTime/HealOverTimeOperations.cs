@@ -1,7 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>
     /// Convenience entry point for the heal-over-time effect: stamps
     /// <see cref="HealOverTimeData"/> on the target, then forwards to the generic

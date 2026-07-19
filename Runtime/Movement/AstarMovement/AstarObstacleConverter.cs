@@ -1,9 +1,11 @@
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticEcs.Unity;
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>Converts a collider into an ECS obstacle linked to a graph entity provider.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Collider))]

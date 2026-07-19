@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [CharacteristicFlag(CharacteristicFlag.Health)]
     public struct HealthCharacteristic : ICharacteristicType { }
 }

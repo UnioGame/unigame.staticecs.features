@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Request to start casting an ability. Consumed by <c>AbilityCastSystem</c>, which
     /// re-validates ability-internal invariants (roster + concurrency, see plan §1b) and

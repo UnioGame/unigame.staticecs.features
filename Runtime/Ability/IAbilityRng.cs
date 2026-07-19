@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public interface IAbilityRng<TWorld> : IResource
         where TWorld : struct, IWorldType {
         int Range(int minInclusive, int maxExclusive);

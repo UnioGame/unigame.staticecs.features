@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 using UnityEditor;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
+    using Unity;
+
     internal sealed class AbilityGraphBrowserWindow : EditorWindow {
         private enum GraphSourceMode {
             Project,

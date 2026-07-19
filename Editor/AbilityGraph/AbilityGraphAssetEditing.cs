@@ -2,7 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal static class AbilityGraphAssetEditing {
         public static bool ReplaceRoot(AbilityAsset asset, AbilityGraphNodeTypeRegistry.Entry entry) {
             if (!TryCreateNode(entry, out var node)) {

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     public struct TestModifierWorld : IWorldType { }
 
     public struct TestStunWorld : IWorldType { }

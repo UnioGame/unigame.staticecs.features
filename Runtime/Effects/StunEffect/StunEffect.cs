@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker for time-bounded stuns. <see cref="StunEffectHandler{TWorld}"/> attaches a
     /// <see cref="StunSource"/> entry on apply (so the existing multi-source counter and

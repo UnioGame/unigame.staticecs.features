@@ -1,7 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>Main-world alias for <see cref="NavMeshMovementSystem{TWorld}"/>.</summary>
     public sealed class NavMeshMovementSystem : NavMeshMovementSystem<Main> { }
 

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// HealOverTime slice. Registers <see cref="HealOverTimeData"/> alongside the generic
     /// <see cref="EffectFeature{TWorld, TEffect}"/> for <see cref="HealOverTimeEffect"/>, with

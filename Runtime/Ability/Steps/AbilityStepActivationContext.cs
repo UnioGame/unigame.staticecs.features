@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Context passed to a leaf step activator. <see cref="CastEntity"/> hosts every per-cast
     /// state component (wait timers, AoE buffer, stack frames). <see cref="Owner"/> equals

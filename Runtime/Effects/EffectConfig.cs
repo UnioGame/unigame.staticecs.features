@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-effect stacking and re-apply policy. Set as a world resource by
     /// <c>EffectFeature&lt;TWorld, TEffect&gt;</c> and read by <c>EffectOperations.Apply</c> when

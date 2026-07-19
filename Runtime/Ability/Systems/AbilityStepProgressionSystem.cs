@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.Time;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Time;
+
     public sealed class AbilityStepProgressionSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType {
         private readonly List<EntityGID> _readyBuffer = new(8);
@@ -266,8 +268,12 @@ namespace unigame.staticecs.features {
                 return TraversalResult.Complete();
             }
 
-            ref var frames = ref castEntity.Ref<World<TWorld>.Multi<AbilityStackFrame>>();
-            while (frames.Length > 0) {
+            while (castEntity.Has<World<TWorld>.Multi<AbilityStackFrame>>()) {
+                ref var frames = ref castEntity.Ref<World<TWorld>.Multi<AbilityStackFrame>>();
+                if (frames.Length == 0) {
+                    break;
+                }
+
                 var topIndex = frames.Length - 1;
                 ref var top = ref frames[topIndex];
 
@@ -481,7 +487,7 @@ namespace unigame.staticecs.features {
             if (castEntity.Has<World<TWorld>.Multi<AbilityActiveStepEntry>>()) {
                 ref var activeSteps = ref castEntity.Ref<World<TWorld>.Multi<AbilityActiveStepEntry>>();
                 for (var i = activeSteps.Length - 1; i >= 0; i--) {
-                    var entry = activeSteps[i];
+                    ref readonly var entry = ref activeSteps.Get(i);
                     if (entry.Kind == leaf.Kind && string.Equals(entry.NodeGuid, leaf.NodeGuid)) {
                         activeSteps.RemoveAtSwap(i);
                         break;

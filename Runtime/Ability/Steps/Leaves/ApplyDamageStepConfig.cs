@@ -1,13 +1,15 @@
 using System;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Synchronous leaf step that raises a damage / healing event through
     /// <see cref="DamageOperations"/>. Always completes inside the activator
     /// (Damage pipeline consumes the event in its own system in a later tick).
     /// </summary>
     [Serializable]
+    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
     public sealed class ApplyDamageStepConfig : IAbilityStepConfig {
         [SerializeField] private string _nodeGuid;
         [SerializeField] private float _amount;

@@ -1,7 +1,6 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Wires the ability slice for a world: registers cast-entity components / tags, the
     /// caster-side <see cref="AbilityActiveCastRef"/> + <see cref="AbilityChannelCastRef"/>

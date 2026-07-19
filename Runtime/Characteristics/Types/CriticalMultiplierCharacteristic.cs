@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker for the critical-multiplier characteristic. Used by the critical filter when the
     /// crit roll succeeds; defaults to 2.0 if the source entity has no value configured.

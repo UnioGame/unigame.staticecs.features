@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Default <see cref="IDamageRng"/> implementation backed by <see cref="Random"/>. Chosen
     /// when no other implementation has been registered before <c>DamageFeature.RegisterTypes</c>.

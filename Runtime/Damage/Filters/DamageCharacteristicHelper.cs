@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     internal static class DamageCharacteristicHelper {
         public static bool TryReadValue<TWorld, TStat>(EntityGID entity, out float value)
             where TWorld : struct, IWorldType

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public static class ManaOperations {
         public static bool TrySpend<TWorld>(EntityGID target, float amount)
             where TWorld : struct, IWorldType {

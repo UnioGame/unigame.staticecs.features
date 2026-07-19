@@ -1,7 +1,8 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.Time;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Time;
+
     /// <summary>
     /// Drains <see cref="EffectComponent{TEffect}"/> timers, fires periodic
     /// <see cref="IEffectHandler{TWorld,TEffect}.OnTick"/> calls, and removes the effect on

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Emitted by the progression system at the moment a cast-entity is destroyed. Mirrors the
     /// previous AbilityStateChangedEvent(Completed/Cancelled) without the phase-enum baggage.

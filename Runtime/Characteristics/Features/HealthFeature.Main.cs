@@ -1,5 +1,8 @@
-using unigame.staticecs.unity;
+namespace UniGame.StaticEcs.Features
+{
+    using Unity;
 
-namespace unigame.staticecs.features {
-    public sealed class HealthFeature : HealthFeature<Main> { }
+    public sealed class HealthFeature : HealthFeature<Main>
+    {
+    }
 }

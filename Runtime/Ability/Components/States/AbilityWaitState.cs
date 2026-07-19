@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Drives the asynchronous part of a Wait leaf. Lives on the cast-entity (one Wait at a
     /// time per cast; Parallel branches use separate branch cast-entities).

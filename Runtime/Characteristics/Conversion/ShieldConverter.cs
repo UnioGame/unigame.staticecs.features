@@ -1,7 +1,9 @@
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     [AddComponentMenu("Static ECS/Characteristics/Shield Converter")]
     public sealed class ShieldConverter : CharacteristicConverter<Main, ShieldCharacteristic> { }
 }

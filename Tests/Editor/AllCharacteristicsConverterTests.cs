@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class AllCharacteristicsConverterTests {
         [SetUp]
@@ -77,15 +77,15 @@ namespace unigame.staticecs.features.Tests {
         public void Apply_AssetVariant_SetsAllNineCharacteristics() {
             var entity = World<TestAllCharacteristicsWorld>.NewEntity<Default>();
             var asset  = new AllCharacteristicsConverterAsset<TestAllCharacteristicsWorld> {
-                Health         = new CharacteristicSettings(60f, 0f, 100f),
-                Mana           = new CharacteristicSettings(40f, 0f, 80f),
-                Speed          = new CharacteristicSettings(3f,  0f, 15f),
-                Shield         = new CharacteristicSettings(10f, 0f, 150f),
-                ArmorResist    = new CharacteristicSettings(0.1f,0f, 1f),
-                BlockChance    = new CharacteristicSettings(0.05f,0f,1f),
-                DodgeChance    = new CharacteristicSettings(0f,  0f, 1f),
-                CritChance     = new CharacteristicSettings(0.1f,0f, 1f),
-                CritMultiplier = new CharacteristicSettings(3f,  1f, 5f),
+                health         = new CharacteristicSettings(60f, 0f, 100f),
+                mana           = new CharacteristicSettings(40f, 0f, 80f),
+                speed          = new CharacteristicSettings(3f,  0f, 15f),
+                shield         = new CharacteristicSettings(10f, 0f, 150f),
+                armorResist    = new CharacteristicSettings(0.1f,0f, 1f),
+                blockChance    = new CharacteristicSettings(0.05f,0f,1f),
+                dodgeChance    = new CharacteristicSettings(0f,  0f, 1f),
+                critChance     = new CharacteristicSettings(0.1f,0f, 1f),
+                critMultiplier = new CharacteristicSettings(3f,  1f, 5f),
             };
 
             asset.Apply(entity, null);

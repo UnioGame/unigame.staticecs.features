@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Slim authoring data for an ability. Holds only ability-internal fields; cooldown,
     /// resource cost, level requirements and other business rules live in dedicated

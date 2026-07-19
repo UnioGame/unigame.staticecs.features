@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public struct CharacteristicChangedEvent<TCharacteristic> : IEvent
         where TCharacteristic : struct, ICharacteristicType {
         public EntityGID Target;

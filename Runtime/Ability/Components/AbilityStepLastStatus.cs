@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Terminal status of the leaf that just completed on a cast-entity. Written together with
     /// <see cref="AbilityStepReadyTag"/>; consumed and cleared by

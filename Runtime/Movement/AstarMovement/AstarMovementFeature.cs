@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Registers A* graph lifecycle, dynamic obstacle synchronization, and agent movement.
     /// </summary>

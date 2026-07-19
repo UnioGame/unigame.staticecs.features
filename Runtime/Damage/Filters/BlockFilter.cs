@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Cancels the damage event when the target carries <see cref="BlockableTag"/> and a roll
     /// against <see cref="BlockChanceCharacteristic"/> succeeds. Healing events bypass the filter.

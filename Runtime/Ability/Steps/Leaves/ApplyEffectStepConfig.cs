@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [Serializable]
+    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
     public sealed class ApplyEffectStepConfig : IAbilityStepConfig {
         [SerializeField] private string _nodeGuid;
         [SerializeField] private int _effectIdValue;

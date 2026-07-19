@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Receives <see cref="CastAbilityEvent"/>s, re-validates ability-internal invariants
     /// (the requesting business layer may have queued the event in a previous tick — state

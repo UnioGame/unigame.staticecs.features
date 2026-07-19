@@ -1,12 +1,16 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
 
-namespace unigame.staticecs.features {
+
+namespace UniGame.StaticEcs.Features
+{
+    using Unity;
+
     /// <summary>
     /// Entry points for routing gameplay input through the <see cref="GameActionEvent{TAction}"/>
     /// pipeline with <see cref="ActionMaskComponent"/> gating.
     /// </summary>
-    public static class GameActionOperations {
+    public static class GameActionOperations
+    {
         // --- Generic TWorld overloads ---
 
         /// <summary>
@@ -17,17 +21,21 @@ namespace unigame.staticecs.features {
         /// <returns><c>true</c> if the event was sent.</returns>
         public static bool Raise<TWorld, TAction>(EntityGID source, in TAction payload)
             where TWorld : struct, IWorldType
-            where TAction : struct, IGameAction {
-            if (World<TWorld>.Status != WorldStatus.Initialized) {
+            where TAction : struct, IGameAction
+        {
+            if (World<TWorld>.Status != WorldStatus.Initialized)
+            {
                 return false;
             }
 
-            if (!IsAvailable<TWorld, TAction>(source)) {
+            if (!IsAvailable<TWorld, TAction>(source))
+            {
                 return false;
             }
 
-            return World<TWorld>.SendEvent(new GameActionEvent<TAction> {
-                Source  = source,
+            return World<TWorld>.SendEvent(new GameActionEvent<TAction>
+            {
+                Source = source,
                 Payload = payload,
             });
         }
@@ -39,12 +47,15 @@ namespace unigame.staticecs.features {
         /// </summary>
         public static bool IsAvailable<TWorld, TAction>(EntityGID source)
             where TWorld : struct, IWorldType
-            where TAction : struct, IGameAction {
-            if (!source.TryUnpack<TWorld>(out var entity)) {
+            where TAction : struct, IGameAction
+        {
+            if (!source.TryUnpack<TWorld>(out var entity))
+            {
                 return false;
             }
 
-            if (!entity.Has<ActionMaskComponent>()) {
+            if (!entity.Has<ActionMaskComponent>())
+            {
                 return true;
             }
 
@@ -54,12 +65,15 @@ namespace unigame.staticecs.features {
         /// <summary>Sets the action bit for <typeparamref name="TAction"/> on the source entity.</summary>
         public static void EnableAction<TWorld, TAction>(EntityGID source)
             where TWorld : struct, IWorldType
-            where TAction : struct, IGameAction {
-            if (!source.TryUnpack<TWorld>(out var entity)) {
+            where TAction : struct, IGameAction
+        {
+            if (!source.TryUnpack<TWorld>(out var entity))
+            {
                 return;
             }
 
-            if (!entity.Has<ActionMaskComponent>()) {
+            if (!entity.Has<ActionMaskComponent>())
+            {
                 return;
             }
 
@@ -69,12 +83,15 @@ namespace unigame.staticecs.features {
         /// <summary>Clears the action bit for <typeparamref name="TAction"/> on the source entity.</summary>
         public static void DisableAction<TWorld, TAction>(EntityGID source)
             where TWorld : struct, IWorldType
-            where TAction : struct, IGameAction {
-            if (!source.TryUnpack<TWorld>(out var entity)) {
+            where TAction : struct, IGameAction
+        {
+            if (!source.TryUnpack<TWorld>(out var entity))
+            {
                 return;
             }
 
-            if (!entity.Has<ActionMaskComponent>()) {
+            if (!entity.Has<ActionMaskComponent>())
+            {
                 return;
             }
 

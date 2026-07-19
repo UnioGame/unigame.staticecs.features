@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Raised by <c>EffectOperations.Apply</c> when a fresh <see cref="EffectComponent{TEffect}"/>
     /// is added to the target. Re-application of an already-active effect raises

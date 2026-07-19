@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal sealed class AbilityGraphProjection {
         internal readonly struct Edge {
             public readonly string FromId;

@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker contract for every step config (leaf or composite). Pure data: held by
     /// <see cref="AbilityRegistry{TWorld}"/>, walked by <c>AbilityStepProgressionSystem</c>,

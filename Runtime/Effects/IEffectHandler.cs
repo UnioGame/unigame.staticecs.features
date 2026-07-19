@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-effect-type behaviour hook. Registered as an <c>IEffectHandler&lt;TWorld, TEffect&gt;</c>
     /// world resource by <c>EffectFeature</c>; <c>EffectOperations</c> and <c>EffectTickSystem</c>

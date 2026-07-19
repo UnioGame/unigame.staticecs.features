@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Raised when the block filter cancels an incoming damage event after a successful roll
     /// against the target's <see cref="BlockChanceCharacteristic"/>.

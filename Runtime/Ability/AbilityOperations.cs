@@ -1,7 +1,8 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>
     /// Public entry points for the ability slice. Roster equip/unequip is ability-internal;
     /// readiness checks intentionally cover only ability-internal invariants (see plan §1b).

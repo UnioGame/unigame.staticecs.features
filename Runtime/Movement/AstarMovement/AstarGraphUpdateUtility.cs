@@ -2,7 +2,7 @@ using FFS.Libraries.StaticEcs;
 using Pathfinding;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     internal static class AstarGraphUpdateUtility {
         public static AstarPath UpdateBounds<TWorld>(
             EntityGID graphGid,

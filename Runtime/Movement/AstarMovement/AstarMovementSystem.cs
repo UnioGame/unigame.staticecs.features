@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using Pathfinding;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Drives A* Pathfinding Project <see cref="Pathfinding.IAstarAI"/> from
     /// <see cref="MovementDestinationComponent"/> and <see cref="CharacteristicComponent{SpeedCharacteristic}"/>.

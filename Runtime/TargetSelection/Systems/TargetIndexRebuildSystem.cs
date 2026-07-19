@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Rebuilds the world's <see cref="ITargetIndex{TWorld}"/> every Update tick. v1 strategy is
     /// "rebuild always" — cheap enough at sandbox scale and correct under entity churn. Replace

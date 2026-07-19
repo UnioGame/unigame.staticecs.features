@@ -1,8 +1,10 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     [AddComponentMenu("Static ECS/Characteristics/Mana Regen Converter")]
     public sealed class ManaRegenConverter : EcsValueConverter<Main, ManaRegenComponent, float> {
         protected override ManaRegenComponent Convert(GameObject host, float value) {

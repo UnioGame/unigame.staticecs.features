@@ -1,9 +1,10 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
-using unigame.staticecs.Modifiers;
+using UniGame.StaticEcs.Modifiers;
+ 
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class ModifierRegistryFlagTests {
         [Test]

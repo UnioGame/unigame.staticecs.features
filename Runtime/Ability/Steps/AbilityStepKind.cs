@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Coarse-grained category of a step config used for observability events and for
     /// progression-system dispatch between leaf and composite branches. The exact step

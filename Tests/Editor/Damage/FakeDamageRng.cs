@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     internal sealed class FakeDamageRng : IDamageRng {
         public bool NextRoll;
         public float NextValue;

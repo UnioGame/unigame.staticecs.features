@@ -1,8 +1,10 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>Main-world alias for <see cref="AllCharacteristicsConverter{TWorld}"/>.</summary>
     [AddComponentMenu("Static ECS/Characteristics/All Characteristics Converter")]
     public sealed class AllCharacteristicsConverter : AllCharacteristicsConverter<Main> { }

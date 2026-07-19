@@ -3,7 +3,7 @@ using FFS.Libraries.StaticEcs;
 using Pathfinding;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Holds references to the A* Pathfinding Project components
     /// that drive navigation for this entity.

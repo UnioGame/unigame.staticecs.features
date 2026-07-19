@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Single roster row, agnostic of the concrete effect type. Updated by
     /// <c>EffectOperations</c> on apply, refresh, and removal — never on a per-tick basis.

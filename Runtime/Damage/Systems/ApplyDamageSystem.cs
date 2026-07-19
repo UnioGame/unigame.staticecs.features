@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Consumes <see cref="IncomingDamageEvent"/>, runs the registered
     /// <c>DamageFilterChain&lt;TWorld&gt;</c>, and applies the surviving amount to the target's

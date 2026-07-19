@@ -1,6 +1,6 @@
 using System;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Stable integer identifier for an effect type. Allocated once per process by
     /// <see cref="EffectIdRegistry"/> on the first <c>EffectFeature.RegisterTypes</c> call for a

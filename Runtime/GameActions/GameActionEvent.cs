@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Typed event dispatched by <see cref="GameActionOperations.Raise{TWorld,TAction}"/> when
     /// the source entity's <see cref="ActionMaskComponent"/> permits the action, or when no mask

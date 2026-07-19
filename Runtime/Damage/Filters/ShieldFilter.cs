@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Absorbs incoming damage with the target's shield pool before it reaches health. Mutates
     /// the shield characteristic in place and emits <see cref="ShieldDeltaEvent"/> when any

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Time-bounded stun slice. Pulls <see cref="StunFeature{TWorld}"/> dependencies (target tag
     /// and multi-source storage) from the project — register <c>StunFeature</c> alongside this

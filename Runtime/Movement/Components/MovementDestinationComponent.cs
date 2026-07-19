@@ -2,7 +2,7 @@ using System;
 using FFS.Libraries.StaticEcs;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>Persistent movement destination for a navigating entity.</summary>
     [Serializable]
     public struct MovementDestinationComponent : IComponent {

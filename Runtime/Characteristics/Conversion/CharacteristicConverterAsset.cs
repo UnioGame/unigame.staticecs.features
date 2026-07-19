@@ -1,8 +1,10 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     public abstract class CharacteristicConverterAsset<TWorld, TCharacteristic> :
         EcsConverterAsset<TWorld>
         where TWorld : struct, IWorldType

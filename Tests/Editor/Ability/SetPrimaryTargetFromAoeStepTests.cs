@@ -1,11 +1,13 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
-using unigame.staticecs.Time;
-using unigame.staticecs.unity;
+using UniGame.StaticEcs.Time;
+using UniGame.StaticEcs.Unity;
+ 
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class SetPrimaryTargetFromAoeStepTests {
         private static readonly AbilityId Ability = new(202);

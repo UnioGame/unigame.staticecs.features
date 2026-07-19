@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Registers <see cref="TargetableTag"/>, the default <see cref="KdTreeTargetIndex{TWorld}"/>
     /// resource, and <see cref="TargetIndexRebuildSystem{TWorld}"/>. Replace the index by setting a

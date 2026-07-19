@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public delegate bool AbilityEffectDispatcher<TWorld>(
         EntityGID source,
         EntityGID target,

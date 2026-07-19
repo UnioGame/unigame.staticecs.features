@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// World-scoped resource mapping a concrete <see cref="IAbilityStepConfig"/> Type to its
     /// stateless activator singleton. Populated once by <see cref="AbilityFeature{TWorld}"/> at

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-entity bitmask that gates <see cref="GameActionOperations.Raise{TWorld,TAction}"/> calls.
     /// Each bit corresponds to one <see cref="IGameAction"/> type via <see cref="ActionBit{TAction}"/>.

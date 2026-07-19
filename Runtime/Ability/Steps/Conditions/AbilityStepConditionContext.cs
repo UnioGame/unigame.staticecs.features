@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public readonly ref struct AbilityStepConditionContext<TWorld>
         where TWorld : struct, IWorldType {
         public readonly EntityGID Caster;

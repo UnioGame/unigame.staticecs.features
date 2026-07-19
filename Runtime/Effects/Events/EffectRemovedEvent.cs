@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Raised when an effect leaves the target — either by manual removal through
     /// <c>EffectOperations.Remove</c>, by expiry inside <c>EffectTickSystem</c>, or by

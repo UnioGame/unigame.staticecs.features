@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Reason a damage event was cancelled by a filter. Read by <c>ApplyDamageSystem</c> to
     /// decide which terminating event to raise instead of <see cref="DamageAppliedEvent"/>.

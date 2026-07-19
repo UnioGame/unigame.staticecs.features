@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public sealed class ApplyEffectStepActivator<TWorld> : AbilityStepActivatorBase<ApplyEffectStepConfig, TWorld>
         where TWorld : struct, IWorldType {
         protected override StepStatus OnActivate(ApplyEffectStepConfig config, in AbilityStepActivationContext<TWorld> ctx) {
@@ -30,7 +30,7 @@ namespace unigame.staticecs.features {
 
             ref readonly var entries = ref castEntity.Read<World<TWorld>.Multi<AbilityAoeBufferEntry>>();
             for (var i = 0; i < entries.Length; i++) {
-                var target = entries[i].Target;
+                var target = entries.Get(i).Target;
                 if (config.ExcludeCaster && target.Equals(ctx.Caster)) {
                     continue;
                 }

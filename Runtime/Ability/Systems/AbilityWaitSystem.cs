@@ -1,7 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.Time;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Time;
+
     /// <summary>
     /// Drains <see cref="AbilityWaitState"/> timers across all active cast-entities. On expiry
     /// removes the wait component, writes <see cref="StepStatus.Success"/> into

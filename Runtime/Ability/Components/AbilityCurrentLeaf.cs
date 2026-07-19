@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Pointer to the leaf step config currently active on the cast-entity. Holds a managed
     /// reference; the underlying object lives in <see cref="AbilityRegistry{TWorld}"/> for the

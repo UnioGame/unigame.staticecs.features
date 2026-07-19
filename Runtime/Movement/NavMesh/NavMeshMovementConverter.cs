@@ -1,9 +1,10 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
 using UnityEngine;
 using UnityEngine.AI;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>Main-world alias for <see cref="NavMeshMovementConverter{TWorld}"/>.</summary>
     [AddComponentMenu("Static ECS/Movement/NavMesh Movement Converter")]
     public sealed class NavMeshMovementConverter : NavMeshMovementConverter<Main> { }

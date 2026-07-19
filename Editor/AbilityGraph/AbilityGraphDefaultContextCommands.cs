@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal static class AbilityGraphDefaultContextCommands {
         [AbilityGraphContextCommand(AbilityGraphContextTarget.Background, "Graph/Add Node...", Order = -10)]
         private static void AddNode(AbilityGraphContextCommandContext context) {

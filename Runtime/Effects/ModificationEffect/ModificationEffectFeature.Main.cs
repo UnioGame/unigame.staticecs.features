@@ -1,7 +1,6 @@
-using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+namespace UniGame.StaticEcs.Features {
+    using Unity;
 
-namespace unigame.staticecs.features {
     /// <summary>
     /// Main-default alias for <see cref="ModificationEffectFeature{TWorld, TStat}"/>.
     /// </summary>

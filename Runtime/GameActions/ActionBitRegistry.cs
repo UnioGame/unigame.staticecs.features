@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Thread-safe allocator that assigns a unique bit index (0–31) to each
     /// <see cref="IGameAction"/> type on first access.

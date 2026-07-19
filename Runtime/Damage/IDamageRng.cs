@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Random source used by damage filters for probabilistic rolls. Registered as the
     /// <see cref="IDamageRng"/>-typed resource on the world by <c>DamageFeature</c>; tests inject

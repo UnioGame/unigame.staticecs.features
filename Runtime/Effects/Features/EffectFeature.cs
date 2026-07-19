@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Generic effect feature: registers <see cref="EffectComponent{TEffect}"/>, lifecycle
     /// events, the shared <see cref="EffectRosterEntry"/> roster, the per-effect handler, the

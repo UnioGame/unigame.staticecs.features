@@ -1,10 +1,12 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 using UnityEditor;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
+    using Unity;
+
     internal sealed class AbilityGraphRuntimeBrowser {
         internal sealed class RuntimeAbilityEntry {
             public AbilityAsset Asset;
@@ -92,7 +94,7 @@ namespace unigame.staticecs.features.Editor.AbilityGraph {
                          .Entities()) {
                 ref readonly var roster = ref entity.Read<World<Main>.Multi<AbilityRosterEntry>>();
                 for (var i = 0; i < roster.Length; i++) {
-                    var abilityId = roster[i].Id;
+                    var abilityId = roster.Get(i).Id;
                     _equippedAbilities.Add(new RuntimeAbilityEntry {
                         Asset = ResolveAsset(abilityId),
                         AbilityId = abilityId,
@@ -131,7 +133,7 @@ namespace unigame.staticecs.features.Editor.AbilityGraph {
                 return string.Empty;
             }
 
-            return activeSteps[0].NodeGuid ?? string.Empty;
+            return activeSteps.Get(0).NodeGuid ?? string.Empty;
         }
 
         private static GameObject ResolveOwnerGameObject(EntityGID owner) {

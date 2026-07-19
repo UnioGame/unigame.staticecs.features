@@ -1,7 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     public static class CharacteristicModifierExtensions {
         public static bool ApplyModifier<TWorld, TCharacteristic>(
             EntityGID target,

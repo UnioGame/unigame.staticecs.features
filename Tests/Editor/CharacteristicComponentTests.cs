@@ -1,7 +1,7 @@
 using NUnit.Framework;
-using unigame.staticecs.features;
+using UniGame.StaticEcs.Features;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class CharacteristicComponentTests {
         [Test]

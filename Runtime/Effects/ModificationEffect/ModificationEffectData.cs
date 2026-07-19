@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-target modifier payload consumed by <see cref="ModificationEffectHandler{TWorld, TStat}"/>.
     /// Re-application overwrites the value; the underlying modifier is keyed by source so

@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [Serializable]
+    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
     public sealed class ConditionalStepConfig : IAbilityStepConfig {
         [SerializeField] private string _nodeGuid;
         [SerializeReference] private IAbilityStepCondition _condition;

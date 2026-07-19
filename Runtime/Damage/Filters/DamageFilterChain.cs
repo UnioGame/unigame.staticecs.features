@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Ordered set of <see cref="IDamageFilter{TWorld}"/> instances applied by
     /// <c>ApplyDamageSystem</c> to every <see cref="IncomingDamageEvent"/>. Registered as the

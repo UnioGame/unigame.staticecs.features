@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-target heal payload consumed by <see cref="HealOverTimeHandler{TWorld}"/> on every
     /// periodic tick. Re-applying the effect overwrites the value with the latest amount.

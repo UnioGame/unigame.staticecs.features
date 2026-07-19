@@ -1,6 +1,9 @@
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features 
+{
+    using Unity;
+
     public sealed class TargetSelectionFeature : TargetSelectionFeature<Main> {
         public TargetSelectionFeature(
             bool registerRebuildSystem = true,

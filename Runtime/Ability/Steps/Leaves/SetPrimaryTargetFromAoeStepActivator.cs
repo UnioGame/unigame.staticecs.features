@@ -1,8 +1,10 @@
 using FFS.Libraries.StaticEcs;
 using UnityEngine;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     public sealed class SetPrimaryTargetFromAoeStepActivator<TWorld> : AbilityStepActivatorBase<SetPrimaryTargetFromAoeStepConfig, TWorld>
         where TWorld : struct, IWorldType {
         protected override StepStatus OnActivate(SetPrimaryTargetFromAoeStepConfig config, in AbilityStepActivationContext<TWorld> ctx) {
@@ -38,13 +40,13 @@ namespace unigame.staticecs.features {
                 case AoeTargetSelector.Closest:
                     return SelectClosest(in entries, caster);
                 default:
-                    return entries[0].Target;
+                    return entries.Get(0).Target;
             }
         }
 
         private static EntityGID SelectRandom(in World<TWorld>.Multi<AbilityAoeBufferEntry> entries) {
             if (!World<TWorld>.HasResource<IAbilityRng<TWorld>>()) {
-                return entries[0].Target;
+                return entries.Get(0).Target;
             }
 
             var index = World<TWorld>.GetResource<IAbilityRng<TWorld>>().Range(0, entries.Length);
@@ -55,7 +57,7 @@ namespace unigame.staticecs.features {
                 index = entries.Length - 1;
             }
 
-            return entries[index].Target;
+            return entries.Get(index).Target;
         }
 
         private static EntityGID SelectClosest(in World<TWorld>.Multi<AbilityAoeBufferEntry> entries, EntityGID caster) {
@@ -73,7 +75,7 @@ namespace unigame.staticecs.features {
             var bestDistance = float.MaxValue;
 
             for (var i = 0; i < entries.Length; i++) {
-                var target = entries[i].Target;
+                var target = entries.Get(i).Target;
                 if (!target.TryUnpack<TWorld>(out var targetEntity) || !targetEntity.Has<TransformBindingComponent>()) {
                     continue;
                 }

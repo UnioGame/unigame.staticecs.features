@@ -1,7 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     public static class CharacteristicOperations {
         public static bool SetValue<TWorld, TCharacteristic>(
             ref CharacteristicComponent<TCharacteristic> characteristic,

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public static class ShieldOperations {
         public static bool Add<TWorld>(EntityGID target, float amount)
             where TWorld : struct, IWorldType {

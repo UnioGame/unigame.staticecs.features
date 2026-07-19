@@ -5,7 +5,7 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal sealed class AbilityGraphCanvasView : GraphView {
         private AbilityAsset _asset;
         private AbilityGraphProjection _projection = AbilityGraphProjection.Empty;

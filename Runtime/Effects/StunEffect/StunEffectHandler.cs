@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Bridges <see cref="StunEffect"/> lifecycle to the existing <c>StunOperations</c> source
     /// counter. Stack-up does not register additional sources — the counter is keyed by source

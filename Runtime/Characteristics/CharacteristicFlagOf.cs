@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public static class CharacteristicFlagOf<T> where T : struct {
         public static readonly CharacteristicFlag Value = Resolve();
 

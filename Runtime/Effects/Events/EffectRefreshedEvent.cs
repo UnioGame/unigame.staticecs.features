@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Raised by <c>EffectOperations.Apply</c> when the target already has an active
     /// <see cref="EffectComponent{TEffect}"/> and the operation refreshes its lifetime

@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     public sealed class FakeAbilityRng : IAbilityRng<TestAbilityWorld> {
         public int NextInt;
         public float NextFloat;

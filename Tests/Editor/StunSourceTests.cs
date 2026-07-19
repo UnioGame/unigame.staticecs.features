@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class StunSourceTests {
         [SetUp]

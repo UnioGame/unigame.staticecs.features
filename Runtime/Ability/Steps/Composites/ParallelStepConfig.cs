@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [Serializable]
+    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
     public sealed class ParallelStepConfig : IAbilityStepConfig {
         [SerializeField] private string _nodeGuid;
         [SerializeReference] private List<IAbilityStepConfig> _children = new();

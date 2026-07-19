@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public sealed class AbilityEffectDispatchRegistry<TWorld> : IResource
         where TWorld : struct, IWorldType {
         private readonly Dictionary<int, AbilityEffectDispatcher<TWorld>> _dispatchers = new();

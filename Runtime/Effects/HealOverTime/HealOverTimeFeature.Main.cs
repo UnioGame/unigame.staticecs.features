@@ -1,6 +1,8 @@
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>
     /// Main-default alias for <see cref="HealOverTimeFeature{TWorld}"/>.
     /// </summary>

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public struct StunChangedEvent : IEvent {
         public EntityGID Target;
         public int PreviousSourceCount;

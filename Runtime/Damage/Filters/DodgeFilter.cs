@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Cancels the damage event when a roll against the target's
     /// <see cref="DodgeChanceCharacteristic"/> succeeds. Healing events bypass the filter.

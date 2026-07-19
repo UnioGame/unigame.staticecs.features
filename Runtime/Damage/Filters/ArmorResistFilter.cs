@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Multiplicatively reduces physical-typed damage by the target's
     /// <see cref="ArmorResistCharacteristic"/> value (clamped to [0, 1]). Other damage types

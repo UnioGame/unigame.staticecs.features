@@ -1,20 +1,28 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.Time;
 
-namespace unigame.staticecs.features {
+
+namespace UniGame.StaticEcs.Features
+{
+    using Time;
+
     public sealed class ManaRegenSystem<TWorld> : ISystem
-        where TWorld : struct, IWorldType {
-        public void Update() {
+        where TWorld : struct, IWorldType
+    {
+        public void Update()
+        {
             var dt = World<TWorld>.GetResource<EcsTime>().DeltaTime;
-            if (dt <= 0f) {
+            if (dt <= 0f)
+            {
                 return;
             }
 
             foreach (var entity in World<TWorld>
                          .Query<All<CharacteristicComponent<ManaCharacteristic>, ManaRegenComponent>>()
-                         .Entities()) {
+                         .Entities())
+            {
                 ref readonly var regen = ref entity.Read<ManaRegenComponent>();
-                if (regen.Rate == 0f) {
+                if (regen.Rate == 0f)
+                {
                     continue;
                 }
 

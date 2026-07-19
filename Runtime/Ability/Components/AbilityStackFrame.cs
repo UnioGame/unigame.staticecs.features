@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// One open composite frame on the cast-entity progression stack. Stored as a multi-component
     /// so the stack lives entirely inside ECS storage — no managed coordinator object.

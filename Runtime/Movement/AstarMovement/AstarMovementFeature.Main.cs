@@ -1,6 +1,8 @@
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>Main-world alias for <see cref="AstarMovementFeature{TWorld}"/>.</summary>
     public sealed class AstarMovementFeature : AstarMovementFeature<Main> {
         /// <summary>Creates the Main-world feature with optional system registration.</summary>

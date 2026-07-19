@@ -1,8 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.Time;
-using unigame.staticecs.unity;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Time;
+    using Unity;
+
     /// <summary>
     /// Virtual-time cooldown helpers operating on a <see cref="CooldownEntry"/> multi-component.
     /// All comparisons use <c>EcsTime.Now</c>, so cooldowns automatically respect time scaling and
@@ -27,12 +28,13 @@ namespace unigame.staticecs.features {
 
             ref var cooldowns = ref entity.Ref<World<TWorld>.Multi<CooldownEntry>>();
             for (var i = 0; i < cooldowns.Length; i++) {
-                if (cooldowns[i].Id == id) {
-                    var entry = cooldowns[i];
-                    entry.ExpiresAt = expiresAt;
-                    cooldowns[i] = entry;
-                    return;
+                ref var entry = ref cooldowns[i];
+                if (entry.Id != id) {
+                    continue;
                 }
+
+                entry.ExpiresAt = expiresAt;
+                return;
             }
 
             cooldowns.Add(new CooldownEntry { Id = id, ExpiresAt = expiresAt });

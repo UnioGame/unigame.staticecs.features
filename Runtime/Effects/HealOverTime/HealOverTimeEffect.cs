@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker for heal-over-time effects. Pairs with <see cref="HealOverTimeData"/> on the target
     /// and a <see cref="HealOverTimeHandler{TWorld}"/> handler resource.

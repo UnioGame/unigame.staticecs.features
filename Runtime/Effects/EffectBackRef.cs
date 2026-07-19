@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Back-reference stored on the effect <em>source</em> entity. One entry per affected target;
     /// <see cref="Mask"/> aggregates every effect flag this source has applied to that target,

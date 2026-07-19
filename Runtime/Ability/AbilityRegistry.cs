@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// World-scoped resource pairing each <see cref="AbilityId"/> with its
     /// <see cref="AbilityDefinition"/> and the root <see cref="IAbilityStepConfig"/> of its

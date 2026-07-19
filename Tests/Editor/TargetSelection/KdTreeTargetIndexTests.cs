@@ -1,10 +1,11 @@
 using System;
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
+using UniGame.StaticEcs.Unity;
 using UnityEngine;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class KdTreeTargetIndexTests {
         private GameObject[] _hosts;

@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker component installed on every entity that has applied at least one effect to a
     /// target. Its <c>OnDelete</c> hook walks <see cref="EffectBackRef"/> and dispatches

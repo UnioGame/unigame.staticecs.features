@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     // Minimal action types used only in tests.
     internal struct JumpAction : IGameAction { public float Height; }
     internal struct AttackAction : IGameAction { public int Damage; }

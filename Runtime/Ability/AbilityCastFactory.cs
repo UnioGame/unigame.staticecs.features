@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     internal static class AbilityCastFactory {
         public static EntityGID SpawnRoot<TWorld>(EntityGID casterGid, AbilityId abilityId, EntityGID target)
             where TWorld : struct, IWorldType {

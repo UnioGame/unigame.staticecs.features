@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Process-global registry that maps effect-type structs to a stable <see cref="EffectId"/>.
     /// Stored as the world resource of the same type, populated by every

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public struct AbilityParallelBranchEntry : IMultiComponent {
         public EntityGID BranchCast;
         public StepStatus Status;

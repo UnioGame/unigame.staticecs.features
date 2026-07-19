@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public static class SpeedOperations {
         public static float Read<TWorld>(EntityGID target, float fallback = 0f)
             where TWorld : struct, IWorldType {

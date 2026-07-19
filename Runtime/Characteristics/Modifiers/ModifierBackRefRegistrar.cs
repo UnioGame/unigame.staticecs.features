@@ -1,7 +1,9 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     public static class ModifierBackRefRegistrar {
         public static void Register<TWorld>(EntityGID source, EntityGID target, CharacteristicFlag flag)
             where TWorld : struct, IWorldType {

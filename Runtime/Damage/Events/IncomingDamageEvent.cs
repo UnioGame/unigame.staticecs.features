@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Single entry point for the damage pipeline. Emitted by <c>DamageOperations.RaiseDamage</c>
     /// and consumed by <c>ApplyDamageSystem</c> which runs the registered filter chain.

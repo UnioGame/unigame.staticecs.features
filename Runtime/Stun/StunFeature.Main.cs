@@ -1,5 +1,5 @@
-using unigame.staticecs.unity;
+namespace UniGame.StaticEcs.Features {
+    using Unity;
 
-namespace unigame.staticecs.features {
     public sealed class StunFeature : StunFeature<Main> { }
 }

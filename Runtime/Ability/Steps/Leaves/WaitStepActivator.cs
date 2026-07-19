@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Stateless activator for <see cref="WaitStepConfig"/>. For positive durations attaches
     /// <see cref="AbilityWaitState"/> to the cast-entity and returns Running; the paired

@@ -1,6 +1,6 @@
-using unigame.staticecs.unity;
+namespace UniGame.StaticEcs.Features {
+    using Unity;
 
-namespace unigame.staticecs.features {
     public class CharacteristicFeature<TCharacteristic> : CharacteristicFeature<Main, TCharacteristic>
         where TCharacteristic : struct, ICharacteristicType { }
 }

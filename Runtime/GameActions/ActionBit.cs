@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Auto-assigns a stable bit index (0–31) to <typeparamref name="TAction"/> on first access.
     /// The index is allocated once per process lifetime and is consistent for the lifetime of the

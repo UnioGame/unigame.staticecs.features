@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Bridges <see cref="ModificationEffect{TStat}"/> lifecycle to
     /// <c>CharacteristicModifierExtensions</c>. On apply the handler installs a

@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [Serializable]
     [CharacteristicFlag(CharacteristicFlag.Stun)]
     public struct StunSource : IMultiComponent {

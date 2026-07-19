@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per cast-entity runtime state. Lives on a dedicated cast-entity created by
     /// <c>AbilityCastSystem</c>. Replaces the legacy <c>AbilityCastComponent</c> which lived on

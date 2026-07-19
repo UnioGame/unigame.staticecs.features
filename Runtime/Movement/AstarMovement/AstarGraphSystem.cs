@@ -4,7 +4,7 @@ using Pathfinding;
 using Pathfinding.Graphs.Grid;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>Creates ECS-owned A* grid graphs and synchronizes ECS obstacle entities.</summary>
     public class AstarGraphSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType {

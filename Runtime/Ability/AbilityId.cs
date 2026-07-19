@@ -1,6 +1,6 @@
 using System;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Stable integer identifier for an ability definition. Use a project-wide constants class
     /// or generated enum to map authored names to ids; the registry stores definitions keyed by

@@ -1,6 +1,6 @@
 using System;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [Flags]
     public enum CharacteristicFlag : ulong {
         None               = 0,

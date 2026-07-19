@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Time-bounded characteristic modification slice. Generic over the target characteristic
     /// type; project code instantiates one feature per stat (e.g.

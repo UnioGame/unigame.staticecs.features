@@ -2,10 +2,9 @@ using System;
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticEcs.Unity;
 using Pathfinding;
-using Pathfinding.Graphs.Grid;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>Stores the A* Pathfinding Project backend associated with a graph entity.</summary>
     [Serializable]
     public struct AstarPathComponent : IComponent {

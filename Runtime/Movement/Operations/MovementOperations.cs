@@ -1,10 +1,13 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features
+{
+    using Unity;
+
     /// <summary>Main-world static helpers. See <see cref="MovementOperations"/> generic overloads.</summary>
-    public static partial class MovementOperations {
+    public static partial class MovementOperations
+    {
         /// <inheritdoc cref="SetDestination{TWorld}(EntityGID, Vector3)"/>
         public static void SetDestination(EntityGID target, Vector3 destination)
             => SetDestination<Main>(target, destination);
@@ -23,23 +26,28 @@ namespace unigame.staticecs.features {
     /// <summary>
     /// Operations for reading and writing <see cref="MovementDestinationComponent"/> on entities.
     /// </summary>
-    public static partial class MovementOperations {
+    public static partial class MovementOperations
+    {
         /// <summary>
         /// Sets the navigation destination and marks the entity as actively moving.
         /// Creates <see cref="MovementDestinationComponent"/> if the entity does not have one yet.
         /// </summary>
         public static void SetDestination<TWorld>(EntityGID target, Vector3 destination)
-            where TWorld : struct, IWorldType {
-            if (!target.TryUnpack<TWorld>(out var entity)) {
+            where TWorld : struct, IWorldType
+        {
+            if (!target.TryUnpack<TWorld>(out var entity))
+            {
                 return;
             }
 
-            if (entity.Has<MovementDestinationComponent>()) {
+            if (entity.Has<MovementDestinationComponent>())
+            {
                 ref var existing = ref entity.Mut<MovementDestinationComponent>();
                 existing.Destination = destination;
-                existing.IsActive    = true;
+                existing.IsActive = true;
             }
-            else {
+            else
+            {
                 entity.Set(new MovementDestinationComponent { Destination = destination, IsActive = true });
             }
         }
@@ -49,12 +57,15 @@ namespace unigame.staticecs.features {
         /// Does nothing if the entity has no <see cref="MovementDestinationComponent"/>.
         /// </summary>
         public static void StopMovement<TWorld>(EntityGID target)
-            where TWorld : struct, IWorldType {
-            if (!target.TryUnpack<TWorld>(out var entity)) {
+            where TWorld : struct, IWorldType
+        {
+            if (!target.TryUnpack<TWorld>(out var entity))
+            {
                 return;
             }
 
-            if (entity.Has<MovementDestinationComponent>()) {
+            if (entity.Has<MovementDestinationComponent>())
+            {
                 entity.Mut<MovementDestinationComponent>().IsActive = false;
             }
         }
@@ -63,8 +74,10 @@ namespace unigame.staticecs.features {
         /// Returns <c>true</c> when the entity has an active <see cref="MovementDestinationComponent"/>.
         /// </summary>
         public static bool IsMoving<TWorld>(EntityGID target)
-            where TWorld : struct, IWorldType {
-            if (!target.TryUnpack<TWorld>(out var entity)) {
+            where TWorld : struct, IWorldType
+        {
+            if (!target.TryUnpack<TWorld>(out var entity))
+            {
                 return false;
             }
 

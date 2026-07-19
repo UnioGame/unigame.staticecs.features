@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Emitted by <c>AbilityCastSystem</c> immediately after a cast-entity is spawned. The
     /// business layer (cooldown, resource cost, anti-spam) subscribes here to apply its own

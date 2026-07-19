@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Amplifies the damage amount when <see cref="DamageContext.ForceCritical"/> is set or the
     /// crit roll succeeds against the source's <see cref="CriticalChanceCharacteristic"/>. The

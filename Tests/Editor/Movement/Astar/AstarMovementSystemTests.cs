@@ -6,7 +6,7 @@ using Pathfinding;
 using Pathfinding.Graphs.Grid;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Tests.Movement.Astar {
+namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
     [TestFixture]
     public sealed class AstarMovementSystemTests {
         private GameObject _host;

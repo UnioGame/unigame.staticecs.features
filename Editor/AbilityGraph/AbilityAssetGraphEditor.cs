@@ -1,7 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     [CustomEditor(typeof(AbilityAsset))]
     public sealed class AbilityAssetGraphEditor : UnityEditor.Editor {
         public override void OnInspectorGUI() {

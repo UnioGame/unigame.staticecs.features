@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Set on a cast-entity to signal <c>AbilityStepProgressionSystem</c> that the current
     /// leaf has terminated and the cast is ready to advance. The terminal status is read from

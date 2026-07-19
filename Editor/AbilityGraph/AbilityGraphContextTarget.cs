@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal enum AbilityGraphContextTarget : byte {
         Background = 0,
         Node = 1,

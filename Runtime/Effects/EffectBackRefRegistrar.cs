@@ -1,45 +1,57 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
 
-namespace unigame.staticecs.features {
+
+namespace UniGame.StaticEcs.Features
+{
+    using Unity;
+
     /// <summary>
     /// Installs <see cref="EffectBackRef"/> entries on the source entity for a given target +
     /// <see cref="EffectFlag"/>. Mirrors <c>ModifierBackRefRegistrar</c>: existing entries
     /// merge their mask via OR; new entries push to the back-ref multi-component.
     /// </summary>
-    public static class EffectBackRefRegistrar {
+    public static class EffectBackRefRegistrar
+    {
         public static void Register<TWorld>(EntityGID source, EntityGID target, EffectFlag flag)
-            where TWorld : struct, IWorldType {
-            if (flag == EffectFlag.None) {
+            where TWorld : struct, IWorldType
+        {
+            if (flag == EffectFlag.None)
+            {
                 return;
             }
 
-            if (!source.TryUnpack<TWorld>(out var src)) {
+            if (!source.TryUnpack<TWorld>(out var src))
+            {
                 return;
             }
 
-            if (!src.Has<EffectSourceTracker>()) {
+            if (!src.Has<EffectSourceTracker>())
+            {
                 src.Add<EffectSourceTracker>();
             }
 
-            if (!src.Has<World<TWorld>.Multi<EffectBackRef>>()) {
+            if (!src.Has<World<TWorld>.Multi<EffectBackRef>>())
+            {
                 src.Add<World<TWorld>.Multi<EffectBackRef>>();
             }
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectBackRef>>();
             var compactTarget = (EntityGIDCompact)target;
 
-            for (var i = 0; i < refs.Length; i++) {
+            for (var i = 0; i < refs.Length; i++)
+            {
                 ref var entry = ref refs[i];
-                if (entry.Target.Equals(compactTarget)) {
+                if (entry.Target.Equals(compactTarget))
+                {
                     entry.Mask |= flag;
                     return;
                 }
             }
 
-            refs.Add(new EffectBackRef {
+            refs.Add(new EffectBackRef
+            {
                 Target = compactTarget,
-                Mask   = flag
+                Mask = flag
             });
         }
 
@@ -49,33 +61,42 @@ namespace unigame.staticecs.features {
         /// noop, since the source's back-ref multi is about to be cleaned up wholesale.
         /// </summary>
         public static void Unregister<TWorld>(EntityGID source, EntityGID target, EffectFlag flag)
-            where TWorld : struct, IWorldType {
-            if (flag == EffectFlag.None) {
+            where TWorld : struct, IWorldType
+        {
+            if (flag == EffectFlag.None)
+            {
                 return;
             }
 
-            if (source.Status<TWorld>() != GIDStatus.Active) {
+            if (source.Status<TWorld>() != GIDStatus.Active)
+            {
                 return;
             }
 
-            if (!source.TryUnpack<TWorld>(out var src)) {
+            if (!source.TryUnpack<TWorld>(out var src))
+            {
                 return;
             }
 
-            if (!src.Has<World<TWorld>.Multi<EffectBackRef>>()) {
+            if (!src.Has<World<TWorld>.Multi<EffectBackRef>>())
+            {
                 return;
             }
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectBackRef>>();
             var compactTarget = (EntityGIDCompact)target;
 
-            for (var i = 0; i < refs.Length; i++) {
+            for (var i = 0; i < refs.Length; i++)
+            {
                 ref var entry = ref refs[i];
-                if (entry.Target.Equals(compactTarget)) {
+                if (entry.Target.Equals(compactTarget))
+                {
                     entry.Mask &= ~flag;
-                    if (entry.Mask == EffectFlag.None) {
+                    if (entry.Mask == EffectFlag.None)
+                    {
                         refs.RemoveAtSwap(i);
                     }
+
                     return;
                 }
             }

@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Single ability slot equipped on a caster. Stored as a multi-component;
     /// <see cref="AbilityOperations.Equip{TWorld}"/> guarantees uniqueness by id.

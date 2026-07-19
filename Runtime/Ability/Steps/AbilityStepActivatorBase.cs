@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Strongly-typed base for a step activator. Casts the polymorphic
     /// <see cref="IAbilityStepConfig"/> argument to <typeparamref name="TConfig"/> once and

@@ -1,8 +1,9 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
-using unigame.staticecs.Time;
+using UniGame.StaticEcs.Time;
+ 
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     /// <summary>
     /// End-to-end smoke for the new step-pipeline (PR #1). Verifies cast-entity creation,
     /// async leaf timing (Wait), composite advance (Sequence), and synchronous leaf execution

@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Bitmask identifier for effect types. Each <see cref="IEffectType"/> declares its own
     /// single-bit flag through <see cref="EffectFlagAttribute"/>; group masks (e.g.

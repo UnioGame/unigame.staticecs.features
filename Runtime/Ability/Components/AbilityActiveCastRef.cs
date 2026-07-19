@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Pointer from a caster to its current foreground cast-entity. Absent when the caster
     /// is idle. Channels and parallel branches do not occupy this slot — they live in

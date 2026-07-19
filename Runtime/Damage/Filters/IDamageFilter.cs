@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// One step of the damage pipeline. Filters are stateless and run in registration order on
     /// a shared <see cref="DamageContext"/>. A filter that sets <see cref="DamageContext.Cancelled"/>

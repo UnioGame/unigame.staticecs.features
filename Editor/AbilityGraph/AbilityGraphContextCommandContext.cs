@@ -1,6 +1,6 @@
 using UnityEditor.Experimental.GraphView;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal sealed class AbilityGraphContextCommandContext {
         public AbilityAsset Asset;
         public AbilityGraphCanvasView CanvasView;

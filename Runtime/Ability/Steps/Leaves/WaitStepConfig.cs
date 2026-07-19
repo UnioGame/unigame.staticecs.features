@@ -1,13 +1,15 @@
 using System;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Asynchronous leaf step that waits <see cref="Duration"/> seconds of <c>EcsTime</c>
     /// before reporting <see cref="StepStatus.Success"/>. A non-positive duration completes
     /// synchronously inside the activator.
     /// </summary>
     [Serializable]
+    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
     public sealed class WaitStepConfig : IAbilityStepConfig {
         [SerializeField] private string _nodeGuid;
         [SerializeField] private float _duration;

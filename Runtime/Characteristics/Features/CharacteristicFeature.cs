@@ -1,18 +1,22 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
-using unigame.staticecs.Modifiers;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features
+{
+    using Modifiers;
+
     public class CharacteristicFeature<TWorld, TCharacteristic> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
-        where TCharacteristic : struct, ICharacteristicType {
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
+        where TCharacteristic : struct, ICharacteristicType
+    {
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
             types
                 .Component<CharacteristicComponent<TCharacteristic>>()
                 .Event<CharacteristicChangedEvent<TCharacteristic>>()
                 .Multi<CharacteristicModifierEntry<TCharacteristic>>();
 
-            if (!World<TWorld>.HasResource<ModifierRegistry>()) {
+            if (!World<TWorld>.HasResource<ModifierRegistry>())
+            {
                 World<TWorld>.SetResource(new ModifierRegistry());
             }
 
@@ -20,7 +24,8 @@ namespace unigame.staticecs.features {
             ModifierFlagCache<TWorld, TCharacteristic>.EnsureRegistered(
                 registry,
                 (ulong)CharacteristicFlagOf<TCharacteristic>.Value,
-                static (src, tgt) => CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TCharacteristic>(tgt, src));
+                static (src, tgt) =>
+                    CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TCharacteristic>(tgt, src));
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker for effect-type structs registered through <c>EffectFeature&lt;TWorld, TEffect&gt;</c>.
     /// Effect types are pure compile-time tags; gameplay state lives in

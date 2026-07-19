@@ -1,6 +1,4 @@
-using FFS.Libraries.StaticEcs;
-
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Marker for time-bounded characteristic modifications. Pairs with
     /// <see cref="ModificationEffectData{TStat}"/> on the target and a

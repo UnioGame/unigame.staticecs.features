@@ -1,6 +1,6 @@
 using System;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Optional editor metadata for an <see cref="IAbilityStepConfig"/> type.
     /// Provides a stable display name and palette category without affecting runtime execution.

@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace unigame.staticecs.features.Editor.AbilityGraph {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     internal static class AbilityGraphContextCommandRegistry {
         private sealed class CommandDefinition {
             public AbilityGraphContextCommandAttribute Attribute;

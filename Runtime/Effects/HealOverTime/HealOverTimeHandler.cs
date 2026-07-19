@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Routes <see cref="HealOverTimeEffect"/> ticks through <c>DamageOperations.RaiseHealing</c>
     /// using the per-target <see cref="HealOverTimeData"/> payload, scaled by current stacks.

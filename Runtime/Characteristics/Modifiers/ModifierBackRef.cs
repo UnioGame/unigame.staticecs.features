@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [Serializable]
     public struct ModifierBackRef : IMultiComponent {
         public EntityGIDCompact Target;

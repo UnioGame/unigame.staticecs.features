@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     internal sealed class RecordingEffectHandler<TWorld, TEffect> : IEffectHandler<TWorld, TEffect>
         where TWorld : struct, IWorldType
         where TEffect : struct, IEffectType {

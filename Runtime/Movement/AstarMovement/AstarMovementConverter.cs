@@ -1,10 +1,12 @@
 using FFS.Libraries.StaticEcs;
 using FFS.Libraries.StaticEcs.Unity;
 using Pathfinding;
-using unigame.staticecs.unity;
+ 
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     /// <summary>
     /// Sets <see cref="AstarAIComponent"/> on conversion by reading <see cref="IAstarAI"/>
     /// from the host <see cref="GameObject"/>.

@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     using Tests;
 
     [TestFixture]

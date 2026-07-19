@@ -1,7 +1,7 @@
 using System;
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public delegate void EffectSourceCleanup(EntityGID source, EntityGID target);
 
     public delegate void EffectUnconditionalRemove(EntityGID target);

@@ -1,8 +1,9 @@
 using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
-using unigame.staticecs.Time;
+using UniGame.StaticEcs.Time;
+ 
 
-namespace unigame.staticecs.features.Tests {
+namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
     public sealed class EffectStackingTests {
         private RecordingEffectHandler<TestEffectsWorld, TestEffectMarker> _handler;

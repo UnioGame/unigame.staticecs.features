@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Stateless activator for <see cref="ApplyDamageStepConfig"/>. Synchronous: routes the
     /// configured amount to <see cref="DamageOperations.RaiseDamage{TWorld}"/> /
@@ -36,7 +36,7 @@ namespace unigame.staticecs.features {
 
             ref readonly var entries = ref castEntity.Read<World<TWorld>.Multi<AbilityAoeBufferEntry>>();
             for (var i = 0; i < entries.Length; i++) {
-                var target = entries[i].Target;
+                var target = entries.Get(i).Target;
                 if (config.ExcludeCaster && target.Equals(ctx.Caster)) {
                     continue;
                 }

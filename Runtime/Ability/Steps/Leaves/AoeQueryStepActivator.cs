@@ -1,8 +1,10 @@
 using System;
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs.unity;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Unity;
+
     public sealed class AoeQueryStepActivator<TWorld> : AbilityStepActivatorBase<AoeQueryStepConfig, TWorld>
         where TWorld : struct, IWorldType {
         private const int MaxStackTargets = 64;

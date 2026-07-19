@@ -1,7 +1,7 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Wires the damage pipeline: registers events, tags, the default filter chain
     /// (Dodge → Block → ArmorResist → Critical → Shield), an <see cref="IDamageRng"/>

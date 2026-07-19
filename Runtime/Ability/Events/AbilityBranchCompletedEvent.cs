@@ -1,6 +1,6 @@
 using FFS.Libraries.StaticEcs;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     public struct AbilityBranchCompletedEvent : IEvent {
         public EntityGID ParentCast;
         public EntityGID BranchCast;

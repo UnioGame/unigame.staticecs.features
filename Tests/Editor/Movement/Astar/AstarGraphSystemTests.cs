@@ -4,11 +4,12 @@ using FFS.Libraries.StaticEcs;
 using NUnit.Framework;
 using Pathfinding;
 using Pathfinding.Graphs.Grid;
-using unigame.staticecs.unity;
+using UniGame.StaticEcs.Unity;
+ 
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace unigame.staticecs.features.Tests.Movement.Astar {
+namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
     [TestFixture]
     public sealed class AstarGraphSystemTests {
         private GameObject _graphHost;

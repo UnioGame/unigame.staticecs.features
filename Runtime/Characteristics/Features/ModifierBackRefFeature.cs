@@ -1,8 +1,10 @@
 using FFS.Libraries.StaticEcs;
-using unigame.staticecs;
-using unigame.staticecs.Modifiers;
+ 
+ 
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
+    using Modifiers;
+
     public class ModifierBackRefFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType {
         public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {

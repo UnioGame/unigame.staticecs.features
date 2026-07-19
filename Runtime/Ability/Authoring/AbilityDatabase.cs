@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace unigame.staticecs.features {
+namespace UniGame.StaticEcs.Features {
     [CreateAssetMenu(menuName = "UniGame/Static ECS/Ability/Ability Database")]
     public sealed class AbilityDatabase : ScriptableObject {
         [SerializeField] private List<AbilityAsset> _abilities = new();
