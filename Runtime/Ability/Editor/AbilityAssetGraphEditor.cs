@@ -2,8 +2,14 @@ using UnityEditor;
 using UnityEngine;
 
 namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
+#if ODIN_INSPECTOR
+    using AbilityAssetEditorBase = Sirenix.OdinInspector.Editor.OdinEditor;
+#else
+    using AbilityAssetEditorBase = UnityEditor.Editor;
+#endif
+
     [CustomEditor(typeof(AbilityAsset))]
-    public sealed class AbilityAssetGraphEditor : UnityEditor.Editor {
+    public sealed class AbilityAssetGraphEditor : AbilityAssetEditorBase {
         public override void OnInspectorGUI() {
             DrawDefaultInspector();
 
