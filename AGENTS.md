@@ -1,5 +1,7 @@
 # AGENTS — unigame.staticecs.features
 
+Use the repo-local `$build-static-ecs-features` skill when implementing, migrating, or reviewing a gameplay feature family.
+
 ## Layer and assemblies
 
 - Gameplay families depend on `unigame.staticecs` and `unigame.staticecs.unity`; neither lower package may depend back on a feature family.
@@ -16,6 +18,7 @@ Use only directories that contain real files:
   Events/
   Systems/
   Operations/
+  Conversion/
   Authoring/
   Editor/
   Tests/Editor/
@@ -37,6 +40,7 @@ Use only directories that contain real files:
 - System registration is UniTask-based and sequential. Do not serialize system lists.
 - Struct and class systems are both supported. Never add reference-type constraints and never implement unused `ISystem` methods.
 - Use native events for transient streams; retain components for persistent/queryable workflow state. Receiver cleanup belongs in system `Destroy`.
+- Prefer family-local serializable converters. Use Mono converters only for behavior that genuinely needs a MonoBehaviour, and use converter preset assets for repeated or configuration-created entity recipes.
 
 ## Documentation
 
