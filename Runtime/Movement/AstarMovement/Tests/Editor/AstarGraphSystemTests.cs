@@ -135,6 +135,18 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
+        public void SerializableGraphConverter_CreatesEquivalentComponents() {
+            var entity = World<TestAstarWorld>.NewEntity<Default>();
+            var converter = new AstarGridGraphSerializableConverter<TestAstarWorld>();
+
+            converter.Apply(entity, _graphHost);
+
+            Assert.AreSame(_backend, entity.Read<AstarPathComponent>().Backend);
+            Assert.AreEqual(40, entity.Read<AstarGridGraphConfigComponent>().Width);
+            Assert.AreEqual(0.5f, entity.Read<AstarGridGraphConfigComponent>().NodeSize);
+        }
+
+        [Test]
         public void ObstacleConverter_ResolvesGraphProviderGid() {
             var obstacleHost = new GameObject("Astar graph test obstacle");
             var providerHost = new GameObject("Astar graph test provider");
@@ -151,6 +163,33 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 field.SetValue(converter, provider);
 
                 var obstacleEntity = World<TestAstarWorld>.NewEntity<Default>();
+                converter.Apply(obstacleEntity, obstacleHost);
+                converter.ResolveLinks(obstacleEntity, obstacleHost);
+
+                ref readonly var obstacle = ref obstacleEntity.Read<AstarObstacleComponent>();
+                Assert.AreSame(collider, obstacle.Collider);
+                Assert.AreEqual(graphEntity.GID, obstacle.GraphEntity);
+            }
+            finally {
+                Object.DestroyImmediate(obstacleHost);
+                Object.DestroyImmediate(providerHost);
+            }
+        }
+
+        [Test]
+        public void SerializableObstacleConverter_ResolvesGraphProviderGid() {
+            var obstacleHost = new GameObject("Astar serializable obstacle");
+            var providerHost = new GameObject("Astar serializable graph provider");
+            try {
+                var collider = obstacleHost.AddComponent<BoxCollider>();
+                var provider = providerHost.AddComponent<TestAstarEntityProvider>();
+                var graphEntity = World<TestAstarWorld>.NewEntity<Default>();
+                provider.EntityGid = graphEntity.GID;
+                var converter = new AstarObstacleSerializableConverter<TestAstarWorld> {
+                    GraphProvider = provider,
+                };
+                var obstacleEntity = World<TestAstarWorld>.NewEntity<Default>();
+
                 converter.Apply(obstacleEntity, obstacleHost);
                 converter.ResolveLinks(obstacleEntity, obstacleHost);
 

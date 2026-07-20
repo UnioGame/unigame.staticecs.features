@@ -14,7 +14,8 @@ namespace UniGame.StaticEcs.Features {
         [SerializeField] protected float _maxValue = 100f;
 
         public sealed override void Apply(World<TWorld>.Entity entity, GameObject host) {
-            entity.Set(new CharacteristicComponent<TCharacteristic>(_value, _minValue, _maxValue, _value));
+            entity.Set(CharacteristicConverterUtility.Build<TCharacteristic>(
+                new CharacteristicSettings(_value, _minValue, _maxValue)));
         }
     }
 }

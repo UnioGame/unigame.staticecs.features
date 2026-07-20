@@ -196,6 +196,30 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
+        public void SerializableConverter_ReadsHostAndResolvesGraphProvider() {
+            var entity = World<TestAstarWorld>.NewEntity<Default>();
+            var providerHost = new GameObject("Astar serializable graph provider");
+            var provider = providerHost.AddComponent<TestAstarEntityProvider>();
+            var graphEntity = World<TestAstarWorld>.NewEntity<Default>();
+            provider.EntityGid = graphEntity.GID;
+            var converter = new AstarMovementSerializableConverter<TestAstarWorld> {
+                GraphProvider = provider,
+            };
+
+            try {
+                converter.Apply(entity, _host);
+                converter.ResolveLinks(entity, _host);
+
+                Assert.AreSame(_ai, entity.Read<AstarAIComponent>().AI);
+                Assert.AreSame(_host.GetComponent<Seeker>(), entity.Read<AstarAIComponent>().Seeker);
+                Assert.AreEqual(graphEntity.GID, entity.Read<AstarAIComponent>().GraphEntity);
+            }
+            finally {
+                Object.DestroyImmediate(providerHost);
+            }
+        }
+
+        [Test]
         public void MovementOperations_CreateUpdateAndStopDestination() {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
 

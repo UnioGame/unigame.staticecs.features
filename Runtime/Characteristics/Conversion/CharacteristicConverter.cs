@@ -14,7 +14,19 @@ namespace UniGame.StaticEcs.Features {
         [SerializeField] protected float _maxValue = 100f;
 
         protected override CharacteristicComponent<TCharacteristic> Build(GameObject host) {
-            return new CharacteristicComponent<TCharacteristic>(_value, _minValue, _maxValue, _value);
+            return CharacteristicConverterUtility.Build<TCharacteristic>(
+                new CharacteristicSettings(_value, _minValue, _maxValue));
+        }
+    }
+
+    internal static class CharacteristicConverterUtility {
+        public static CharacteristicComponent<TCharacteristic> Build<TCharacteristic>(CharacteristicSettings settings)
+            where TCharacteristic : struct, ICharacteristicType {
+            return new CharacteristicComponent<TCharacteristic>(
+                settings.value,
+                settings.min,
+                settings.max,
+                settings.value);
         }
     }
 }

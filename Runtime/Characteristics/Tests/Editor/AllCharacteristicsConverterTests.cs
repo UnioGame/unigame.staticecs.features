@@ -105,9 +105,37 @@ namespace UniGame.StaticEcs.Features.Tests {
 
             Object.DestroyImmediate(asset);
         }
+
+        [Test]
+        public void Apply_SerializableVariant_SetsAllNineCharacteristics() {
+            var entity = World<TestAllCharacteristicsWorld>.NewEntity<Default>();
+            var converter = new TestAllCharacteristicsSerializableConverter {
+                health = new CharacteristicSettings(75f, 0f, 100f),
+                mana = new CharacteristicSettings(35f, 0f, 80f),
+                speed = new CharacteristicSettings(9f, 0f, 50f),
+                shield = new CharacteristicSettings(20f, 0f, 150f),
+                armorResist = new CharacteristicSettings(0.2f, 0f, 1f),
+                blockChance = new CharacteristicSettings(0.1f, 0f, 1f),
+                dodgeChance = new CharacteristicSettings(0.15f, 0f, 1f),
+                critChance = new CharacteristicSettings(0.25f, 0f, 1f),
+                critMultiplier = new CharacteristicSettings(4f, 1f, 6f),
+            };
+
+            converter.Apply(entity, _host);
+
+            Assert.AreEqual(75f, entity.Read<CharacteristicComponent<HealthCharacteristic>>().Value, 1e-5f);
+            Assert.AreEqual(35f, entity.Read<CharacteristicComponent<ManaCharacteristic>>().Value, 1e-5f);
+            Assert.AreEqual(9f, entity.Read<CharacteristicComponent<SpeedCharacteristic>>().Value, 1e-5f);
+            Assert.AreEqual(50f, entity.Read<CharacteristicComponent<SpeedCharacteristic>>().MaxValue, 1e-5f);
+            Assert.AreEqual(4f, entity.Read<CharacteristicComponent<CriticalMultiplierCharacteristic>>().Value, 1e-5f);
+        }
     }
 
     internal sealed class TestAllCharacteristicsConverter : AllCharacteristicsConverter<TestAllCharacteristicsWorld> { }
 
     internal sealed class TestAllCharacteristicsConverterAsset : AllCharacteristicsConverterAsset<TestAllCharacteristicsWorld> { }
+
+    [System.Serializable]
+    internal sealed class TestAllCharacteristicsSerializableConverter :
+        AllCharacteristicsSerializableConverter<TestAllCharacteristicsWorld> { }
 }

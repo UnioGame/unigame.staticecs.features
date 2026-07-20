@@ -41,19 +41,44 @@ namespace UniGame.StaticEcs.Features
         /// <inheritdoc/>
         public override void Apply(World<TWorld>.Entity entity, GameObject host)
         {
-            var backend = host != null ? host.GetComponent<AstarPath>() : null;
-            entity.Set(new AstarPathComponent { Backend = backend });
+            AstarGridGraphConverterUtility.Apply(
+                entity,
+                host,
+                new AstarGridGraphConverterSettings(
+                    _center,
+                    _rotation,
+                    _width,
+                    _depth,
+                    _nodeSize,
+                    _obstacleMask,
+                    _agentDiameter,
+                    _agentHeight,
+                    _flushGraphUpdates));
+        }
+    }
+
+    internal static class AstarGridGraphConverterUtility
+    {
+        public static void Apply<TWorld>(
+            World<TWorld>.Entity entity,
+            GameObject host,
+            AstarGridGraphConverterSettings settings)
+            where TWorld : struct, IWorldType
+        {
+            entity.Set(new AstarPathComponent {
+                Backend = host != null ? host.GetComponent<AstarPath>() : null,
+            });
             entity.Set(new AstarGridGraphConfigComponent
             {
-                Center = _center,
-                Rotation = _rotation,
-                Width = _width,
-                Depth = _depth,
-                NodeSize = _nodeSize,
-                ObstacleMask = _obstacleMask.value,
-                AgentDiameter = _agentDiameter,
-                AgentHeight = _agentHeight,
-                FlushGraphUpdates = _flushGraphUpdates,
+                Center = settings.center,
+                Rotation = settings.rotation,
+                Width = settings.width,
+                Depth = settings.depth,
+                NodeSize = settings.nodeSize,
+                ObstacleMask = settings.obstacleMask.value,
+                AgentDiameter = settings.agentDiameter,
+                AgentHeight = settings.agentHeight,
+                FlushGraphUpdates = settings.flushGraphUpdates,
             });
         }
     }

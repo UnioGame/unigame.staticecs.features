@@ -1,0 +1,14 @@
+{
+    "name": "unigame.staticecs.features.movement.tests",
+    "rootNamespace": "UniGame.StaticEcs.Features.Tests.Movement",
+    "references": [
+        "unigame.staticecs.features.movement",
+        "unigame.staticecs",
+        "unigame.staticecs.unity",
+        "FFS.StaticEcs",
+        "FFS.StaticEcs.Unity"
+    ],
+    "includePlatforms": ["Editor"],
+    "optionalUnityReferences": ["TestAssemblies"],
+    "noEngineReferences": false
+}

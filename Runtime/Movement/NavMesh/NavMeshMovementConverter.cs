@@ -17,8 +17,15 @@ namespace UniGame.StaticEcs.Features {
         where TWorld : struct, IWorldType {
         /// <inheritdoc/>
         public override void Apply(World<TWorld>.Entity entity, GameObject host) {
-            var agent = host != null ? host.GetComponent<NavMeshAgent>() : null;
-            entity.Set(new NavMeshAgentComponent { Agent = agent });
+            entity.Set(NavMeshMovementConverterUtility.Build(host));
+        }
+    }
+
+    internal static class NavMeshMovementConverterUtility {
+        public static NavMeshAgentComponent Build(GameObject host) {
+            return new NavMeshAgentComponent {
+                Agent = host != null ? host.GetComponent<NavMeshAgent>() : null,
+            };
         }
     }
 }
