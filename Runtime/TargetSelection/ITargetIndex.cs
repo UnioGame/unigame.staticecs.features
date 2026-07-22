@@ -1,7 +1,8 @@
-using FFS.Libraries.StaticEcs;
-using UnityEngine;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
+    using UnityEngine;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Spatial index over targetable entities. The current implementation is rebuilt by
     /// <c>TargetIndexRebuildSystem</c>; abilities and AoE queries call <see cref="FillSphere"/>
@@ -9,7 +10,8 @@ namespace UniGame.StaticEcs.Features {
     /// keyed by <see cref="EntityGID"/>.
     /// </summary>
     public interface ITargetIndex<TWorld> : IResource
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         int Count { get; }
 
         void Rebuild();

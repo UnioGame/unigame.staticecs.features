@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Raised when an effect leaves the target — either by manual removal through
     /// <c>EffectOperations.Remove</c>, by expiry inside <c>EffectTickSystem</c>, or by
@@ -8,7 +9,8 @@ namespace UniGame.StaticEcs.Features {
     /// explicit removal.
     /// </summary>
     public struct EffectRemovedEvent<TEffect> : IEvent
-        where TEffect : struct, IEffectType {
+        where TEffect : struct, IEffectType
+    {
         public EntityGID Source;
         public EntityGID Target;
         public int Stacks;

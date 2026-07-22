@@ -1,19 +1,22 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
-
 namespace UniGame.StaticEcs.Features
 {
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
+
     /// <summary>Composes the standard gameplay characteristics and mana regeneration.</summary>
-    public class CharacteristicsFeature<TWorld> :
-        StaticEcsFeature<TWorld>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+    public class CharacteristicsFeature<TWorld>
+        : StaticEcsFeature<TWorld>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
         where TWorld : struct, IWorldType
     {
         private readonly ManaFeature<TWorld> _mana;
 
         /// <summary>Creates the standard characteristics feature.</summary>
-        public CharacteristicsFeature(bool registerManaRegen = true, short manaRegenOrder = ManaFeature<TWorld>.DefaultRegenOrder)
+        public CharacteristicsFeature(
+            bool registerManaRegen = true,
+            short manaRegenOrder = ManaFeature<TWorld>.DefaultRegenOrder
+        )
         {
             _mana = new ManaFeature<TWorld>(registerManaRegen, manaRegenOrder);
         }
@@ -30,13 +33,16 @@ namespace UniGame.StaticEcs.Features
             new CharacteristicFeature<TWorld, DodgeChanceCharacteristic>().RegisterTypes(types);
             new CharacteristicFeature<TWorld, ArmorResistCharacteristic>().RegisterTypes(types);
             new CharacteristicFeature<TWorld, CriticalChanceCharacteristic>().RegisterTypes(types);
-            new CharacteristicFeature<TWorld, CriticalMultiplierCharacteristic>().RegisterTypes(types);
+            new CharacteristicFeature<TWorld, CriticalMultiplierCharacteristic>().RegisterTypes(
+                types
+            );
         }
 
         /// <inheritdoc />
         public UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             return _mana.RegisterSystemsAsync(systems, cancellationToken);
         }

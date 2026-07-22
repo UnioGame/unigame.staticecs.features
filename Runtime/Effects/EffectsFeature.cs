@@ -1,13 +1,13 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
-
 namespace UniGame.StaticEcs.Features
 {
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
+
     /// <summary>Composes the standard heal-over-time, stun, and speed-modification effects.</summary>
-    public class EffectsFeature<TWorld> :
-        StaticEcsFeature<TWorld>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+    public class EffectsFeature<TWorld>
+        : StaticEcsFeature<TWorld>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
         where TWorld : struct, IWorldType
     {
         private readonly HealOverTimeFeature<TWorld> _heal = new();
@@ -25,7 +25,8 @@ namespace UniGame.StaticEcs.Features
         /// <inheritdoc />
         public async UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             await _heal.RegisterSystemsAsync(systems, cancellationToken);
             await _stun.RegisterSystemsAsync(systems, cancellationToken);

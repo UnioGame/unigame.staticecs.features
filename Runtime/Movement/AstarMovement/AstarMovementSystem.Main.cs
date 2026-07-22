@@ -1,6 +1,5 @@
- 
-
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     using Unity;
 
     /// <summary>Main-world alias for <see cref="AstarMovementSystem{TWorld}"/>.</summary>

@@ -1,8 +1,7 @@
- 
-using UnityEngine;
-
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     using Unity;
+    using UnityEngine;
 
     /// <summary>Main-world alias for <see cref="AstarObstacleConverter{TWorld}"/>.</summary>
     [AddComponentMenu("Static ECS/Movement/Astar Obstacle Converter")]

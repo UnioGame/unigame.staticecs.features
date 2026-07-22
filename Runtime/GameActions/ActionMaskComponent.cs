@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-entity bitmask that gates <see cref="GameActionOperations.Raise{TWorld,TAction}"/> calls.
     /// Each bit corresponds to one <see cref="IGameAction"/> type via <see cref="ActionBit{TAction}"/>.
@@ -10,7 +11,8 @@ namespace UniGame.StaticEcs.Features {
     /// Entities without this component are treated as fully enabled.
     /// </para>
     /// </summary>
-    public struct ActionMaskComponent : IComponent {
+    public struct ActionMaskComponent : IComponent
+    {
         /// <summary>Bitmask of currently enabled action slots.</summary>
         public uint Bits;
 

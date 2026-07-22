@@ -1,23 +1,24 @@
-using System;
-using FFS.Libraries.StaticEcs;
-using FFS.Libraries.StaticEcs.Unity;
-using UniGame.StaticEcs.Unity;
-using UnityEngine;
-
 namespace UniGame.StaticEcs.Features
 {
+    using System;
+    using FFS.Libraries.StaticEcs;
+    using FFS.Libraries.StaticEcs.Unity;
+    using UniGame.StaticEcs.Unity;
+    using UnityEngine;
+
     /// <summary>Creates and resolves A* movement bindings from inline authoring data.</summary>
     [Serializable]
-    public class AstarMovementSerializableConverter<TWorld> :
-        EcsSerializableConverter<TWorld>,
-        IEcsLinkResolver<TWorld>
+    public class AstarMovementSerializableConverter<TWorld>
+        : EcsSerializableConverter<TWorld>,
+            IEcsLinkResolver<TWorld>
         where TWorld : struct, IWorldType
     {
         [SerializeField]
         private AbstractStaticEcsEntityProvider _graphProvider;
 
         /// <summary>Gets or sets the provider owning the A* graph entity.</summary>
-        public AbstractStaticEcsEntityProvider GraphProvider {
+        public AbstractStaticEcsEntityProvider GraphProvider
+        {
             get => _graphProvider;
             set => _graphProvider = value;
         }

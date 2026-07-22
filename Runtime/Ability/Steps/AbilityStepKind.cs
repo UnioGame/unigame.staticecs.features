@@ -1,10 +1,12 @@
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     /// <summary>
     /// Coarse-grained category of a step config used for observability events and for
     /// progression-system dispatch between leaf and composite branches. The exact step
     /// behaviour is selected by the concrete <see cref="IAbilityStepConfig"/> Type, not by this enum.
     /// </summary>
-    public enum AbilityStepKind : byte {
+    public enum AbilityStepKind : byte
+    {
         Wait = 0,
         ApplyDamage = 1,
         ApplyEffect = 2,

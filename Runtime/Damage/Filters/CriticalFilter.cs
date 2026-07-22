@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Amplifies the damage amount when <see cref="DamageContext.ForceCritical"/> is set or the
     /// crit roll succeeds against the source's <see cref="CriticalChanceCharacteristic"/>. The
@@ -8,21 +9,32 @@ namespace UniGame.StaticEcs.Features {
     /// falls back to <see cref="DefaultMultiplier"/> when the source has no value configured.
     /// </summary>
     public sealed class CriticalFilter<TWorld> : IDamageFilter<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         public const float DefaultMultiplier = 2f;
 
-        public void Apply(ref DamageContext ctx) {
-            if (ctx.Cancelled || ctx.Type == DamageType.Healing || ctx.Amount <= 0f) {
+        public void Apply(ref DamageContext ctx)
+        {
+            if (ctx.Cancelled || ctx.Type == DamageType.Healing || ctx.Amount <= 0f)
+            {
                 return;
             }
 
             var roll = ctx.ForceCritical;
-            if (!roll) {
-                if (!DamageCharacteristicHelper.TryReadValue<TWorld, CriticalChanceCharacteristic>(ctx.Source, out var chance)) {
+            if (!roll)
+            {
+                if (
+                    !DamageCharacteristicHelper.TryReadValue<TWorld, CriticalChanceCharacteristic>(
+                        ctx.Source,
+                        out var chance
+                    )
+                )
+                {
                     return;
                 }
 
-                if (chance <= 0f) {
+                if (chance <= 0f)
+                {
                     return;
                 }
 
@@ -30,12 +42,20 @@ namespace UniGame.StaticEcs.Features {
                 roll = rng.RollChance(chance);
             }
 
-            if (!roll) {
+            if (!roll)
+            {
                 return;
             }
 
             var multiplier = DefaultMultiplier;
-            if (DamageCharacteristicHelper.TryReadValue<TWorld, CriticalMultiplierCharacteristic>(ctx.Source, out var configured) && configured > 0f) {
+            if (
+                DamageCharacteristicHelper.TryReadValue<TWorld, CriticalMultiplierCharacteristic>(
+                    ctx.Source,
+                    out var configured
+                )
+                && configured > 0f
+            )
+            {
                 multiplier = configured;
             }
 
@@ -43,14 +63,17 @@ namespace UniGame.StaticEcs.Features {
             ctx.Amount *= multiplier;
             ctx.IsCritical = true;
 
-            World<TWorld>.SendEvent(new DamageCriticalEvent {
-                Source      = ctx.Source,
-                Target      = ctx.Target,
-                BaseAmount  = baseAmount,
-                FinalAmount = ctx.Amount,
-                Multiplier  = multiplier,
-                Type        = ctx.Type
-            });
+            World<TWorld>.SendEvent(
+                new DamageCriticalEvent
+                {
+                    Source = ctx.Source,
+                    Target = ctx.Target,
+                    BaseAmount = baseAmount,
+                    FinalAmount = ctx.Amount,
+                    Multiplier = multiplier,
+                    Type = ctx.Type,
+                }
+            );
         }
     }
 }

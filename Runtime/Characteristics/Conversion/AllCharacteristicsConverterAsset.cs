@@ -1,15 +1,13 @@
-using FFS.Libraries.StaticEcs;
-using UnityEngine;
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Unity;
+    using UnityEngine;
 
     /// <summary>Main-world alias for <see cref="AllCharacteristicsConverterAsset{TWorld}"/>.</summary>
     [CreateAssetMenu(menuName = "Static ECS/Characteristics/All Characteristics Converter")]
-    public sealed class AllCharacteristicsConverterAsset : AllCharacteristicsConverterAsset<Main>
-    {
-    }
+    public sealed class AllCharacteristicsConverterAsset
+        : AllCharacteristicsConverterAsset<Main> { }
 
     /// <summary>
     /// ScriptableObject converter that applies all nine standard characteristic components
@@ -58,7 +56,8 @@ namespace UniGame.StaticEcs.Features
                 blockChance,
                 dodgeChance,
                 critChance,
-                critMultiplier);
+                critMultiplier
+            );
         }
     }
 }

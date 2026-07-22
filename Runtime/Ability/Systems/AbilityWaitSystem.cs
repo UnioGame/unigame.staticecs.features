@@ -1,34 +1,36 @@
-using FFS.Libraries.StaticEcs;
- 
-
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
     using Time;
 
     /// <summary>
-    /// Drains <see cref="AbilityWaitState"/> timers across all active cast-entities. On expiry
+    /// Drains <see cref="AbilityWaitComponent"/> timers across all active cast-entities. On expiry
     /// removes the wait component, writes <see cref="StepStatus.Success"/> into
-    /// <see cref="AbilityStepLastStatus"/>, and arms <see cref="AbilityStepReadyTag"/> so
+    /// <see cref="AbilityStepStatusComponent"/>, and arms <see cref="AbilityStepReadyTag"/> so
     /// <c>AbilityStepProgressionSystem</c> can advance the cast in the next pass.
     /// </summary>
     public sealed class AbilityWaitSystem<TWorld> : ISystem
-        where TWorld : struct, IWorldType {
-        public void Update() {
+        where TWorld : struct, IWorldType
+    {
+        public void Update()
+        {
             var dt = World<TWorld>.GetResource<EcsTime>().DeltaTime;
-            if (dt <= 0f) {
+            if (dt <= 0f)
+            {
                 return;
             }
 
-            foreach (var entity in World<TWorld>
-                         .Query<All<AbilityWaitState>>()
-                         .Entities()) {
-                ref var state = ref entity.Mut<AbilityWaitState>();
+            foreach (var entity in World<TWorld>.Query<All<AbilityWaitComponent>>().Entities())
+            {
+                ref var state = ref entity.Mut<AbilityWaitComponent>();
                 state.TimeLeft -= dt;
-                if (state.TimeLeft > 0f) {
+                if (state.TimeLeft > 0f)
+                {
                     continue;
                 }
 
-                entity.Delete<AbilityWaitState>();
-                entity.Set(new AbilityStepLastStatus { Status = StepStatus.Success });
+                entity.Delete<AbilityWaitComponent>();
+                entity.Set(new AbilityStepStatusComponent { Status = StepStatus.Success });
                 entity.Set<AbilityStepReadyTag>();
             }
         }

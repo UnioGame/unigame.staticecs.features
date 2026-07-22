@@ -1,11 +1,14 @@
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
+namespace UniGame.StaticEcs.Features.Tests
+{
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
 
-namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
-    public sealed class StunSourceTests {
+    public sealed class StunSourceTests
+    {
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestStunWorld>.Create(WorldConfig.Default());
             new ModifierBackRefFeature<TestStunWorld>().RegisterTypes(World<TestStunWorld>.Types());
             new StunFeature<TestStunWorld>().RegisterTypes(World<TestStunWorld>.Types());
@@ -13,14 +16,17 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [TearDown]
-        public void TearDown() {
-            if (World<TestStunWorld>.Status != WorldStatus.NotCreated) {
+        public void TearDown()
+        {
+            if (World<TestStunWorld>.Status != WorldStatus.NotCreated)
+            {
                 World<TestStunWorld>.Destroy();
             }
         }
 
         [Test]
-        public void TwoSources_FirstAdded_ActivatesTag() {
+        public void TwoSources_FirstAdded_ActivatesTag()
+        {
             var target = World<TestStunWorld>.NewEntity<Default>();
             var sourceA = World<TestStunWorld>.NewEntity<Default>();
             var sourceB = World<TestStunWorld>.NewEntity<Default>();
@@ -35,7 +41,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void RemoveSource_KeepsTagWhileOthersPresent() {
+        public void RemoveSource_KeepsTagWhileOthersPresent()
+        {
             var target = World<TestStunWorld>.NewEntity<Default>();
             var sourceA = World<TestStunWorld>.NewEntity<Default>();
             var sourceB = World<TestStunWorld>.NewEntity<Default>();
@@ -55,7 +62,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void DestroySource_AutoRemovesItsEntry() {
+        public void DestroySource_AutoRemovesItsEntry()
+        {
             var target = World<TestStunWorld>.NewEntity<Default>();
             var sourceA = World<TestStunWorld>.NewEntity<Default>();
             var sourceB = World<TestStunWorld>.NewEntity<Default>();
@@ -75,7 +83,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Clear_RemovesAllSourcesAndTag() {
+        public void Clear_RemovesAllSourcesAndTag()
+        {
             var target = World<TestStunWorld>.NewEntity<Default>();
             var sourceA = World<TestStunWorld>.NewEntity<Default>();
             var sourceB = World<TestStunWorld>.NewEntity<Default>();

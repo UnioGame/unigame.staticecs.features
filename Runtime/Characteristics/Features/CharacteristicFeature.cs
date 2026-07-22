@@ -1,7 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Modifiers;
 
     public class CharacteristicFeature<TWorld, TCharacteristic> : StaticEcsFeature<TWorld>
@@ -13,7 +12,7 @@ namespace UniGame.StaticEcs.Features
             types
                 .Component<CharacteristicComponent<TCharacteristic>>()
                 .Event<CharacteristicChangedEvent<TCharacteristic>>()
-                .Multi<CharacteristicModifierEntry<TCharacteristic>>();
+                .Multi<CharacteristicModifierComponent<TCharacteristic>>();
 
             if (!World<TWorld>.HasResource<ModifierRegistry>())
             {
@@ -25,7 +24,11 @@ namespace UniGame.StaticEcs.Features
                 registry,
                 (ulong)CharacteristicFlagOf<TCharacteristic>.Value,
                 static (src, tgt) =>
-                    CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TCharacteristic>(tgt, src));
+                    CharacteristicModifierExtensions.RemoveModifiersFromSource<
+                        TWorld,
+                        TCharacteristic
+                    >(tgt, src)
+            );
         }
     }
 }

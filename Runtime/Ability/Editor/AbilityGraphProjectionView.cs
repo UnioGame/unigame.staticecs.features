@@ -1,36 +1,50 @@
-using UnityEngine;
-using UnityEngine.UIElements;
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
+{
+    using UnityEngine;
+    using UnityEngine.UIElements;
 
-namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
-    internal sealed class AbilityGraphProjectionView : ScrollView {
-        public AbilityGraphProjectionView() {
+    internal sealed class AbilityGraphProjectionView : ScrollView
+    {
+        public AbilityGraphProjectionView()
+        {
             style.flexGrow = 1f;
             horizontalScrollerVisibility = ScrollerVisibility.Hidden;
             verticalScrollerVisibility = ScrollerVisibility.Auto;
         }
 
-        public void Render(AbilityGraphProjection projection) {
+        public void Render(AbilityGraphProjection projection)
+        {
             contentContainer.Clear();
 
-            if (projection == null || projection.Nodes.Count == 0) {
-                Add(new HelpBox("No graph data available for the selected ability.", HelpBoxMessageType.Info));
+            if (projection == null || projection.Nodes.Count == 0)
+            {
+                Add(
+                    new HelpBox(
+                        "No graph data available for the selected ability.",
+                        HelpBoxMessageType.Info
+                    )
+                );
                 return;
             }
 
-            if (projection.Warnings.Count > 0) {
-                for (var i = 0; i < projection.Warnings.Count; i++) {
+            if (projection.Warnings.Count > 0)
+            {
+                for (var i = 0; i < projection.Warnings.Count; i++)
+                {
                     var warning = new HelpBox(projection.Warnings[i], HelpBoxMessageType.Warning);
                     warning.style.marginBottom = 6f;
                     Add(warning);
                 }
             }
 
-            for (var i = 0; i < projection.Nodes.Count; i++) {
+            for (var i = 0; i < projection.Nodes.Count; i++)
+            {
                 Add(CreateNodeRow(projection.Nodes[i]));
             }
         }
 
-        private static VisualElement CreateNodeRow(AbilityGraphProjection.Node node) {
+        private static VisualElement CreateNodeRow(AbilityGraphProjection.Node node)
+        {
             var row = new VisualElement();
             row.style.flexDirection = FlexDirection.Row;
             row.style.alignItems = Align.FlexStart;
@@ -41,7 +55,9 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
             indent.style.flexShrink = 0f;
             row.Add(indent);
 
-            var edgeLabel = new Label(string.IsNullOrEmpty(node.ParentEdgeLabel) ? "Root" : node.ParentEdgeLabel);
+            var edgeLabel = new Label(
+                string.IsNullOrEmpty(node.ParentEdgeLabel) ? "Root" : node.ParentEdgeLabel
+            );
             edgeLabel.style.minWidth = 76f;
             edgeLabel.style.marginTop = 8f;
             edgeLabel.style.unityTextAlign = TextAnchor.MiddleLeft;
@@ -78,7 +94,9 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
             subtitle.style.color = new Color(0.78f, 0.78f, 0.82f, 1f);
             card.Add(subtitle);
 
-            var metadata = new Label($"Kind: {node.Config.Kind}   NodeGuid: {(string.IsNullOrWhiteSpace(node.Config.NodeGuid) ? "<empty>" : node.Config.NodeGuid)}");
+            var metadata = new Label(
+                $"Kind: {node.Config.Kind}   NodeGuid: {(string.IsNullOrWhiteSpace(node.Config.NodeGuid) ? "<empty>" : node.Config.NodeGuid)}"
+            );
             metadata.style.marginTop = 4f;
             metadata.style.fontSize = 11;
             metadata.style.color = new Color(0.55f, 0.55f, 0.60f, 1f);

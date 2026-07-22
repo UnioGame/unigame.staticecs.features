@@ -1,5 +1,7 @@
-namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
-    internal enum AbilityGraphContextTarget : byte {
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
+{
+    internal enum AbilityGraphContextTarget : byte
+    {
         Background = 0,
         Node = 1,
         Edge = 2,

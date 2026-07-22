@@ -1,4 +1,5 @@
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     /// <summary>
     /// Marker for the critical-chance characteristic. Value is a 0..1 probability for an incoming
     /// damage event to be amplified by <see cref="CriticalMultiplierCharacteristic"/>.

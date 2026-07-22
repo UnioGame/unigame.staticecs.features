@@ -1,7 +1,8 @@
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     /// <summary>
     /// Marker for time-bounded characteristic modifications. Pairs with
-    /// <see cref="ModificationEffectData{TStat}"/> on the target and a
+    /// <see cref="ModificationEffectComponent{TStat}"/> on the target and a
     /// <see cref="ModificationEffectHandler{TWorld, TStat}"/> handler resource.
     /// </summary>
     [EffectFlag(EffectFlag.Modification)]

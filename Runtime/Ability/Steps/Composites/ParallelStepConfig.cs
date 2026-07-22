@@ -1,16 +1,29 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using System.Collections.Generic;
+    using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
-    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
-    public sealed class ParallelStepConfig : IAbilityStepConfig {
-        [SerializeField] private string _nodeGuid;
-        [SerializeReference] private List<IAbilityStepConfig> _children = new();
-        [SerializeField] private ParallelJoinPolicy _joinPolicy;
-        [SerializeField] private bool _cancelRemainingOnJoin = true;
+    [MovedFrom(
+        true,
+        sourceNamespace: "unigame.staticecs.features",
+        sourceAssembly: "unigame.staticecs.features"
+    )]
+    public sealed class ParallelStepConfig : IAbilityStepConfig
+    {
+        [SerializeField]
+        private string _nodeGuid;
+
+        [SerializeReference]
+        private List<IAbilityStepConfig> _children = new();
+
+        [SerializeField]
+        private ParallelJoinPolicy _joinPolicy;
+
+        [SerializeField]
+        private bool _cancelRemainingOnJoin = true;
 
         public ParallelStepConfig() { }
 
@@ -18,11 +31,14 @@ namespace UniGame.StaticEcs.Features {
             IList<IAbilityStepConfig> children,
             ParallelJoinPolicy joinPolicy = ParallelJoinPolicy.AllSuccess,
             bool cancelRemainingOnJoin = true,
-            string nodeGuid = null) {
+            string nodeGuid = null
+        )
+        {
             _nodeGuid = nodeGuid;
             _joinPolicy = joinPolicy;
             _cancelRemainingOnJoin = cancelRemainingOnJoin;
-            if (children != null) {
+            if (children != null)
+            {
                 _children = new List<IAbilityStepConfig>(children);
             }
         }
@@ -33,6 +49,7 @@ namespace UniGame.StaticEcs.Features {
         public ParallelJoinPolicy JoinPolicy => _joinPolicy;
         public bool CancelRemainingOnJoin => _cancelRemainingOnJoin;
         public int ChildCount => _children?.Count ?? 0;
+
         public IAbilityStepConfig GetChild(int index) => _children[index];
     }
 }

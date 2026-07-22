@@ -1,49 +1,56 @@
-using FFS.Libraries.StaticEcs;
-
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
     using Time;
 
     /// <summary>
     /// Drains <see cref="EffectComponent{TEffect}"/> timers, fires periodic
     /// <see cref="IEffectHandler{TWorld,TEffect}.OnTick"/> calls, and removes the effect on
     /// natural expiry. Source-destroy cleanup is push-driven by
-    /// <see cref="EffectSourceTracker"/> and the <see cref="EffectRegistry"/> back-ref pipeline,
+    /// <see cref="EffectTrackerComponent"/> and the <see cref="EffectRegistry"/> back-ref pipeline,
     /// so this system does not poll <c>Source.Status</c>.
     /// </summary>
     public sealed class EffectTickSystem<TWorld, TEffect> : ISystem
         where TWorld : struct, IWorldType
-        where TEffect : struct, IEffectType {
-        public void Update() {
+        where TEffect : struct, IEffectType
+    {
+        public void Update()
+        {
             var dt = World<TWorld>.GetResource<EcsTime>().DeltaTime;
-            if (dt <= 0f) {
+            if (dt <= 0f)
+            {
                 return;
             }
 
             ref var handler = ref World<TWorld>.GetResource<IEffectHandler<TWorld, TEffect>>();
 
-            foreach (var entity in World<TWorld>
-                         .Query<All<EffectComponent<TEffect>>>()
-                         .Entities()) {
+            foreach (var entity in World<TWorld>.Query<All<EffectComponent<TEffect>>>().Entities())
+            {
                 ref var data = ref entity.Mut<EffectComponent<TEffect>>();
 
-                if (data.DelayLeft > 0f) {
+                if (data.DelayLeft > 0f)
+                {
                     data.DelayLeft -= dt;
-                    if (data.DelayLeft < 0f) {
+                    if (data.DelayLeft < 0f)
+                    {
                         data.DelayLeft = 0f;
                     }
                 }
 
                 data.TimeLeft -= dt;
 
-                if (data.Period > 0f) {
+                if (data.Period > 0f)
+                {
                     data.PeriodLeft -= dt;
-                    while (data.DelayLeft <= 0f && data.PeriodLeft <= 0f && data.TimeLeft > 0f) {
+                    while (data.DelayLeft <= 0f && data.PeriodLeft <= 0f && data.TimeLeft > 0f)
+                    {
                         handler.OnTick(entity.GID, data.Source, data.Stacks);
                         data.PeriodLeft += data.Period;
                     }
                 }
 
-                if (data.TimeLeft <= 0f) {
+                if (data.TimeLeft <= 0f)
+                {
                     EffectOperations.Expire<TWorld, TEffect>(entity, entity.GID);
                 }
             }

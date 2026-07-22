@@ -1,15 +1,15 @@
-using System.Collections.Generic;
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
-using UniGame.StaticEcs.Time;
-using UniGame.StaticEcs.Unity;
- 
- 
-using UnityEngine;
+namespace UniGame.StaticEcs.Features.Tests
+{
+    using System.Collections.Generic;
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
+    using UniGame.StaticEcs.Time;
+    using UniGame.StaticEcs.Unity;
+    using UnityEngine;
 
-namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
-    public sealed class SetPrimaryTargetFromAoeStepTests {
+    public sealed class SetPrimaryTargetFromAoeStepTests
+    {
         private static readonly AbilityId Ability = new(202);
 
         private readonly List<GameObject> _objects = new();
@@ -19,13 +19,22 @@ namespace UniGame.StaticEcs.Features.Tests {
         private FakeAbilityRng _rng;
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(World<TestAbilityWorld>.Types());
-            new TargetSelectionFeature<TestAbilityWorld>(registerRebuildSystem: false).RegisterTypes(World<TestAbilityWorld>.Types());
-            new DamageFeature<TestAbilityWorld>(registerApplySystem: false).RegisterTypes(World<TestAbilityWorld>.Types());
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(World<TestAbilityWorld>.Types());
-            World<TestAbilityWorld>.Types().Component<TransformBindingComponent>();
+            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(
+                World<TestAbilityWorld>.Types()
+            );
+            new TargetSelectionFeature<TestAbilityWorld>(
+                registerRebuildSystem: false
+            ).RegisterTypes(World<TestAbilityWorld>.Types());
+            new DamageFeature<TestAbilityWorld>(registerApplySystem: false).RegisterTypes(
+                World<TestAbilityWorld>.Types()
+            );
+            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
+                World<TestAbilityWorld>.Types()
+            );
+            World<TestAbilityWorld>.Types().Component<TransformComponent>();
             World<TestAbilityWorld>.Initialize();
 
             _rng = new FakeAbilityRng();
@@ -38,56 +47,68 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [TearDown]
-        public void TearDown() {
+        public void TearDown()
+        {
             _castSystem.Destroy();
-            foreach (var go in _objects) {
+            foreach (var go in _objects)
+            {
                 Object.DestroyImmediate(go);
             }
             _objects.Clear();
-            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated) {
+            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
+            {
                 World<TestAbilityWorld>.Destroy();
             }
         }
 
         [Test]
-        public void First_SelectsFirstAoeEntry() {
+        public void First_SelectsFirstAoeEntry()
+        {
             AssertSelector(AoeTargetSelector.First, randomIndex: 0, expectedX: 1f);
         }
 
         [Test]
-        public void Random_UsesAbilityRngIndex() {
+        public void Random_UsesAbilityRngIndex()
+        {
             AssertSelector(AoeTargetSelector.Random, randomIndex: 1, expectedX: 2f);
         }
 
         [Test]
-        public void Closest_SelectsNearestToCaster() {
+        public void Closest_SelectsNearestToCaster()
+        {
             AssertSelector(AoeTargetSelector.Closest, randomIndex: 0, expectedX: 1f);
         }
 
         [Test]
-        public void EmptyBuffer_FailsCast() {
+        public void EmptyBuffer_FailsCast()
+        {
             RegisterSelectorAbility(AoeTargetSelector.First);
             var caster = CreateEntity("caster", Vector3.zero, targetable: false);
             World<TestAbilityWorld>.GetResource<ITargetIndex<TestAbilityWorld>>().Rebuild();
             AbilityOperations.Equip<TestAbilityWorld>(caster.GID, Ability);
 
             var receiver = World<TestAbilityWorld>.RegisterEventReceiver<AbilityCompletedEvent>();
-            try {
+            try
+            {
                 AbilityOperations.TryStartCast<TestAbilityWorld>(caster.GID, Ability);
                 Tick(0.0001f);
                 RunSystems();
 
                 AbilityCompletedReason? reason = null;
-                foreach (var e in receiver) {
+                foreach (var e in receiver)
+                {
                     reason = e.Value.Reason;
                 }
                 Assert.AreEqual(AbilityCompletedReason.Cancelled, reason);
-            } finally {
+            }
+            finally
+            {
                 World<TestAbilityWorld>.DeleteEventReceiver(ref receiver);
             }
         }
 
-        private void AssertSelector(AoeTargetSelector selector, int randomIndex, float expectedX) {
+        private void AssertSelector(AoeTargetSelector selector, int randomIndex, float expectedX)
+        {
             RegisterSelectorAbility(selector);
             _rng.NextInt = randomIndex;
 
@@ -100,50 +121,69 @@ namespace UniGame.StaticEcs.Features.Tests {
             AbilityOperations.Equip<TestAbilityWorld>(caster.GID, Ability);
 
             var receiver = World<TestAbilityWorld>.RegisterEventReceiver<IncomingDamageEvent>();
-            try {
+            try
+            {
                 AbilityOperations.TryStartCast<TestAbilityWorld>(caster.GID, Ability);
                 Tick(0.0001f);
                 RunSystems();
 
                 EntityGID actual = default;
-                foreach (var e in receiver) {
+                foreach (var e in receiver)
+                {
                     actual = e.Value.Target;
                 }
                 Assert.AreEqual(expected, actual);
-            } finally {
+            }
+            finally
+            {
                 World<TestAbilityWorld>.DeleteEventReceiver(ref receiver);
             }
         }
 
-        private static void RegisterSelectorAbility(AoeTargetSelector selector) {
+        private static void RegisterSelectorAbility(AoeTargetSelector selector)
+        {
             var registry = World<TestAbilityWorld>.GetResource<AbilityRegistry<TestAbilityWorld>>();
-            registry.Register(new AbilityDefinition(Ability), new SequenceStepConfig(new IAbilityStepConfig[] {
-                new AoeQueryStepConfig(radius: 3f, maxTargets: 8, excludeCaster: true),
-                new SetPrimaryTargetFromAoeStepConfig(selector),
-                new ApplyDamageStepConfig(10f, AbilityTargetMode.PrimaryTarget),
-            }));
+            registry.Register(
+                new AbilityDefinition(Ability),
+                new SequenceStepConfig(
+                    new IAbilityStepConfig[]
+                    {
+                        new AoeQueryStepConfig(radius: 3f, maxTargets: 8, excludeCaster: true),
+                        new SetPrimaryTargetFromAoeStepConfig(selector),
+                        new ApplyDamageStepConfig(10f, AbilityTargetMode.PrimaryTarget),
+                    }
+                )
+            );
         }
 
-        private World<TestAbilityWorld>.Entity CreateEntity(string name, Vector3 position, bool targetable) {
+        private World<TestAbilityWorld>.Entity CreateEntity(
+            string name,
+            Vector3 position,
+            bool targetable
+        )
+        {
             var go = new GameObject(name);
             _objects.Add(go);
             go.transform.position = position;
 
             var entity = World<TestAbilityWorld>.NewEntity<Default>();
-            entity.Set(new TransformBindingComponent { Transform = go.transform });
-            if (targetable) {
+            entity.Set(new TransformComponent { Transform = go.transform });
+            if (targetable)
+            {
                 entity.Set<TargetableTag>();
             }
             return entity;
         }
 
-        private static void Tick(float dt) {
+        private static void Tick(float dt)
+        {
             ref var time = ref World<TestAbilityWorld>.GetResource<EcsTime>();
             time.DeltaTime = dt;
             time.Now += dt;
         }
 
-        private void RunSystems() {
+        private void RunSystems()
+        {
             _castSystem.Update();
             _waitSystem.Update();
             _progressionSystem.Update();

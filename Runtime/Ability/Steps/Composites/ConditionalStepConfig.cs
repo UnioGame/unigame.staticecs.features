@@ -1,15 +1,28 @@
-using System;
-using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
-    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
-    public sealed class ConditionalStepConfig : IAbilityStepConfig {
-        [SerializeField] private string _nodeGuid;
-        [SerializeReference] private IAbilityStepCondition _condition;
-        [SerializeReference] private IAbilityStepConfig _ifTrue;
-        [SerializeReference] private IAbilityStepConfig _ifFalse;
+    [MovedFrom(
+        true,
+        sourceNamespace: "unigame.staticecs.features",
+        sourceAssembly: "unigame.staticecs.features"
+    )]
+    public sealed class ConditionalStepConfig : IAbilityStepConfig
+    {
+        [SerializeField]
+        private string _nodeGuid;
+
+        [SerializeReference]
+        private IAbilityStepCondition _condition;
+
+        [SerializeReference]
+        private IAbilityStepConfig _ifTrue;
+
+        [SerializeReference]
+        private IAbilityStepConfig _ifFalse;
 
         public ConditionalStepConfig() { }
 
@@ -17,7 +30,9 @@ namespace UniGame.StaticEcs.Features {
             IAbilityStepCondition condition,
             IAbilityStepConfig ifTrue,
             IAbilityStepConfig ifFalse = null,
-            string nodeGuid = null) {
+            string nodeGuid = null
+        )
+        {
             _condition = condition;
             _ifTrue = ifTrue;
             _ifFalse = ifFalse;

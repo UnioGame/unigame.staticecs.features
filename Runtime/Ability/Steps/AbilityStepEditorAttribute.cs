@@ -1,16 +1,19 @@
-using System;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Optional editor metadata for an <see cref="IAbilityStepConfig"/> type.
     /// Provides a stable display name and palette category without affecting runtime execution.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-    public sealed class AbilityStepEditorAttribute : Attribute {
+    public sealed class AbilityStepEditorAttribute : Attribute
+    {
         /// <summary>
         /// Creates metadata for a custom or built-in ability step config type.
         /// </summary>
-        public AbilityStepEditorAttribute(string displayName, string category = null) {
+        public AbilityStepEditorAttribute(string displayName, string category = null)
+        {
             DisplayName = displayName;
             Category = category;
         }

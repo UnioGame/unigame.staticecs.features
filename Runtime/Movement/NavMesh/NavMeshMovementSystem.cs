@@ -1,7 +1,6 @@
-using FFS.Libraries.StaticEcs;
- 
-
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
     using Unity;
 
     /// <summary>Main-world alias for <see cref="NavMeshMovementSystem{TWorld}"/>.</summary>
@@ -13,27 +12,38 @@ namespace UniGame.StaticEcs.Features {
     /// Register in the update group after <see cref="NavMeshMovementFeature{TWorld}"/>.
     /// </summary>
     public class NavMeshMovementSystem<TWorld> : ISystem
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         /// <inheritdoc/>
-        public void Update() {
-            foreach (var entity in World<TWorld>
-                         .Query<All<MovementDestinationComponent, NavMeshAgentComponent>>()
-                         .Entities()) {
-                ref readonly var dest  = ref entity.Read<MovementDestinationComponent>();
+        public void Update()
+        {
+            foreach (
+                var entity in World<TWorld>
+                    .Query<All<MovementDestinationComponent, NavMeshAgentComponent>>()
+                    .Entities()
+            )
+            {
+                ref readonly var dest = ref entity.Read<MovementDestinationComponent>();
                 ref readonly var agent = ref entity.Read<NavMeshAgentComponent>();
 
-                if (agent.Agent == null) {
+                if (agent.Agent == null)
+                {
                     continue;
                 }
 
-                if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>()) {
-                    agent.Agent.speed = entity.Read<CharacteristicComponent<SpeedCharacteristic>>().Value;
+                if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
+                {
+                    agent.Agent.speed = entity
+                        .Read<CharacteristicComponent<SpeedCharacteristic>>()
+                        .Value;
                 }
 
-                if (dest.IsActive) {
+                if (dest.IsActive)
+                {
                     agent.Agent.SetDestination(dest.Destination);
                 }
-                else {
+                else
+                {
                     agent.Agent.ResetPath();
                 }
             }

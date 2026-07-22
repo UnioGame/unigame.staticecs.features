@@ -1,7 +1,9 @@
-using UnityEditor.Experimental.GraphView;
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
+{
+    using UnityEditor.Experimental.GraphView;
 
-namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
-    internal sealed class AbilityGraphContextCommandContext {
+    internal sealed class AbilityGraphContextCommandContext
+    {
         public AbilityAsset Asset;
         public AbilityGraphCanvasView CanvasView;
         public AbilityGraphNodeView NodeView;

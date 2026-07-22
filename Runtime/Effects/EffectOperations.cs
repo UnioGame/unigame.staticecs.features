@@ -1,9 +1,7 @@
-using System.Diagnostics;
-using FFS.Libraries.StaticEcs;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using System.Diagnostics;
+    using FFS.Libraries.StaticEcs;
     using Unity;
 
     /// <summary>
@@ -78,7 +76,8 @@ namespace UniGame.StaticEcs.Features
             EntityGID source,
             float duration,
             float period = 0f,
-            float delay = 0f)
+            float delay = 0f
+        )
             where TWorld : struct, IWorldType
             where TEffect : struct, IEffectType
         {
@@ -176,24 +175,28 @@ namespace UniGame.StaticEcs.Features
 
             if (isFresh)
             {
-                World<TWorld>.SendEvent(new EffectAppliedEvent<TEffect>
-                {
-                    Source = source,
-                    Target = target,
-                    Stacks = newStacks,
-                    TimeLeft = resultingTimeLeft
-                });
+                World<TWorld>.SendEvent(
+                    new EffectAppliedEvent<TEffect>
+                    {
+                        Source = source,
+                        Target = target,
+                        Stacks = newStacks,
+                        TimeLeft = resultingTimeLeft,
+                    }
+                );
             }
             else
             {
-                World<TWorld>.SendEvent(new EffectRefreshedEvent<TEffect>
-                {
-                    Source = source,
-                    Target = target,
-                    Stacks = newStacks,
-                    PreviousStacks = previousStacks,
-                    TimeLeft = resultingTimeLeft
-                });
+                World<TWorld>.SendEvent(
+                    new EffectRefreshedEvent<TEffect>
+                    {
+                        Source = source,
+                        Target = target,
+                        Stacks = newStacks,
+                        PreviousStacks = previousStacks,
+                        TimeLeft = resultingTimeLeft,
+                    }
+                );
             }
 
             return true;
@@ -271,7 +274,7 @@ namespace UniGame.StaticEcs.Features
                 return 0;
             }
 
-            if (!entity.Has<World<TWorld>.Multi<EffectRosterEntry>>())
+            if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
             {
                 return 0;
             }
@@ -283,7 +286,7 @@ namespace UniGame.StaticEcs.Features
 
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             ref var registry = ref World<TWorld>.GetResource<EffectRegistry>();
-            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectRosterEntry>>();
+            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
 
             var removed = 0;
             // Snapshot ids before invoking callbacks, since callbacks mutate the roster (RemoveAtSwap).
@@ -336,7 +339,8 @@ namespace UniGame.StaticEcs.Features
         private static void FinalizeEffect<TWorld, TEffect>(
             World<TWorld>.Entity entity,
             EntityGID target,
-            bool expired)
+            bool expired
+        )
             where TWorld : struct, IWorldType
             where TEffect : struct, IEffectType
         {
@@ -346,18 +350,24 @@ namespace UniGame.StaticEcs.Features
             entity.Delete<EffectComponent<TEffect>>();
             RemoveRosterEntry<TWorld, TEffect>(entity);
 
-            EffectBackRefRegistrar.Unregister<TWorld>(sourceFull, target, EffectFlagOf<TEffect>.Value);
+            EffectBackRefRegistrar.Unregister<TWorld>(
+                sourceFull,
+                target,
+                EffectFlagOf<TEffect>.Value
+            );
 
             ref var handler = ref World<TWorld>.GetResource<IEffectHandler<TWorld, TEffect>>();
             handler.OnRemoved(target, sourceFull, snapshot.Stacks, expired);
 
-            World<TWorld>.SendEvent(new EffectRemovedEvent<TEffect>
-            {
-                Source = sourceFull,
-                Target = target,
-                Stacks = snapshot.Stacks,
-                Expired = expired
-            });
+            World<TWorld>.SendEvent(
+                new EffectRemovedEvent<TEffect>
+                {
+                    Source = sourceFull,
+                    Target = target,
+                    Stacks = snapshot.Stacks,
+                    Expired = expired,
+                }
+            );
         }
 
         /// <summary>Tick-system entry point: completes the same finalize pipeline as
@@ -373,7 +383,10 @@ namespace UniGame.StaticEcs.Features
         // --- roster helpers (operate on already-resolved entity, no extra TryUnpack) ---
 
         private static void AddRosterEntry<TWorld, TEffect>(
-            World<TWorld>.Entity entity, int stacks, float timeLeft)
+            World<TWorld>.Entity entity,
+            int stacks,
+            float timeLeft
+        )
             where TWorld : struct, IWorldType
             where TEffect : struct, IEffectType
         {
@@ -383,17 +396,27 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            if (!entity.Has<World<TWorld>.Multi<EffectRosterEntry>>())
+            if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
             {
-                entity.Add<World<TWorld>.Multi<EffectRosterEntry>>();
+                entity.Add<World<TWorld>.Multi<EffectSummaryComponent>>();
             }
 
-            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectRosterEntry>>();
-            roster.Add(new EffectRosterEntry { Id = id, Stacks = stacks, TimeLeft = timeLeft });
+            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
+            roster.Add(
+                new EffectSummaryComponent
+                {
+                    Id = id,
+                    Stacks = stacks,
+                    TimeLeft = timeLeft,
+                }
+            );
         }
 
         private static void UpdateRosterEntry<TWorld, TEffect>(
-            World<TWorld>.Entity entity, int stacks, float timeLeft)
+            World<TWorld>.Entity entity,
+            int stacks,
+            float timeLeft
+        )
             where TWorld : struct, IWorldType
             where TEffect : struct, IEffectType
         {
@@ -403,13 +426,13 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            if (!entity.Has<World<TWorld>.Multi<EffectRosterEntry>>())
+            if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
             {
                 AddRosterEntry<TWorld, TEffect>(entity, stacks, timeLeft);
                 return;
             }
 
-            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectRosterEntry>>();
+            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
             for (var i = 0; i < roster.Length; i++)
             {
                 if (roster[i].Id.Equals(id))
@@ -420,7 +443,14 @@ namespace UniGame.StaticEcs.Features
                 }
             }
 
-            roster.Add(new EffectRosterEntry { Id = id, Stacks = stacks, TimeLeft = timeLeft });
+            roster.Add(
+                new EffectSummaryComponent
+                {
+                    Id = id,
+                    Stacks = stacks,
+                    TimeLeft = timeLeft,
+                }
+            );
         }
 
         private static void RemoveRosterEntry<TWorld, TEffect>(World<TWorld>.Entity entity)
@@ -438,12 +468,12 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            if (!entity.Has<World<TWorld>.Multi<EffectRosterEntry>>())
+            if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
             {
                 return;
             }
 
-            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectRosterEntry>>();
+            ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
             for (var i = 0; i < roster.Length; i++)
             {
                 if (roster[i].Id.Equals(id))
@@ -462,50 +492,54 @@ namespace UniGame.StaticEcs.Features
             if (!World<TWorld>.HasResource<EffectIdRegistry>())
             {
                 throw new System.InvalidOperationException(
-                    $"EffectIdRegistry is not registered for world {typeof(TWorld).Name}. " +
-                    $"Did you forget to add EffectFeature<{typeof(TWorld).Name}, {typeof(TEffect).Name}>?");
+                    $"EffectIdRegistry is not registered for world {typeof(TWorld).Name}. "
+                        + $"Did you forget to add EffectFeature<{typeof(TWorld).Name}, {typeof(TEffect).Name}>?"
+                );
             }
 
             if (!World<TWorld>.HasResource<IEffectHandler<TWorld, TEffect>>())
             {
                 throw new System.InvalidOperationException(
-                    $"IEffectHandler<{typeof(TWorld).Name}, {typeof(TEffect).Name}> is not registered. " +
-                    $"Did you forget to add EffectFeature<{typeof(TWorld).Name}, {typeof(TEffect).Name}>?");
+                    $"IEffectHandler<{typeof(TWorld).Name}, {typeof(TEffect).Name}> is not registered. "
+                        + $"Did you forget to add EffectFeature<{typeof(TWorld).Name}, {typeof(TEffect).Name}>?"
+                );
             }
 
             if (!World<TWorld>.HasResource<EffectConfig<TWorld, TEffect>>())
             {
                 throw new System.InvalidOperationException(
-                    $"EffectConfig<{typeof(TWorld).Name}, {typeof(TEffect).Name}> is not registered.");
+                    $"EffectConfig<{typeof(TWorld).Name}, {typeof(TEffect).Name}> is not registered."
+                );
             }
         }
 
         // --- Main-default overloads ---
 
-        public static bool Has<TEffect>(EntityGID target) where TEffect : struct, IEffectType
-            => Has<Main, TEffect>(target);
+        public static bool Has<TEffect>(EntityGID target)
+            where TEffect : struct, IEffectType => Has<Main, TEffect>(target);
 
-        public static float GetTimeLeft<TEffect>(EntityGID target) where TEffect : struct, IEffectType
-            => GetTimeLeft<Main, TEffect>(target);
+        public static float GetTimeLeft<TEffect>(EntityGID target)
+            where TEffect : struct, IEffectType => GetTimeLeft<Main, TEffect>(target);
 
-        public static int GetStacks<TEffect>(EntityGID target) where TEffect : struct, IEffectType
-            => GetStacks<Main, TEffect>(target);
+        public static int GetStacks<TEffect>(EntityGID target)
+            where TEffect : struct, IEffectType => GetStacks<Main, TEffect>(target);
 
         public static bool Apply<TEffect>(
             EntityGID target,
             EntityGID source,
             float duration,
             float period = 0f,
-            float delay = 0f)
-            where TEffect : struct, IEffectType
-            => Apply<Main, TEffect>(target, source, duration, period, delay);
+            float delay = 0f
+        )
+            where TEffect : struct, IEffectType =>
+            Apply<Main, TEffect>(target, source, duration, period, delay);
 
-        public static bool Remove<TEffect>(EntityGID target) where TEffect : struct, IEffectType
-            => Remove<Main, TEffect>(target);
+        public static bool Remove<TEffect>(EntityGID target)
+            where TEffect : struct, IEffectType => Remove<Main, TEffect>(target);
 
         public static int RemoveAll(EntityGID target) => RemoveAll<Main>(target);
 
-        public static int RemoveByMask(EntityGID target, EffectFlag mask)
-            => RemoveByMask<Main>(target, mask);
+        public static int RemoveByMask(EntityGID target, EffectFlag mask) =>
+            RemoveByMask<Main>(target, mask);
     }
 }

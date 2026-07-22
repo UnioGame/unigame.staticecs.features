@@ -1,15 +1,28 @@
-using System;
-using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
-    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
-    public sealed class RepeatStepConfig : IAbilityStepConfig {
-        [SerializeField] private string _nodeGuid;
-        [SerializeReference] private IAbilityStepConfig _body;
-        [SerializeField] private int _maxIterations;
-        [SerializeReference] private IAbilityStepCondition _whileCondition;
+    [MovedFrom(
+        true,
+        sourceNamespace: "unigame.staticecs.features",
+        sourceAssembly: "unigame.staticecs.features"
+    )]
+    public sealed class RepeatStepConfig : IAbilityStepConfig
+    {
+        [SerializeField]
+        private string _nodeGuid;
+
+        [SerializeReference]
+        private IAbilityStepConfig _body;
+
+        [SerializeField]
+        private int _maxIterations;
+
+        [SerializeReference]
+        private IAbilityStepCondition _whileCondition;
 
         public RepeatStepConfig() { }
 
@@ -17,7 +30,9 @@ namespace UniGame.StaticEcs.Features {
             IAbilityStepConfig body,
             int maxIterations,
             IAbilityStepCondition whileCondition = null,
-            string nodeGuid = null) {
+            string nodeGuid = null
+        )
+        {
             _body = body;
             _maxIterations = maxIterations;
             _whileCondition = whileCondition;

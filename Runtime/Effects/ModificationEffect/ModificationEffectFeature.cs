@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Time-bounded characteristic modification slice. Generic over the target characteristic
     /// type; project code instantiates one feature per stat (e.g.
@@ -9,19 +10,28 @@ namespace UniGame.StaticEcs.Features {
     /// Requires the matching <see cref="CharacteristicFeature{TWorld, TCharacteristic}"/> and
     /// <see cref="ModifierBackRefFeature{TWorld}"/> to be registered first.
     /// </summary>
-    public class ModificationEffectFeature<TWorld, TStat> : EffectFeature<TWorld, ModificationEffect<TStat>>
+    public class ModificationEffectFeature<TWorld, TStat>
+        : EffectFeature<TWorld, ModificationEffect<TStat>>
         where TWorld : struct, IWorldType
-        where TStat : struct, ICharacteristicType {
+        where TStat : struct, ICharacteristicType
+    {
         public ModificationEffectFeature(
             int maxStacks = 1,
             bool refreshOnReapply = true,
             short tickOrder = DefaultTickOrder,
-            bool registerTickSystem = true)
-            : base(new ModificationEffectHandler<TWorld, TStat>(), maxStacks, refreshOnReapply, tickOrder, registerTickSystem) {
-        }
+            bool registerTickSystem = true
+        )
+            : base(
+                new ModificationEffectHandler<TWorld, TStat>(),
+                maxStacks,
+                refreshOnReapply,
+                tickOrder,
+                registerTickSystem
+            ) { }
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
-            types.Component<ModificationEffectData<TStat>>();
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
+            types.Component<ModificationEffectComponent<TStat>>();
             base.RegisterTypes(types);
         }
     }

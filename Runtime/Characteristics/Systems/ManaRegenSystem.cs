@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Time;
 
     public sealed class ManaRegenSystem<TWorld> : ISystem
@@ -16,9 +14,11 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            foreach (var entity in World<TWorld>
-                         .Query<All<CharacteristicComponent<ManaCharacteristic>, ManaRegenComponent>>()
-                         .Entities())
+            foreach (
+                var entity in World<TWorld>
+                    .Query<All<CharacteristicComponent<ManaCharacteristic>, ManaRegenComponent>>()
+                    .Entities()
+            )
             {
                 ref readonly var regen = ref entity.Read<ManaRegenComponent>();
                 if (regen.Rate == 0f)
@@ -30,7 +30,8 @@ namespace UniGame.StaticEcs.Features
                 CharacteristicOperations.AddValue<TWorld, ManaCharacteristic>(
                     ref mana,
                     entity.GID,
-                    regen.Rate * dt);
+                    regen.Rate * dt
+                );
             }
         }
     }

@@ -1,9 +1,8 @@
-using FFS.Libraries.StaticEcs;
-using UnityEngine;
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Unity;
+    using UnityEngine;
 
     /// <summary>Converts an A* graph host into backend and grid configuration components.</summary>
     [DisallowMultipleComponent]
@@ -53,7 +52,9 @@ namespace UniGame.StaticEcs.Features
                     _obstacleMask,
                     _agentDiameter,
                     _agentHeight,
-                    _flushGraphUpdates));
+                    _flushGraphUpdates
+                )
+            );
         }
     }
 
@@ -62,24 +63,30 @@ namespace UniGame.StaticEcs.Features
         public static void Apply<TWorld>(
             World<TWorld>.Entity entity,
             GameObject host,
-            AstarGridGraphConverterSettings settings)
+            AstarGridGraphConverterSettings settings
+        )
             where TWorld : struct, IWorldType
         {
-            entity.Set(new AstarPathComponent {
-                Backend = host != null ? host.GetComponent<AstarPath>() : null,
-            });
-            entity.Set(new AstarGridGraphConfigComponent
-            {
-                Center = settings.center,
-                Rotation = settings.rotation,
-                Width = settings.width,
-                Depth = settings.depth,
-                NodeSize = settings.nodeSize,
-                ObstacleMask = settings.obstacleMask.value,
-                AgentDiameter = settings.agentDiameter,
-                AgentHeight = settings.agentHeight,
-                FlushGraphUpdates = settings.flushGraphUpdates,
-            });
+            entity.Set(
+                new AstarPathComponent
+                {
+                    Backend = host != null ? host.GetComponent<AstarPath>() : null,
+                }
+            );
+            entity.Set(
+                new AstarGridGraphConfigComponent
+                {
+                    Center = settings.center,
+                    Rotation = settings.rotation,
+                    Width = settings.width,
+                    Depth = settings.depth,
+                    NodeSize = settings.nodeSize,
+                    ObstacleMask = settings.obstacleMask.value,
+                    AgentDiameter = settings.agentDiameter,
+                    AgentHeight = settings.agentHeight,
+                    FlushGraphUpdates = settings.flushGraphUpdates,
+                }
+            );
         }
     }
 }

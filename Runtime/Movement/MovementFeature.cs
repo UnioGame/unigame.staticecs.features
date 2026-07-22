@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
- 
- 
-
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
     using Unity;
 
     /// <summary>Main-world alias for <see cref="MovementFeature{TWorld}"/>.</summary>
@@ -14,9 +12,11 @@ namespace UniGame.StaticEcs.Features {
     /// to the update group to drive actual navigation.
     /// </summary>
     public class MovementFeature<TWorld> : StaticEcsFeature<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         /// <inheritdoc/>
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
             types.Component<MovementDestinationComponent>();
         }
     }

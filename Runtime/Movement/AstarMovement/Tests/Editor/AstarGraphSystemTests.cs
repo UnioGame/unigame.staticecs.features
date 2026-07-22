@@ -1,23 +1,25 @@
-using System.Reflection;
-using System.Text.RegularExpressions;
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
-using Pathfinding;
-using Pathfinding.Graphs.Grid;
-using UniGame.StaticEcs.Unity;
- 
-using UnityEngine;
-using UnityEngine.TestTools;
+namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
+{
+    using System.Reflection;
+    using System.Text.RegularExpressions;
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
+    using Pathfinding;
+    using Pathfinding.Graphs.Grid;
+    using UniGame.StaticEcs.Unity;
+    using UnityEngine;
+    using UnityEngine.TestTools;
 
-namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
     [TestFixture]
-    public sealed class AstarGraphSystemTests {
+    public sealed class AstarGraphSystemTests
+    {
         private GameObject _graphHost;
         private AstarPath _backend;
         private AstarGraphSystem<TestAstarWorld> _system;
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestAstarWorld>.Create(WorldConfig.Default());
             new AstarMovementFeature<TestAstarWorld>().RegisterTypes(World<TestAstarWorld>.Types());
             World<TestAstarWorld>.Initialize();
@@ -28,58 +30,71 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [TearDown]
-        public void TearDown() {
-            if (World<TestAstarWorld>.Status != WorldStatus.NotCreated) {
+        public void TearDown()
+        {
+            if (World<TestAstarWorld>.Status != WorldStatus.NotCreated)
+            {
                 World<TestAstarWorld>.Destroy();
             }
 
-            if (_graphHost != null) {
+            if (_graphHost != null)
+            {
                 Object.DestroyImmediate(_graphHost);
             }
         }
 
         [Test]
-        public void Update_CreatesAndScansGraphOnlyOnce() {
+        public void Update_CreatesAndScansGraphOnlyOnce()
+        {
             var entity = CreateGraphEntity();
 
             _system.Update();
-            var firstGraph = entity.Read<AstarGridGraphRuntimeComponent>().Graph;
+            var firstGraph = entity.Read<AstarGridGraphComponent>().Graph;
             _system.Update();
 
             Assert.IsNotNull(firstGraph);
             Assert.IsTrue(entity.Has<AstarGraphInitializedTag>());
-            Assert.Greater(entity.Read<AstarGridGraphRuntimeComponent>().NodeCount, 0);
-            Assert.Greater(entity.Read<AstarGridGraphRuntimeComponent>().WalkableNodeCount, 0);
-            Assert.AreSame(firstGraph, entity.Read<AstarGridGraphRuntimeComponent>().Graph);
+            Assert.Greater(entity.Read<AstarGridGraphComponent>().NodeCount, 0);
+            Assert.Greater(entity.Read<AstarGridGraphComponent>().WalkableNodeCount, 0);
+            Assert.AreSame(firstGraph, entity.Read<AstarGridGraphComponent>().Graph);
             Assert.AreEqual(1, _backend.data.graphs.Length);
         }
 
         [Test]
-        public void Update_FullyBlockedGraphIsMarkedFailedAndNotRecreated() {
+        public void Update_FullyBlockedGraphIsMarkedFailedAndNotRecreated()
+        {
             var blocker = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            try {
+            try
+            {
                 blocker.transform.position = new Vector3(0f, 0.5f, 0f);
                 blocker.transform.localScale = new Vector3(20f, 2f, 20f);
                 Physics.SyncTransforms();
                 var entity = CreateGraphEntity();
 
-                LogAssert.Expect(LogType.Error, new Regex("Grid scan is unusable: registered=True, scanned=True, nodes=.*walkable=0"));
+                LogAssert.Expect(
+                    LogType.Error,
+                    new Regex(
+                        "Grid scan is unusable: registered=True, scanned=True, nodes=.*walkable=0"
+                    )
+                );
                 _system.Update();
-                var graph = entity.Read<AstarGridGraphRuntimeComponent>().Graph;
+                var graph = entity.Read<AstarGridGraphComponent>().Graph;
                 _system.Update();
 
                 Assert.IsFalse(entity.Has<AstarGraphInitializedTag>());
                 Assert.IsTrue(entity.Has<AstarGraphInitializationFailedTag>());
-                Assert.AreEqual(0, entity.Read<AstarGridGraphRuntimeComponent>().WalkableNodeCount);
-                Assert.AreSame(graph, entity.Read<AstarGridGraphRuntimeComponent>().Graph);
+                Assert.AreEqual(0, entity.Read<AstarGridGraphComponent>().WalkableNodeCount);
+                Assert.AreSame(graph, entity.Read<AstarGridGraphComponent>().Graph);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(blocker);
             }
         }
 
         [Test]
-        public void Update_MissingBackendWaitsWithoutException() {
+        public void Update_MissingBackendWaitsWithoutException()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
             entity.Set(new AstarPathComponent());
             entity.Set(DefaultConfig());
@@ -89,9 +104,11 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void Update_NonActiveBackendIsRejectedOnce() {
+        public void Update_NonActiveBackendIsRejectedOnce()
+        {
             var otherHost = new GameObject("Inactive Astar backend");
-            try {
+            try
+            {
                 var otherBackend = otherHost.AddComponent<AstarPath>();
                 var entity = World<TestAstarWorld>.NewEntity<Default>();
                 entity.Set(new AstarPathComponent { Backend = otherBackend });
@@ -104,18 +121,20 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 Assert.IsTrue(entity.Has<AstarGraphInitializationFailedTag>());
                 Assert.IsFalse(entity.Has<AstarGraphInitializedTag>());
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(otherHost);
             }
         }
 
         [Test]
-        public void Destroy_RemovesOwnedGraphAndPreservesForeignGraph() {
+        public void Destroy_RemovesOwnedGraphAndPreservesForeignGraph()
+        {
             var foreign = _backend.data.AddGraph(typeof(PointGraph));
             var entity = CreateGraphEntity();
             _system.Update();
 
-            var owned = entity.Read<AstarGridGraphRuntimeComponent>().Graph;
+            var owned = entity.Read<AstarGridGraphComponent>().Graph;
             _system.Destroy();
 
             CollectionAssert.Contains(_backend.data.graphs, foreign);
@@ -123,7 +142,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void GraphConverter_CreatesBackendAndConfigurationComponents() {
+        public void GraphConverter_CreatesBackendAndConfigurationComponents()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
             var converter = _graphHost.AddComponent<TestAstarGridGraphConverter>();
 
@@ -135,7 +155,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void SerializableGraphConverter_CreatesEquivalentComponents() {
+        public void SerializableGraphConverter_CreatesEquivalentComponents()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
             var converter = new AstarGridGraphSerializableConverter<TestAstarWorld>();
 
@@ -147,10 +168,12 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void ObstacleConverter_ResolvesGraphProviderGid() {
+        public void ObstacleConverter_ResolvesGraphProviderGid()
+        {
             var obstacleHost = new GameObject("Astar graph test obstacle");
             var providerHost = new GameObject("Astar graph test provider");
-            try {
+            try
+            {
                 var collider = obstacleHost.AddComponent<BoxCollider>();
                 var converter = obstacleHost.AddComponent<TestAstarObstacleConverter>();
                 var provider = providerHost.AddComponent<TestAstarEntityProvider>();
@@ -159,7 +182,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
 
                 var field = typeof(AstarObstacleConverter<TestAstarWorld>).GetField(
                     "_graphProvider",
-                    BindingFlags.Instance | BindingFlags.NonPublic);
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
                 field.SetValue(converter, provider);
 
                 var obstacleEntity = World<TestAstarWorld>.NewEntity<Default>();
@@ -170,22 +194,26 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 Assert.AreSame(collider, obstacle.Collider);
                 Assert.AreEqual(graphEntity.GID, obstacle.GraphEntity);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(obstacleHost);
                 Object.DestroyImmediate(providerHost);
             }
         }
 
         [Test]
-        public void SerializableObstacleConverter_ResolvesGraphProviderGid() {
+        public void SerializableObstacleConverter_ResolvesGraphProviderGid()
+        {
             var obstacleHost = new GameObject("Astar serializable obstacle");
             var providerHost = new GameObject("Astar serializable graph provider");
-            try {
+            try
+            {
                 var collider = obstacleHost.AddComponent<BoxCollider>();
                 var provider = providerHost.AddComponent<TestAstarEntityProvider>();
                 var graphEntity = World<TestAstarWorld>.NewEntity<Default>();
                 provider.EntityGid = graphEntity.GID;
-                var converter = new AstarObstacleSerializableConverter<TestAstarWorld> {
+                var converter = new AstarObstacleSerializableConverter<TestAstarWorld>
+                {
                     GraphProvider = provider,
                 };
                 var obstacleEntity = World<TestAstarWorld>.NewEntity<Default>();
@@ -197,25 +225,31 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 Assert.AreSame(collider, obstacle.Collider);
                 Assert.AreEqual(graphEntity.GID, obstacle.GraphEntity);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(obstacleHost);
                 Object.DestroyImmediate(providerHost);
             }
         }
 
         [Test]
-        public void Update_TracksObstacleTransformAndActiveState() {
+        public void Update_TracksObstacleTransformAndActiveState()
+        {
             var graphEntity = CreateGraphEntity();
             _system.Update();
 
             var obstacleHost = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            try {
+            try
+            {
                 var collider = obstacleHost.GetComponent<Collider>();
                 var obstacleEntity = World<TestAstarWorld>.NewEntity<Default>();
-                obstacleEntity.Set(new AstarObstacleComponent {
-                    GraphEntity = graphEntity.GID,
-                    Collider = collider,
-                });
+                obstacleEntity.Set(
+                    new AstarObstacleComponent
+                    {
+                        GraphEntity = graphEntity.GID,
+                        Collider = collider,
+                    }
+                );
 
                 _system.Update();
                 var initialBounds = obstacleEntity.Read<AstarObstacleComponent>().LastBounds;
@@ -232,47 +266,57 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 _system.Update();
                 Assert.IsFalse(obstacleEntity.Read<AstarObstacleComponent>().WasActive);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(obstacleHost);
             }
         }
 
         [Test]
-        public void DeleteObstacle_DisablesColliderBeforeClearingFootprint() {
+        public void DeleteObstacle_DisablesColliderBeforeClearingFootprint()
+        {
             var graphEntity = CreateGraphEntity();
             _system.Update();
 
             var obstacleHost = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            try {
+            try
+            {
                 var collider = obstacleHost.GetComponent<Collider>();
                 var obstacleEntity = World<TestAstarWorld>.NewEntity<Default>();
-                obstacleEntity.Set(new AstarObstacleComponent {
-                    GraphEntity = graphEntity.GID,
-                    Collider = collider,
-                    LastBounds = collider.bounds,
-                    LastLocalToWorld = obstacleHost.transform.localToWorldMatrix,
-                    HasSnapshot = true,
-                    WasActive = true,
-                });
+                obstacleEntity.Set(
+                    new AstarObstacleComponent
+                    {
+                        GraphEntity = graphEntity.GID,
+                        Collider = collider,
+                        LastBounds = collider.bounds,
+                        LastLocalToWorld = obstacleHost.transform.localToWorldMatrix,
+                        HasSnapshot = true,
+                        WasActive = true,
+                    }
+                );
 
                 obstacleEntity.Destroy();
 
                 Assert.IsFalse(collider.enabled);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(obstacleHost);
             }
         }
 
-        private World<TestAstarWorld>.Entity CreateGraphEntity() {
+        private World<TestAstarWorld>.Entity CreateGraphEntity()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
             entity.Set(new AstarPathComponent { Backend = _backend });
             entity.Set(DefaultConfig());
             return entity;
         }
 
-        private static AstarGridGraphConfigComponent DefaultConfig() {
-            return new AstarGridGraphConfigComponent {
+        private static AstarGridGraphConfigComponent DefaultConfig()
+        {
+            return new AstarGridGraphConfigComponent
+            {
                 Width = 8,
                 Depth = 8,
                 NodeSize = 1f,

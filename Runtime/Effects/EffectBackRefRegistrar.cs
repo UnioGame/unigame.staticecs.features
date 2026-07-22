@@ -1,12 +1,10 @@
-using FFS.Libraries.StaticEcs;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Unity;
 
     /// <summary>
-    /// Installs <see cref="EffectBackRef"/> entries on the source entity for a given target +
+    /// Installs <see cref="EffectTargetComponent"/> entries on the source entity for a given target +
     /// <see cref="EffectFlag"/>. Mirrors <c>ModifierBackRefRegistrar</c>: existing entries
     /// merge their mask via OR; new entries push to the back-ref multi-component.
     /// </summary>
@@ -25,17 +23,17 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            if (!src.Has<EffectSourceTracker>())
+            if (!src.Has<EffectTrackerComponent>())
             {
-                src.Add<EffectSourceTracker>();
+                src.Add<EffectTrackerComponent>();
             }
 
-            if (!src.Has<World<TWorld>.Multi<EffectBackRef>>())
+            if (!src.Has<World<TWorld>.Multi<EffectTargetComponent>>())
             {
-                src.Add<World<TWorld>.Multi<EffectBackRef>>();
+                src.Add<World<TWorld>.Multi<EffectTargetComponent>>();
             }
 
-            ref var refs = ref src.Ref<World<TWorld>.Multi<EffectBackRef>>();
+            ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;
 
             for (var i = 0; i < refs.Length; i++)
@@ -48,11 +46,7 @@ namespace UniGame.StaticEcs.Features
                 }
             }
 
-            refs.Add(new EffectBackRef
-            {
-                Target = compactTarget,
-                Mask = flag
-            });
+            refs.Add(new EffectTargetComponent { Target = compactTarget, Mask = flag });
         }
 
         /// <summary>
@@ -78,12 +72,12 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            if (!src.Has<World<TWorld>.Multi<EffectBackRef>>())
+            if (!src.Has<World<TWorld>.Multi<EffectTargetComponent>>())
             {
                 return;
             }
 
-            ref var refs = ref src.Ref<World<TWorld>.Multi<EffectBackRef>>();
+            ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;
 
             for (var i = 0; i < refs.Length; i++)
@@ -104,10 +98,10 @@ namespace UniGame.StaticEcs.Features
 
         // --- Main-default overloads ---
 
-        public static void Register(EntityGID source, EntityGID target, EffectFlag flag)
-            => Register<Main>(source, target, flag);
+        public static void Register(EntityGID source, EntityGID target, EffectFlag flag) =>
+            Register<Main>(source, target, flag);
 
-        public static void Unregister(EntityGID source, EntityGID target, EffectFlag flag)
-            => Unregister<Main>(source, target, flag);
+        public static void Unregister(EntityGID source, EntityGID target, EffectFlag flag) =>
+            Unregister<Main>(source, target, flag);
     }
 }

@@ -1,14 +1,23 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
-    public sealed class ApplyEffectStepActivator<TWorld> : AbilityStepActivatorBase<ApplyEffectStepConfig, TWorld>
-        where TWorld : struct, IWorldType {
-        protected override StepStatus OnActivate(ApplyEffectStepConfig config, in AbilityStepActivationContext<TWorld> ctx) {
-            if (!World<TWorld>.HasResource<AbilityEffectDispatchRegistry<TWorld>>()) {
+    public sealed class ApplyEffectStepActivator<TWorld>
+        : AbilityStepActivatorBase<ApplyEffectStepConfig, TWorld>
+        where TWorld : struct, IWorldType
+    {
+        protected override StepStatus OnActivate(
+            ApplyEffectStepConfig config,
+            in AbilityStepActivationContext<TWorld> ctx
+        )
+        {
+            if (!World<TWorld>.HasResource<AbilityEffectDispatchRegistry<TWorld>>())
+            {
                 return StepStatus.Failed;
             }
 
-            switch (config.Mode) {
+            switch (config.Mode)
+            {
                 case AbilityTargetMode.Self:
                     return Dispatch(config, ctx.Caster, ctx.Caster);
                 case AbilityTargetMode.PrimaryTarget:
@@ -20,18 +29,27 @@ namespace UniGame.StaticEcs.Features {
             }
         }
 
-        private static StepStatus DispatchAoe(ApplyEffectStepConfig config, in AbilityStepActivationContext<TWorld> ctx) {
-            if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity)) {
+        private static StepStatus DispatchAoe(
+            ApplyEffectStepConfig config,
+            in AbilityStepActivationContext<TWorld> ctx
+        )
+        {
+            if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity))
+            {
                 return StepStatus.Failed;
             }
-            if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeBufferEntry>>()) {
+            if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
+            {
                 return StepStatus.Success;
             }
 
-            ref readonly var entries = ref castEntity.Read<World<TWorld>.Multi<AbilityAoeBufferEntry>>();
-            for (var i = 0; i < entries.Length; i++) {
+            ref readonly var entries =
+                ref castEntity.Read<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
+            for (var i = 0; i < entries.Length; i++)
+            {
                 var target = entries.Get(i).Target;
-                if (config.ExcludeCaster && target.Equals(ctx.Caster)) {
+                if (config.ExcludeCaster && target.Equals(ctx.Caster))
+                {
                     continue;
                 }
 
@@ -41,8 +59,14 @@ namespace UniGame.StaticEcs.Features {
             return StepStatus.Success;
         }
 
-        private static StepStatus Dispatch(ApplyEffectStepConfig config, EntityGID source, EntityGID target) {
-            if (!target.TryUnpack<TWorld>(out _)) {
+        private static StepStatus Dispatch(
+            ApplyEffectStepConfig config,
+            EntityGID source,
+            EntityGID target
+        )
+        {
+            if (!target.TryUnpack<TWorld>(out _))
+            {
                 return StepStatus.Failed;
             }
 
@@ -54,7 +78,8 @@ namespace UniGame.StaticEcs.Features {
                 config.Duration,
                 config.Period,
                 config.Delay,
-                config.Magnitude)
+                config.Magnitude
+            )
                 ? StepStatus.Success
                 : StepStatus.Failed;
         }

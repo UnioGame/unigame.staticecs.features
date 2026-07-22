@@ -1,8 +1,9 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Registers the <see cref="ActionMaskComponent"/> type that gates
     /// <see cref="GameActionOperations.Raise{TWorld,TAction}"/> calls.
@@ -17,29 +18,35 @@ namespace UniGame.StaticEcs.Features {
     /// <see cref="StunFeature{TWorld}"/> has been registered.
     /// </para>
     /// </summary>
-    public class GameActionsFeature<TWorld> :
-        StaticEcsFeature<TWorld>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
-        where TWorld : struct, IWorldType {
+    public class GameActionsFeature<TWorld>
+        : StaticEcsFeature<TWorld>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+        where TWorld : struct, IWorldType
+    {
         private readonly bool _registerMaintenance;
         private readonly short _maintenanceOrder;
 
         /// <summary>Creates the action mask feature.</summary>
-        public GameActionsFeature(bool registerMaintenance = true, short maintenanceOrder = 25) {
+        public GameActionsFeature(bool registerMaintenance = true, short maintenanceOrder = 25)
+        {
             _registerMaintenance = registerMaintenance;
             _maintenanceOrder = maintenanceOrder;
         }
 
         /// <inheritdoc/>
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
             types.Component<ActionMaskComponent>();
         }
 
         /// <inheritdoc />
         public UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken) {
-            if (_registerMaintenance) {
+            CancellationToken cancellationToken
+        )
+        {
+            if (_registerMaintenance)
+            {
                 systems.Add(new ActionMaskMaintenanceSystem<TWorld>(), _maintenanceOrder);
             }
 

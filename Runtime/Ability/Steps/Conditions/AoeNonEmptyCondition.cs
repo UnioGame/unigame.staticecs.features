@@ -1,21 +1,30 @@
-using System;
-using FFS.Libraries.StaticEcs;
-using UnityEngine.Scripting.APIUpdating;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using FFS.Libraries.StaticEcs;
+    using UnityEngine.Scripting.APIUpdating;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
-    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
-    public sealed class AoeNonEmptyCondition : IAbilityStepCondition {
+    [MovedFrom(
+        true,
+        sourceNamespace: "unigame.staticecs.features",
+        sourceAssembly: "unigame.staticecs.features"
+    )]
+    public sealed class AoeNonEmptyCondition : IAbilityStepCondition
+    {
         public bool Evaluate<TWorld>(in AbilityStepConditionContext<TWorld> ctx)
-            where TWorld : struct, IWorldType {
-            if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity)) {
+            where TWorld : struct, IWorldType
+        {
+            if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity))
+            {
                 return false;
             }
-            if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeBufferEntry>>()) {
+            if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
+            {
                 return false;
             }
 
-            return castEntity.Read<World<TWorld>.Multi<AbilityAoeBufferEntry>>().Length > 0;
+            return castEntity.Read<World<TWorld>.Multi<AbilityAoeTargetComponent>>().Length > 0;
         }
     }
 }

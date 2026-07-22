@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Per-effect-type behaviour hook. Registered as an <c>IEffectHandler&lt;TWorld, TEffect&gt;</c>
     /// world resource by <c>EffectFeature</c>; <c>EffectOperations</c> and <c>EffectTickSystem</c>
@@ -11,7 +12,8 @@ namespace UniGame.StaticEcs.Features {
     /// </summary>
     public interface IEffectHandler<TWorld, TEffect> : IResource
         where TWorld : struct, IWorldType
-        where TEffect : struct, IEffectType {
+        where TEffect : struct, IEffectType
+    {
         /// <summary>Called from <c>Apply</c> for both fresh applications and refresh re-applies.</summary>
         void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks);
 

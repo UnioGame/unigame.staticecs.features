@@ -1,13 +1,15 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Context passed to a leaf step activator. <see cref="CastEntity"/> hosts every per-cast
     /// state component (wait timers, AoE buffer, stack frames). <see cref="Owner"/> equals
     /// <see cref="Caster"/> for root casts and is inherited from the parent for sub-ability casts.
     /// </summary>
     public readonly ref struct AbilityStepActivationContext<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         public readonly EntityGID Caster;
         public readonly EntityGID Owner;
         public readonly EntityGID CastEntity;
@@ -19,7 +21,9 @@ namespace UniGame.StaticEcs.Features {
             EntityGID owner,
             EntityGID castEntity,
             EntityGID primaryTarget,
-            AbilityId abilityId) {
+            AbilityId abilityId
+        )
+        {
             Caster = caster;
             Owner = owner;
             CastEntity = castEntity;
@@ -29,7 +33,8 @@ namespace UniGame.StaticEcs.Features {
     }
 
     public readonly ref struct AbilityStepCancelContext<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         public readonly EntityGID Caster;
         public readonly EntityGID Owner;
         public readonly EntityGID CastEntity;
@@ -39,7 +44,9 @@ namespace UniGame.StaticEcs.Features {
             EntityGID caster,
             EntityGID owner,
             EntityGID castEntity,
-            AbilityId abilityId) {
+            AbilityId abilityId
+        )
+        {
             Caster = caster;
             Owner = owner;
             CastEntity = castEntity;

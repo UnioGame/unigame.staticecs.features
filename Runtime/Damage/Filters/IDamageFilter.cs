@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// One step of the damage pipeline. Filters are stateless and run in registration order on
     /// a shared <see cref="DamageContext"/>. A filter that sets <see cref="DamageContext.Cancelled"/>
@@ -8,7 +9,8 @@ namespace UniGame.StaticEcs.Features {
     /// </summary>
     /// <typeparam name="TWorld">World type whose entities the filter resolves against.</typeparam>
     public interface IDamageFilter<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         void Apply(ref DamageContext ctx);
     }
 }

@@ -1,24 +1,21 @@
-using FFS.Libraries.StaticEcs;
-using UnityEngine;
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Unity;
+    using UnityEngine;
 
     /// <summary>Main-world static helpers. See <see cref="MovementOperations"/> generic overloads.</summary>
     public static partial class MovementOperations
     {
         /// <inheritdoc cref="SetDestination{TWorld}(EntityGID, Vector3)"/>
-        public static void SetDestination(EntityGID target, Vector3 destination)
-            => SetDestination<Main>(target, destination);
+        public static void SetDestination(EntityGID target, Vector3 destination) =>
+            SetDestination<Main>(target, destination);
 
         /// <inheritdoc cref="StopMovement{TWorld}(EntityGID)"/>
-        public static void StopMovement(EntityGID target)
-            => StopMovement<Main>(target);
+        public static void StopMovement(EntityGID target) => StopMovement<Main>(target);
 
         /// <inheritdoc cref="IsMoving{TWorld}(EntityGID)"/>
-        public static bool IsMoving(EntityGID target)
-            => IsMoving<Main>(target);
+        public static bool IsMoving(EntityGID target) => IsMoving<Main>(target);
     }
 
     // --- Generic overloads ---
@@ -48,7 +45,9 @@ namespace UniGame.StaticEcs.Features
             }
             else
             {
-                entity.Set(new MovementDestinationComponent { Destination = destination, IsActive = true });
+                entity.Set(
+                    new MovementDestinationComponent { Destination = destination, IsActive = true }
+                );
             }
         }
 
@@ -82,7 +81,7 @@ namespace UniGame.StaticEcs.Features
             }
 
             return entity.Has<MovementDestinationComponent>()
-                   && entity.Read<MovementDestinationComponent>().IsActive;
+                && entity.Read<MovementDestinationComponent>().IsActive;
         }
     }
 }

@@ -8,9 +8,8 @@ namespace UniGame.StaticEcs.Features
             bool registerSystems = true,
             short castOrder = DefaultCastOrder,
             short waitOrder = DefaultWaitOrder,
-            short progressionOrder = DefaultProgressionOrder)
-            : base(registerSystems, castOrder, waitOrder, progressionOrder)
-        {
-        }
+            short progressionOrder = DefaultProgressionOrder
+        )
+            : base(registerSystems, castOrder, waitOrder, progressionOrder) { }
     }
 }

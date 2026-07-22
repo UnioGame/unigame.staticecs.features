@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Unity;
 
     /// <summary>
@@ -33,11 +31,9 @@ namespace UniGame.StaticEcs.Features
                 return false;
             }
 
-            return World<TWorld>.SendEvent(new GameActionEvent<TAction>
-            {
-                Source = source,
-                Payload = payload,
-            });
+            return World<TWorld>.SendEvent(
+                new GameActionEvent<TAction> { Source = source, Payload = payload }
+            );
         }
 
         /// <summary>
@@ -102,22 +98,18 @@ namespace UniGame.StaticEcs.Features
 
         /// <inheritdoc cref="Raise{TWorld,TAction}"/>
         public static bool Raise<TAction>(EntityGID source, in TAction payload)
-            where TAction : struct, IGameAction
-            => Raise<Main, TAction>(source, payload);
+            where TAction : struct, IGameAction => Raise<Main, TAction>(source, payload);
 
         /// <inheritdoc cref="IsAvailable{TWorld,TAction}"/>
         public static bool IsAvailable<TAction>(EntityGID source)
-            where TAction : struct, IGameAction
-            => IsAvailable<Main, TAction>(source);
+            where TAction : struct, IGameAction => IsAvailable<Main, TAction>(source);
 
         /// <inheritdoc cref="EnableAction{TWorld,TAction}"/>
         public static void EnableAction<TAction>(EntityGID source)
-            where TAction : struct, IGameAction
-            => EnableAction<Main, TAction>(source);
+            where TAction : struct, IGameAction => EnableAction<Main, TAction>(source);
 
         /// <inheritdoc cref="DisableAction{TWorld,TAction}"/>
         public static void DisableAction<TAction>(EntityGID source)
-            where TAction : struct, IGameAction
-            => DisableAction<Main, TAction>(source);
+            where TAction : struct, IGameAction => DisableAction<Main, TAction>(source);
     }
 }

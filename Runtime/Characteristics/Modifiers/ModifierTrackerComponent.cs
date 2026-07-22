@@ -1,14 +1,14 @@
-using System;
-using FFS.Libraries.StaticEcs;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using System;
+    using FFS.Libraries.StaticEcs;
     using Modifiers;
 
+    /// <summary>Removes source-owned modifiers from tracked targets when the source is deleted.</summary>
     [Serializable]
-    public struct ModifierSourceTracker : IComponent
+    public struct ModifierTrackerComponent : IComponent
     {
+        /// <summary>Handles source-entity deletion and dispatches modifier cleanup.</summary>
         public void OnDelete<TWorld>(World<TWorld>.Entity self, HookReason reason)
             where TWorld : struct, IWorldType
         {
@@ -17,7 +17,7 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            if (!self.Has<World<TWorld>.Multi<ModifierBackRef>>())
+            if (!self.Has<World<TWorld>.Multi<ModifierTargetComponent>>())
             {
                 return;
             }
@@ -27,7 +27,7 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            ref var refs = ref self.Ref<World<TWorld>.Multi<ModifierBackRef>>();
+            ref var refs = ref self.Ref<World<TWorld>.Multi<ModifierTargetComponent>>();
             if (refs.IsEmpty)
             {
                 return;

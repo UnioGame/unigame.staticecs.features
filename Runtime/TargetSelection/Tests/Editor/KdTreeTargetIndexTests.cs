@@ -1,47 +1,55 @@
-using System;
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
-using UniGame.StaticEcs.Unity;
-using UnityEngine;
- 
+namespace UniGame.StaticEcs.Features.Tests
+{
+    using System;
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
+    using UniGame.StaticEcs.Unity;
+    using UnityEngine;
 
-namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
-    public sealed class KdTreeTargetIndexTests {
+    public sealed class KdTreeTargetIndexTests
+    {
         private GameObject[] _hosts;
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestTargetIndexWorld>.Create(WorldConfig.Default());
-            new TargetSelectionFeature<TestTargetIndexWorld>(registerRebuildSystem: false)
-                .RegisterTypes(World<TestTargetIndexWorld>.Types());
-            World<TestTargetIndexWorld>.Types()
-                .Component<TransformBindingComponent>();
+            new TargetSelectionFeature<TestTargetIndexWorld>(
+                registerRebuildSystem: false
+            ).RegisterTypes(World<TestTargetIndexWorld>.Types());
+            World<TestTargetIndexWorld>.Types().Component<TransformComponent>();
 
             World<TestTargetIndexWorld>.Initialize();
         }
 
         [TearDown]
-        public void TearDown() {
-            if (_hosts != null) {
-                foreach (var host in _hosts) {
-                    if (host != null) {
+        public void TearDown()
+        {
+            if (_hosts != null)
+            {
+                foreach (var host in _hosts)
+                {
+                    if (host != null)
+                    {
                         UnityEngine.Object.DestroyImmediate(host);
                     }
                 }
                 _hosts = null;
             }
-            if (World<TestTargetIndexWorld>.Status != WorldStatus.NotCreated) {
+            if (World<TestTargetIndexWorld>.Status != WorldStatus.NotCreated)
+            {
                 World<TestTargetIndexWorld>.Destroy();
             }
         }
 
-        private EntityGID Spawn(Vector3 position) {
+        private EntityGID Spawn(Vector3 position)
+        {
             var host = new GameObject("kd-target");
             host.transform.position = position;
             var entity = World<TestTargetIndexWorld>.NewEntity<Default>();
             entity.Set<TargetableTag>();
-            entity.Set(new TransformBindingComponent { Transform = host.transform });
+            entity.Set(new TransformComponent { Transform = host.transform });
 
             Array.Resize(ref _hosts, (_hosts?.Length ?? 0) + 1);
             _hosts[_hosts.Length - 1] = host;
@@ -49,8 +57,11 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void FillSphere_ReturnsZero_WhenIndexEmpty() {
-            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
+        public void FillSphere_ReturnsZero_WhenIndexEmpty()
+        {
+            var index = World<TestTargetIndexWorld>.GetResource<
+                ITargetIndex<TestTargetIndexWorld>
+            >();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[4];
@@ -58,12 +69,15 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void FillSphere_FindsAllPointsInsideRadius() {
+        public void FillSphere_FindsAllPointsInsideRadius()
+        {
             var center = Spawn(new Vector3(0, 0, 0));
             var near = Spawn(new Vector3(1, 0, 0));
             var far = Spawn(new Vector3(10, 0, 0));
 
-            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
+            var index = World<TestTargetIndexWorld>.GetResource<
+                ITargetIndex<TestTargetIndexWorld>
+            >();
             index.Rebuild();
             Assert.AreEqual(3, index.Count);
 
@@ -72,7 +86,8 @@ namespace UniGame.StaticEcs.Features.Tests {
             Assert.AreEqual(2, count);
 
             var found = new System.Collections.Generic.HashSet<EntityGID>();
-            for (var i = 0; i < count; i++) {
+            for (var i = 0; i < count; i++)
+            {
                 found.Add(buffer[i]);
             }
             Assert.IsTrue(found.Contains(center));
@@ -81,11 +96,15 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void FillSphere_RespectsBufferCapacity() {
-            for (var i = 0; i < 8; i++) {
+        public void FillSphere_RespectsBufferCapacity()
+        {
+            for (var i = 0; i < 8; i++)
+            {
                 Spawn(new Vector3(i * 0.1f, 0, 0));
             }
-            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
+            var index = World<TestTargetIndexWorld>.GetResource<
+                ITargetIndex<TestTargetIndexWorld>
+            >();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[3];
@@ -94,9 +113,12 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Rebuild_ReflectsLatestPositions() {
+        public void Rebuild_ReflectsLatestPositions()
+        {
             var moving = Spawn(new Vector3(10, 0, 0));
-            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
+            var index = World<TestTargetIndexWorld>.GetResource<
+                ITargetIndex<TestTargetIndexWorld>
+            >();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[4];

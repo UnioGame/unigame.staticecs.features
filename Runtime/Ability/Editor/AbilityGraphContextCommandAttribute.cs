@@ -1,9 +1,12 @@
-using System;
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
+{
+    using System;
 
-namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = false)]
-    internal sealed class AbilityGraphContextCommandAttribute : Attribute {
-        public AbilityGraphContextCommandAttribute(AbilityGraphContextTarget target, string path) {
+    internal sealed class AbilityGraphContextCommandAttribute : Attribute
+    {
+        public AbilityGraphContextCommandAttribute(AbilityGraphContextTarget target, string path)
+        {
             Target = target;
             Path = path;
         }

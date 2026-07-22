@@ -1,9 +1,9 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
- 
+namespace UniGame.StaticEcs.Features
+{
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Wires the damage pipeline: registers events, tags, the default filter chain
     /// (Dodge → Block → ArmorResist → Critical → Shield), an <see cref="IDamageRng"/>
@@ -13,10 +13,11 @@ namespace UniGame.StaticEcs.Features {
     /// <see cref="HealthFeature{TWorld}"/>, <see cref="ShieldFeature{TWorld}"/>, and
     /// <see cref="CharacteristicFeature{TWorld, TCharacteristic}"/> for each combat stat.
     /// </summary>
-    public class DamageFeature<TWorld> :
-        StaticEcsFeature<TWorld>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
-        where TWorld : struct, IWorldType {
+    public class DamageFeature<TWorld>
+        : StaticEcsFeature<TWorld>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+        where TWorld : struct, IWorldType
+    {
         public const short DefaultApplyOrder = 100;
 
         private readonly short _applyOrder;
@@ -26,13 +27,16 @@ namespace UniGame.StaticEcs.Features {
         public DamageFeature(
             bool registerApplySystem = true,
             bool registerDefaultChain = true,
-            short applyOrder = DefaultApplyOrder) {
+            short applyOrder = DefaultApplyOrder
+        )
+        {
             _registerApplySystem = registerApplySystem;
             _registerDefaultChain = registerDefaultChain;
             _applyOrder = applyOrder;
         }
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
             types
                 .Tag<BlockableTag>()
                 .Tag<DeathPendingTag>()
@@ -43,11 +47,13 @@ namespace UniGame.StaticEcs.Features {
                 .Event<ShieldDeltaEvent>()
                 .Event<DamageAppliedEvent>();
 
-            if (!World<TWorld>.HasResource<IDamageRng>()) {
+            if (!World<TWorld>.HasResource<IDamageRng>())
+            {
                 World<TWorld>.SetResource<IDamageRng>(new UnityDamageRng());
             }
 
-            if (_registerDefaultChain && !World<TWorld>.HasResource<DamageFilterChain<TWorld>>()) {
+            if (_registerDefaultChain && !World<TWorld>.HasResource<DamageFilterChain<TWorld>>())
+            {
                 var chain = new DamageFilterChain<TWorld>()
                     .Add(new DodgeFilter<TWorld>())
                     .Add(new BlockFilter<TWorld>())
@@ -60,8 +66,11 @@ namespace UniGame.StaticEcs.Features {
 
         public UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken) {
-            if (!_registerApplySystem) {
+            CancellationToken cancellationToken
+        )
+        {
+            if (!_registerApplySystem)
+            {
                 return UniTask.CompletedTask;
             }
 

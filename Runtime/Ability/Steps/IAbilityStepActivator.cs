@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Stateless singleton that activates a leaf step config. Composite steps are handled
     /// directly by <c>AbilityStepProgressionSystem</c> and do not need an activator.
@@ -18,7 +19,8 @@ namespace UniGame.StaticEcs.Features {
     /// Implementations must be allocation-free per call.
     /// </summary>
     public interface IAbilityStepActivator<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         StepStatus Activate(IAbilityStepConfig config, in AbilityStepActivationContext<TWorld> ctx);
         void Cancel(IAbilityStepConfig config, in AbilityStepCancelContext<TWorld> ctx);
     }

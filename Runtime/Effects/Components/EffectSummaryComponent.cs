@@ -1,7 +1,8 @@
-using System;
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Single roster row, agnostic of the concrete effect type. Updated by
     /// <c>EffectOperations</c> on apply, refresh, and removal — never on a per-tick basis.
@@ -14,9 +15,15 @@ namespace UniGame.StaticEcs.Features {
     /// boundaries.</para>
     /// </summary>
     [Serializable]
-    public struct EffectRosterEntry : IMultiComponent {
+    public struct EffectSummaryComponent : IMultiComponent
+    {
+        /// <summary>The effect identifier.</summary>
         public EffectId Id;
+
+        /// <summary>The stack count captured at the latest lifecycle event.</summary>
         public int Stacks;
+
+        /// <summary>The remaining duration captured at the latest lifecycle event.</summary>
         public float TimeLeft;
     }
 }

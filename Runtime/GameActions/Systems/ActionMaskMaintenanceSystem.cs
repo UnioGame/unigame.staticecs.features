@@ -1,6 +1,7 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Responds to <see cref="StunChangedEvent"/>s and keeps <see cref="ActionMaskComponent"/>
     /// in sync with stun state:
@@ -15,27 +16,34 @@ namespace UniGame.StaticEcs.Features {
     /// </para>
     /// </summary>
     public sealed class ActionMaskMaintenanceSystem<TWorld> : ISystem
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         private EventReceiver<TWorld, StunChangedEvent> _receiver;
 
         /// <inheritdoc/>
-        public void Init() {
+        public void Init()
+        {
             _receiver = World<TWorld>.RegisterEventReceiver<StunChangedEvent>();
         }
 
         /// <inheritdoc/>
-        public void Update() {
-            foreach (var e in _receiver) {
+        public void Update()
+        {
+            foreach (var e in _receiver)
+            {
                 ref readonly var ev = ref e.Value;
-                if (!ev.BecameActive && !ev.BecameInactive) {
+                if (!ev.BecameActive && !ev.BecameInactive)
+                {
                     continue;
                 }
 
-                if (!ev.Target.TryUnpack<TWorld>(out var entity)) {
+                if (!ev.Target.TryUnpack<TWorld>(out var entity))
+                {
                     continue;
                 }
 
-                if (!entity.Has<ActionMaskComponent>()) {
+                if (!entity.Has<ActionMaskComponent>())
+                {
                     continue;
                 }
 
@@ -44,7 +52,8 @@ namespace UniGame.StaticEcs.Features {
         }
 
         /// <inheritdoc/>
-        public void Destroy() {
+        public void Destroy()
+        {
             World<TWorld>.DeleteEventReceiver(ref _receiver);
         }
     }

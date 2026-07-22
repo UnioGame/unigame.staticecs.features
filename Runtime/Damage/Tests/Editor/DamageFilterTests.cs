@@ -1,49 +1,85 @@
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
+namespace UniGame.StaticEcs.Features.Tests
+{
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
 
-namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
-    public sealed class DamageFilterTests {
+    public sealed class DamageFilterTests
+    {
         private FakeDamageRng _rng;
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestDamageWorld>.Create(WorldConfig.Default());
             _rng = new FakeDamageRng();
             World<TestDamageWorld>.SetResource<IDamageRng>(_rng);
 
-            new ModifierBackRefFeature<TestDamageWorld>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, CriticalChanceCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, CriticalMultiplierCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new DamageFeature<TestDamageWorld>(registerApplySystem: false).RegisterTypes(World<TestDamageWorld>.Types());
+            new ModifierBackRefFeature<TestDamageWorld>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<
+                TestDamageWorld,
+                CriticalChanceCharacteristic
+            >().RegisterTypes(World<TestDamageWorld>.Types());
+            new CharacteristicFeature<
+                TestDamageWorld,
+                CriticalMultiplierCharacteristic
+            >().RegisterTypes(World<TestDamageWorld>.Types());
+            new DamageFeature<TestDamageWorld>(registerApplySystem: false).RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
 
             World<TestDamageWorld>.Initialize();
         }
 
         [TearDown]
-        public void TearDown() {
-            if (World<TestDamageWorld>.Status != WorldStatus.NotCreated) {
+        public void TearDown()
+        {
+            if (World<TestDamageWorld>.Status != WorldStatus.NotCreated)
+            {
                 World<TestDamageWorld>.Destroy();
             }
         }
 
-        private static DamageContext MakeCtx(EntityGID source, EntityGID target, float amount, DamageType type = DamageType.Physical, bool forceCrit = false) {
-            return DamageContext.FromEvent(new IncomingDamageEvent {
-                Source = source,
-                Target = target,
-                Amount = amount,
-                Type = type,
-                ForceCritical = forceCrit
-            });
+        private static DamageContext MakeCtx(
+            EntityGID source,
+            EntityGID target,
+            float amount,
+            DamageType type = DamageType.Physical,
+            bool forceCrit = false
+        )
+        {
+            return DamageContext.FromEvent(
+                new IncomingDamageEvent
+                {
+                    Source = source,
+                    Target = target,
+                    Amount = amount,
+                    Type = type,
+                    ForceCritical = forceCrit,
+                }
+            );
         }
 
         [Test]
-        public void Dodge_RollSucceeds_CancelsAndMarksDodged() {
+        public void Dodge_RollSucceeds_CancelsAndMarksDodged()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<DodgeChanceCharacteristic>.Create(0.5f, 0f, 1f));
@@ -57,7 +93,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Dodge_RollFails_DoesNothing() {
+        public void Dodge_RollFails_DoesNothing()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<DodgeChanceCharacteristic>.Create(0.5f, 0f, 1f));
@@ -70,7 +107,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Dodge_HealingType_Skipped() {
+        public void Dodge_HealingType_Skipped()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<DodgeChanceCharacteristic>.Create(1f, 0f, 1f));
@@ -83,7 +121,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Block_RequiresBlockableTag() {
+        public void Block_RequiresBlockableTag()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<BlockChanceCharacteristic>.Create(1f, 0f, 1f));
@@ -96,7 +135,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Block_RollSucceeds_CancelsAndMarksBlocked() {
+        public void Block_RollSucceeds_CancelsAndMarksBlocked()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set<BlockableTag>();
@@ -111,7 +151,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void ArmorResist_PhysicalOnly_ReducesAmount() {
+        public void ArmorResist_PhysicalOnly_ReducesAmount()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<ArmorResistCharacteristic>.Create(0.25f, 0f, 1f));
@@ -123,7 +164,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void ArmorResist_NonPhysical_Untouched() {
+        public void ArmorResist_NonPhysical_Untouched()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<ArmorResistCharacteristic>.Create(0.5f, 0f, 1f));
@@ -135,7 +177,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Critical_ForceFlag_AppliesDefaultMultiplier() {
+        public void Critical_ForceFlag_AppliesDefaultMultiplier()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
 
@@ -147,11 +190,14 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Critical_RollSucceeds_UsesSourceMultiplier() {
+        public void Critical_RollSucceeds_UsesSourceMultiplier()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             source.Set(CharacteristicComponent<CriticalChanceCharacteristic>.Create(0.5f, 0f, 1f));
-            source.Set(CharacteristicComponent<CriticalMultiplierCharacteristic>.Create(3f, 0f, 10f));
+            source.Set(
+                CharacteristicComponent<CriticalMultiplierCharacteristic>.Create(3f, 0f, 10f)
+            );
             _rng.NextRoll = true;
 
             var ctx = MakeCtx(source.GID, target.GID, 10f);
@@ -162,7 +208,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Critical_RollFails_NoEffect() {
+        public void Critical_RollFails_NoEffect()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             source.Set(CharacteristicComponent<CriticalChanceCharacteristic>.Create(0.5f, 0f, 1f));
@@ -176,7 +223,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Shield_AbsorbsPartial_ReducesAmount() {
+        public void Shield_AbsorbsPartial_ReducesAmount()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<ShieldCharacteristic>.Create(30f, 0f, 100f));
@@ -190,7 +238,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void Shield_AbsorbsFull_ZerosOutAmount() {
+        public void Shield_AbsorbsFull_ZerosOutAmount()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<ShieldCharacteristic>.Create(100f, 0f, 100f));
@@ -200,7 +249,10 @@ namespace UniGame.StaticEcs.Features.Tests {
 
             Assert.AreEqual(0f, ctx.Amount, 0.0001f);
             Assert.AreEqual(50f, ctx.ShieldAbsorbed, 0.0001f);
-            Assert.AreEqual(50f, target.Read<CharacteristicComponent<ShieldCharacteristic>>().Value);
+            Assert.AreEqual(
+                50f,
+                target.Read<CharacteristicComponent<ShieldCharacteristic>>().Value
+            );
         }
     }
 }

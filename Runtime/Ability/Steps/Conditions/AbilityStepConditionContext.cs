@@ -1,8 +1,10 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     public readonly ref struct AbilityStepConditionContext<TWorld>
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         public readonly EntityGID Caster;
         public readonly EntityGID Owner;
         public readonly EntityGID CastEntity;
@@ -14,7 +16,9 @@ namespace UniGame.StaticEcs.Features {
             EntityGID owner,
             EntityGID castEntity,
             EntityGID primaryTarget,
-            AbilityId abilityId) {
+            AbilityId abilityId
+        )
+        {
             Caster = caster;
             Owner = owner;
             CastEntity = castEntity;

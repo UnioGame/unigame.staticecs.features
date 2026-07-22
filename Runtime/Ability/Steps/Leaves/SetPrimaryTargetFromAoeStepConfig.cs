@@ -1,17 +1,27 @@
-using System;
-using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
-    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
-    public sealed class SetPrimaryTargetFromAoeStepConfig : IAbilityStepConfig {
-        [SerializeField] private string _nodeGuid;
-        [SerializeField] private AoeTargetSelector _selector;
+    [MovedFrom(
+        true,
+        sourceNamespace: "unigame.staticecs.features",
+        sourceAssembly: "unigame.staticecs.features"
+    )]
+    public sealed class SetPrimaryTargetFromAoeStepConfig : IAbilityStepConfig
+    {
+        [SerializeField]
+        private string _nodeGuid;
+
+        [SerializeField]
+        private AoeTargetSelector _selector;
 
         public SetPrimaryTargetFromAoeStepConfig() { }
 
-        public SetPrimaryTargetFromAoeStepConfig(AoeTargetSelector selector, string nodeGuid = null) {
+        public SetPrimaryTargetFromAoeStepConfig(AoeTargetSelector selector, string nodeGuid = null)
+        {
             _selector = selector;
             _nodeGuid = nodeGuid;
         }

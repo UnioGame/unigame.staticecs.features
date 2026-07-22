@@ -1,17 +1,21 @@
-using System;
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
     public struct CharacteristicComponent<TCharacteristic> : IComponent
-        where TCharacteristic : struct, ICharacteristicType {
+        where TCharacteristic : struct, ICharacteristicType
+    {
         public float Value;
         public float BaseValue;
         public float MinValue;
         public float MaxValue;
 
-        public CharacteristicComponent(float value, float minValue, float maxValue, float baseValue) {
-            if (maxValue < minValue) {
+        public CharacteristicComponent(float value, float minValue, float maxValue, float baseValue)
+        {
+            if (maxValue < minValue)
+            {
                 maxValue = minValue;
             }
 
@@ -21,30 +25,41 @@ namespace UniGame.StaticEcs.Features {
             Value = Clamp(value, minValue, maxValue);
         }
 
-        public static CharacteristicComponent<TCharacteristic> Create(float value, float minValue = 0f, float maxValue = float.MaxValue) {
+        public static CharacteristicComponent<TCharacteristic> Create(
+            float value,
+            float minValue = 0f,
+            float maxValue = float.MaxValue
+        )
+        {
             return new CharacteristicComponent<TCharacteristic>(value, minValue, maxValue, value);
         }
 
-        public float SetValue(float value) {
+        public float SetValue(float value)
+        {
             Value = Clamp(value, MinValue, MaxValue);
             return Value;
         }
 
-        public float AddValue(float delta) {
+        public float AddValue(float delta)
+        {
             return SetValue(Value + delta);
         }
 
-        public float SetBaseValue(float value, bool resetValue = false) {
+        public float SetBaseValue(float value, bool resetValue = false)
+        {
             BaseValue = Clamp(value, MinValue, MaxValue);
-            if (resetValue) {
+            if (resetValue)
+            {
                 Value = BaseValue;
             }
 
             return BaseValue;
         }
 
-        public void SetLimits(float minValue, float maxValue, bool clampCurrent = true) {
-            if (maxValue < minValue) {
+        public void SetLimits(float minValue, float maxValue, bool clampCurrent = true)
+        {
+            if (maxValue < minValue)
+            {
                 maxValue = minValue;
             }
 
@@ -52,13 +67,16 @@ namespace UniGame.StaticEcs.Features {
             MaxValue = maxValue;
             BaseValue = Clamp(BaseValue, MinValue, MaxValue);
 
-            if (clampCurrent) {
+            if (clampCurrent)
+            {
                 Value = Clamp(Value, MinValue, MaxValue);
             }
         }
 
-        private static float Clamp(float value, float minValue, float maxValue) {
-            if (value < minValue) {
+        private static float Clamp(float value, float minValue, float maxValue)
+        {
+            if (value < minValue)
+            {
                 return minValue;
             }
 

@@ -1,7 +1,9 @@
-namespace UniGame.StaticEcs.Features {
-    public enum CharacteristicModifierOp : byte {
+namespace UniGame.StaticEcs.Features
+{
+    public enum CharacteristicModifierOp : byte
+    {
         Add = 0,
         Mul = 1,
-        Override = 2
+        Override = 2,
     }
 }

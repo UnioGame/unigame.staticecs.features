@@ -1,7 +1,7 @@
-using UnityEngine;
-
 namespace UniGame.StaticEcs.Features
 {
+    using UnityEngine;
+
     [CreateAssetMenu(menuName = "UniGame/Static ECS/Ability/Ability Asset")]
     public sealed class AbilityAsset : ScriptableObject
     {

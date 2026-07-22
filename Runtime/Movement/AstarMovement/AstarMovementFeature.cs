@@ -1,17 +1,20 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
- 
+namespace UniGame.StaticEcs.Features
+{
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Registers A* graph lifecycle, dynamic obstacle synchronization, and agent movement.
     /// </summary>
-    public class AstarMovementFeature<TWorld> : MovementFeature<TWorld>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
-        where TWorld : struct, IWorldType {
+    public class AstarMovementFeature<TWorld>
+        : MovementFeature<TWorld>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+        where TWorld : struct, IWorldType
+    {
         /// <summary>Default order for graph initialization and obstacle synchronization.</summary>
         public const short DefaultGraphOrder = -100;
+
         /// <summary>Default order for agent movement synchronization.</summary>
         public const short DefaultMovementOrder = 0;
 
@@ -25,7 +28,9 @@ namespace UniGame.StaticEcs.Features {
             bool registerGraphSystem = true,
             bool registerMovementSystem = true,
             short graphOrder = DefaultGraphOrder,
-            short movementOrder = DefaultMovementOrder) {
+            short movementOrder = DefaultMovementOrder
+        )
+        {
             _registerGraphSystem = registerGraphSystem;
             _registerMovementSystem = registerMovementSystem;
             _graphOrder = graphOrder;
@@ -33,13 +38,14 @@ namespace UniGame.StaticEcs.Features {
         }
 
         /// <inheritdoc/>
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
             base.RegisterTypes(types);
             types
                 .Component<AstarAIComponent>()
                 .Component<AstarPathComponent>()
                 .Component<AstarGridGraphConfigComponent>()
-                .Component<AstarGridGraphRuntimeComponent>()
+                .Component<AstarGridGraphComponent>()
                 .Component<AstarObstacleComponent>()
                 .Tag<AstarGraphInitializedTag>()
                 .Tag<AstarGraphInitializationFailedTag>();
@@ -48,11 +54,15 @@ namespace UniGame.StaticEcs.Features {
         /// <summary>Registers graph synchronization before agent movement.</summary>
         public UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken) {
-            if (_registerGraphSystem) {
+            CancellationToken cancellationToken
+        )
+        {
+            if (_registerGraphSystem)
+            {
                 systems.Add(new AstarGraphSystem<TWorld>(), _graphOrder);
             }
-            if (_registerMovementSystem) {
+            if (_registerMovementSystem)
+            {
                 systems.Add(new AstarMovementSystem<TWorld>(), _movementOrder);
             }
             return UniTask.CompletedTask;

@@ -1,26 +1,33 @@
-using System;
-using System.Collections.Generic;
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using System.Collections.Generic;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     public sealed class AbilityEffectDispatchRegistry<TWorld> : IResource
-        where TWorld : struct, IWorldType {
+        where TWorld : struct, IWorldType
+    {
         private readonly Dictionary<int, AbilityEffectDispatcher<TWorld>> _dispatchers = new();
 
         public void Register<TEffect>(EffectIdRegistry ids)
-            where TEffect : struct, IEffectType {
-            if (ids == null) {
+            where TEffect : struct, IEffectType
+        {
+            if (ids == null)
+            {
                 throw new ArgumentNullException(nameof(ids));
             }
 
             Register(ids.Get<TEffect>(), Dispatch<TEffect>);
         }
 
-        public void Register(EffectId id, AbilityEffectDispatcher<TWorld> dispatcher) {
-            if (!id.IsValid) {
+        public void Register(EffectId id, AbilityEffectDispatcher<TWorld> dispatcher)
+        {
+            if (!id.IsValid)
+            {
                 throw new ArgumentException("Effect id must be valid.", nameof(id));
             }
-            if (dispatcher == null) {
+            if (dispatcher == null)
+            {
                 throw new ArgumentNullException(nameof(dispatcher));
             }
 
@@ -34,15 +41,19 @@ namespace UniGame.StaticEcs.Features {
             float duration,
             float period,
             float delay,
-            float magnitude) {
-            if (!id.IsValid) {
+            float magnitude
+        )
+        {
+            if (!id.IsValid)
+            {
                 return false;
             }
             return _dispatchers.TryGetValue(id.Value, out var dispatcher)
                 && dispatcher(source, target, duration, period, delay, magnitude);
         }
 
-        public bool IsRegistered(EffectId id) {
+        public bool IsRegistered(EffectId id)
+        {
             return id.IsValid && _dispatchers.ContainsKey(id.Value);
         }
 
@@ -52,8 +63,10 @@ namespace UniGame.StaticEcs.Features {
             float duration,
             float period,
             float delay,
-            float magnitude)
-            where TEffect : struct, IEffectType {
+            float magnitude
+        )
+            where TEffect : struct, IEffectType
+        {
             return EffectOperations.Apply<TWorld, TEffect>(target, source, duration, period, delay);
         }
     }

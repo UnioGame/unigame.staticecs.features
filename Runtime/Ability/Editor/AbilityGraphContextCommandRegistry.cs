@@ -1,62 +1,82 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.UIElements;
+namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using UnityEditor;
+    using UnityEngine;
+    using UnityEngine.UIElements;
 
-namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
-    internal static class AbilityGraphContextCommandRegistry {
-        private sealed class CommandDefinition {
+    internal static class AbilityGraphContextCommandRegistry
+    {
+        private sealed class CommandDefinition
+        {
             public AbilityGraphContextCommandAttribute Attribute;
             public MethodInfo Method;
         }
 
         private static List<CommandDefinition> _commands;
 
-        public static void AppendCommands(DropdownMenu menu, AbilityGraphContextCommandContext context) {
+        public static void AppendCommands(
+            DropdownMenu menu,
+            AbilityGraphContextCommandContext context
+        )
+        {
             var commands = GetCommands();
             var added = false;
 
-            for (var i = 0; i < commands.Count; i++) {
+            for (var i = 0; i < commands.Count; i++)
+            {
                 var command = commands[i];
-                if (!Matches(command.Attribute, context)) {
+                if (!Matches(command.Attribute, context))
+                {
                     continue;
                 }
 
                 added = true;
-                menu.AppendAction(command.Attribute.Path, _ => InvokeCommand(command.Method, context), DropdownMenuAction.Status.Normal);
+                menu.AppendAction(
+                    command.Attribute.Path,
+                    _ => InvokeCommand(command.Method, context),
+                    DropdownMenuAction.Status.Normal
+                );
             }
 
-            if (!added) {
+            if (!added)
+            {
                 menu.AppendAction("No Commands", _ => { }, DropdownMenuAction.Status.Disabled);
             }
         }
 
-        private static List<CommandDefinition> GetCommands() {
-            if (_commands != null) {
+        private static List<CommandDefinition> GetCommands()
+        {
+            if (_commands != null)
+            {
                 return _commands;
             }
 
             _commands = new List<CommandDefinition>();
             var methods = TypeCache.GetMethodsWithAttribute<AbilityGraphContextCommandAttribute>();
-            for (var methodIndex = 0; methodIndex < methods.Count; methodIndex++) {
+            for (var methodIndex = 0; methodIndex < methods.Count; methodIndex++)
+            {
                 var method = methods[methodIndex];
-                if (!IsValidCommandMethod(method)) {
+                if (!IsValidCommandMethod(method))
+                {
                     continue;
                 }
 
-                var attributes = method.GetCustomAttributes(typeof(AbilityGraphContextCommandAttribute), false);
-                for (var attrIndex = 0; attrIndex < attributes.Length; attrIndex++) {
-                    if (attributes[attrIndex] is not AbilityGraphContextCommandAttribute attribute) {
+                var attributes = method.GetCustomAttributes(
+                    typeof(AbilityGraphContextCommandAttribute),
+                    false
+                );
+                for (var attrIndex = 0; attrIndex < attributes.Length; attrIndex++)
+                {
+                    if (attributes[attrIndex] is not AbilityGraphContextCommandAttribute attribute)
+                    {
                         continue;
                     }
 
-                    _commands.Add(new CommandDefinition {
-                        Attribute = attribute,
-                        Method = method,
-                    });
+                    _commands.Add(new CommandDefinition { Attribute = attribute, Method = method });
                 }
             }
 
@@ -68,21 +88,30 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
             return _commands;
         }
 
-        private static bool IsValidCommandMethod(MethodInfo method) {
-            if (method.ReturnType != typeof(void)) {
+        private static bool IsValidCommandMethod(MethodInfo method)
+        {
+            if (method.ReturnType != typeof(void))
+            {
                 return false;
             }
 
             var parameters = method.GetParameters();
-            return parameters.Length == 1 && parameters[0].ParameterType == typeof(AbilityGraphContextCommandContext);
+            return parameters.Length == 1
+                && parameters[0].ParameterType == typeof(AbilityGraphContextCommandContext);
         }
 
-        private static bool Matches(AbilityGraphContextCommandAttribute attribute, AbilityGraphContextCommandContext context) {
-            if (attribute.Target != context.Target) {
+        private static bool Matches(
+            AbilityGraphContextCommandAttribute attribute,
+            AbilityGraphContextCommandContext context
+        )
+        {
+            if (attribute.Target != context.Target)
+            {
                 return false;
             }
 
-            if (attribute.NodeType == null) {
+            if (attribute.NodeType == null)
+            {
                 return true;
             }
 
@@ -90,14 +119,21 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph {
             return nodeConfig != null && attribute.NodeType.IsInstanceOfType(nodeConfig);
         }
 
-        private static void InvokeCommand(MethodInfo method, AbilityGraphContextCommandContext context) {
-            try {
+        private static void InvokeCommand(
+            MethodInfo method,
+            AbilityGraphContextCommandContext context
+        )
+        {
+            try
+            {
                 method.Invoke(null, new object[] { context });
             }
-            catch (TargetInvocationException exception) when (exception.InnerException != null) {
+            catch (TargetInvocationException exception) when (exception.InnerException != null)
+            {
                 Debug.LogException(exception.InnerException);
             }
-            catch (Exception exception) {
+            catch (Exception exception)
+            {
                 Debug.LogException(exception);
             }
         }

@@ -1,9 +1,9 @@
-using System;
-using System.Collections.Generic;
-using FFS.Libraries.StaticEcs;
-
 namespace UniGame.StaticEcs.Features
 {
+    using System;
+    using System.Collections.Generic;
+    using FFS.Libraries.StaticEcs;
+
     public class AbilityDatabaseFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
@@ -50,17 +50,23 @@ namespace UniGame.StaticEcs.Features
                 var id = asset.Id;
                 if (!ids.Add(id.Value))
                 {
-                    throw new InvalidOperationException($"Ability database contains duplicate ability id {id}.");
+                    throw new InvalidOperationException(
+                        $"Ability database contains duplicate ability id {id}."
+                    );
                 }
 
                 if (registry.Contains(id))
                 {
-                    throw new InvalidOperationException($"Ability registry already contains ability id {id}.");
+                    throw new InvalidOperationException(
+                        $"Ability registry already contains ability id {id}."
+                    );
                 }
 
                 if (asset.Root == null)
                 {
-                    throw new InvalidOperationException($"Ability asset {asset.name} has no root step.");
+                    throw new InvalidOperationException(
+                        $"Ability asset {asset.name} has no root step."
+                    );
                 }
 
                 registry.Register(asset.BuildDefinition(), asset.Root);

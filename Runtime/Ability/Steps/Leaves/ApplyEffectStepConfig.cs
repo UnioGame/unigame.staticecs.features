@@ -1,19 +1,40 @@
-using System;
-using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
+namespace UniGame.StaticEcs.Features
+{
+    using System;
+    using UnityEngine;
+    using UnityEngine.Scripting.APIUpdating;
 
-namespace UniGame.StaticEcs.Features {
     [Serializable]
-    [MovedFrom(true, sourceNamespace: "unigame.staticecs.features", sourceAssembly: "unigame.staticecs.features")]
-    public sealed class ApplyEffectStepConfig : IAbilityStepConfig {
-        [SerializeField] private string _nodeGuid;
-        [SerializeField] private int _effectIdValue;
-        [SerializeField] private AbilityTargetMode _mode = AbilityTargetMode.PrimaryTarget;
-        [SerializeField] private float _duration;
-        [SerializeField] private float _period;
-        [SerializeField] private float _delay;
-        [SerializeField] private float _magnitude;
-        [SerializeField] private bool _excludeCaster = true;
+    [MovedFrom(
+        true,
+        sourceNamespace: "unigame.staticecs.features",
+        sourceAssembly: "unigame.staticecs.features"
+    )]
+    public sealed class ApplyEffectStepConfig : IAbilityStepConfig
+    {
+        [SerializeField]
+        private string _nodeGuid;
+
+        [SerializeField]
+        private int _effectIdValue;
+
+        [SerializeField]
+        private AbilityTargetMode _mode = AbilityTargetMode.PrimaryTarget;
+
+        [SerializeField]
+        private float _duration;
+
+        [SerializeField]
+        private float _period;
+
+        [SerializeField]
+        private float _delay;
+
+        [SerializeField]
+        private float _magnitude;
+
+        [SerializeField]
+        private bool _excludeCaster = true;
 
         public ApplyEffectStepConfig() { }
 
@@ -25,7 +46,9 @@ namespace UniGame.StaticEcs.Features {
             float delay = 0f,
             float magnitude = 0f,
             bool excludeCaster = true,
-            string nodeGuid = null) {
+            string nodeGuid = null
+        )
+        {
             _effectIdValue = effectId.Value;
             _mode = mode;
             _duration = duration;

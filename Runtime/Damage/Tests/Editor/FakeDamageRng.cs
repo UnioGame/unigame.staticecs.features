@@ -1,5 +1,7 @@
-namespace UniGame.StaticEcs.Features.Tests {
-    internal sealed class FakeDamageRng : IDamageRng {
+namespace UniGame.StaticEcs.Features.Tests
+{
+    internal sealed class FakeDamageRng : IDamageRng
+    {
         public bool NextRoll;
         public float NextValue;
 

@@ -1,16 +1,14 @@
-using System;
-using System.Collections.Generic;
-using FFS.Libraries.StaticEcs;
-using UnityEngine;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using System;
+    using System.Collections.Generic;
+    using FFS.Libraries.StaticEcs;
     using Unity;
+    using UnityEngine;
 
     /// <summary>
     /// Managed v1 KD-tree implementation of <see cref="ITargetIndex{TWorld}"/>. Rebuilds from
-    /// every entity carrying <see cref="TargetableTag"/> + <see cref="TransformBindingComponent"/>.
+    /// every entity carrying <see cref="TargetableTag"/> + <see cref="TransformComponent"/>.
     /// The tree is rebuilt in full each call (no incremental updates); a DOD refactor is tracked
     /// separately. Allocations during query are bounded to the recursion stack.
     /// </summary>
@@ -31,10 +29,13 @@ namespace UniGame.StaticEcs.Features
             _ids.Clear();
             _positions.Clear();
 
-            foreach (var entity in World<TWorld>.Query<All<TargetableTag, TransformBindingComponent>>()
-                         .Entities())
+            foreach (
+                var entity in World<TWorld>
+                    .Query<All<TargetableTag, TransformComponent>>()
+                    .Entities()
+            )
             {
-                ref readonly var binding = ref entity.Read<TransformBindingComponent>();
+                ref readonly var binding = ref entity.Read<TransformComponent>();
                 if (binding.Transform == null)
                 {
                     continue;
@@ -143,7 +144,13 @@ namespace UniGame.StaticEcs.Features
             return axis == 0 ? p.x : (axis == 1 ? p.y : p.z);
         }
 
-        private void QuerySphere(int nodeIndex, Vector3 center, float radiusSq, Span<EntityGID> output, ref int written)
+        private void QuerySphere(
+            int nodeIndex,
+            Vector3 center,
+            float radiusSq,
+            Span<EntityGID> output,
+            ref int written
+        )
         {
             if (nodeIndex < 0 || written >= output.Length)
             {

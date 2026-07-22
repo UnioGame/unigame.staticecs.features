@@ -1,3 +1,4 @@
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     public interface ICharacteristicType { }
 }

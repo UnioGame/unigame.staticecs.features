@@ -1,10 +1,10 @@
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.AI;
-
 namespace UniGame.StaticEcs.Features.Tests.Movement
 {
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
+    using UnityEngine;
+    using UnityEngine.AI;
+
     public sealed class NavMeshMovementSerializableConverterTests
     {
         private GameObject _host;
@@ -32,18 +32,23 @@ namespace UniGame.StaticEcs.Features.Tests.Movement
             var monoEntity = World<TestNavMeshConverterWorld>.NewEntity<Default>();
             var serializableEntity = World<TestNavMeshConverterWorld>.NewEntity<Default>();
             var mono = _host.AddComponent<TestNavMeshMovementConverter>();
-            var serializable = new NavMeshMovementSerializableConverter<TestNavMeshConverterWorld>();
+            var serializable =
+                new NavMeshMovementSerializableConverter<TestNavMeshConverterWorld>();
 
             mono.Apply(monoEntity, _host);
             serializable.Apply(serializableEntity, _host);
 
             var expected = _host.GetComponent<NavMeshAgent>();
             Assert.That(monoEntity.Read<NavMeshAgentComponent>().Agent, Is.SameAs(expected));
-            Assert.That(serializableEntity.Read<NavMeshAgentComponent>().Agent, Is.SameAs(expected));
+            Assert.That(
+                serializableEntity.Read<NavMeshAgentComponent>().Agent,
+                Is.SameAs(expected)
+            );
         }
     }
 
-    public sealed class TestNavMeshMovementConverter : NavMeshMovementConverter<TestNavMeshConverterWorld> { }
+    public sealed class TestNavMeshMovementConverter
+        : NavMeshMovementConverter<TestNavMeshConverterWorld> { }
 
     public struct TestNavMeshConverterWorld : IWorldType { }
 }

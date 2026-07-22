@@ -42,6 +42,16 @@ Use only directories that contain real files:
 - Use native events for transient streams; retain components for persistent/queryable workflow state. Receiver cleanup belongs in system `Destroy`.
 - Prefer family-local serializable converters. Use Mono converters only for behavior that genuinely needs a MonoBehaviour, and use converter preset assets for repeated or configuration-created entity recipes.
 
+## ECS naming and formatting
+
+- `IComponent` and `IMultiComponent` types end with `Component`; `ITag` types end with `Tag`; `IEvent` types end with `Event`; `ISystem` types end with `System`.
+- Prefer the shortest unambiguous domain name. Do not retain technical filler such as `Entry`, `Data`, `Runtime`, `Binding`, or `Ref` when the ECS suffix and the remaining domain role already communicate the meaning.
+- Keep qualifiers such as `Config`, `Source`, `Target`, `Owner`, `Parent`, `Channel`, `Tracker`, `Mask`, `Destination`, `Path`, `Agent`, and `Obstacle` only when they distinguish a real domain role or lifecycle.
+- Public ECS component and event fields use PascalCase. Inspector and authoring fields use `public camelCase`; private runtime fields use `_camelCase`.
+- Use Allman braces, four spaces, block-scoped namespaces, and `using` directives inside the namespace with `System` imports first.
+- Empty tags use a normal multi-line declaration. Attributes stay above their declaration, and fluent registrations and query chains use one logical call per line.
+- Package asmdef names are lowercase, dot-separated, start with `unigame.staticecs.features`, and match their filenames.
+
 ## Documentation
 
 - Each feature family has an English README with Capabilities / Usage / Configuration.

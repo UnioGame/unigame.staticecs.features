@@ -1,10 +1,13 @@
-using NUnit.Framework;
+namespace UniGame.StaticEcs.Features.Tests
+{
+    using NUnit.Framework;
 
-namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
-    public sealed class EffectIdRegistryTests {
+    public sealed class EffectIdRegistryTests
+    {
         [Test]
-        public void Register_AssignsStableIds_AndReverseLookupYieldsType() {
+        public void Register_AssignsStableIds_AndReverseLookupYieldsType()
+        {
             var registry = new EffectIdRegistry();
             var idA = registry.Register<TestEffectMarker>();
             var idB = registry.Register<TestEffectMarkerB>();
@@ -17,7 +20,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void GetTypeName_ReturnsTypeName_OrFallback() {
+        public void GetTypeName_ReturnsTypeName_OrFallback()
+        {
             var registry = new EffectIdRegistry();
             var id = registry.Register<TestEffectMarker>();
 
@@ -27,18 +31,24 @@ namespace UniGame.StaticEcs.Features.Tests {
     }
 
     [TestFixture]
-    public sealed class EffectFlagOfTests {
+    public sealed class EffectFlagOfTests
+    {
         [Test]
-        public void Resolve_ReadsAttribute_FromOpenGenericDefinition() {
+        public void Resolve_ReadsAttribute_FromOpenGenericDefinition()
+        {
             Assert.AreEqual(EffectFlag.Reserved0, EffectFlagOf<TestEffectMarker>.Value);
             Assert.AreEqual(EffectFlag.Reserved1, EffectFlagOf<TestEffectMarkerB>.Value);
         }
 
         [Test]
-        public void Resolve_ProductionEffects_HaveSingleBitFlags() {
+        public void Resolve_ProductionEffects_HaveSingleBitFlags()
+        {
             Assert.AreEqual(EffectFlag.HealOverTime, EffectFlagOf<HealOverTimeEffect>.Value);
             Assert.AreEqual(EffectFlag.Stun, EffectFlagOf<StunEffect>.Value);
-            Assert.AreEqual(EffectFlag.Modification, EffectFlagOf<ModificationEffect<SpeedCharacteristic>>.Value);
+            Assert.AreEqual(
+                EffectFlag.Modification,
+                EffectFlagOf<ModificationEffect<SpeedCharacteristic>>.Value
+            );
         }
     }
 }

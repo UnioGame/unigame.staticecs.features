@@ -1,8 +1,6 @@
-using FFS.Libraries.StaticEcs;
-
-
 namespace UniGame.StaticEcs.Features
 {
+    using FFS.Libraries.StaticEcs;
     using Unity;
 
     /// <summary>
@@ -18,7 +16,8 @@ namespace UniGame.StaticEcs.Features
             EntityGID target,
             float amount,
             DamageType type = DamageType.Physical,
-            bool forceCritical = false)
+            bool forceCritical = false
+        )
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
@@ -26,20 +25,19 @@ namespace UniGame.StaticEcs.Features
                 return false;
             }
 
-            return World<TWorld>.SendEvent(new IncomingDamageEvent
-            {
-                Source = source,
-                Target = target,
-                Amount = amount,
-                Type = type,
-                ForceCritical = forceCritical
-            });
+            return World<TWorld>.SendEvent(
+                new IncomingDamageEvent
+                {
+                    Source = source,
+                    Target = target,
+                    Amount = amount,
+                    Type = type,
+                    ForceCritical = forceCritical,
+                }
+            );
         }
 
-        public static bool RaiseHealing<TWorld>(
-            EntityGID source,
-            EntityGID target,
-            float amount)
+        public static bool RaiseHealing<TWorld>(EntityGID source, EntityGID target, float amount)
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
@@ -47,14 +45,16 @@ namespace UniGame.StaticEcs.Features
                 return false;
             }
 
-            return World<TWorld>.SendEvent(new IncomingDamageEvent
-            {
-                Source = source,
-                Target = target,
-                Amount = amount,
-                Type = DamageType.Healing,
-                ForceCritical = false
-            });
+            return World<TWorld>.SendEvent(
+                new IncomingDamageEvent
+                {
+                    Source = source,
+                    Target = target,
+                    Amount = amount,
+                    Type = DamageType.Healing,
+                    ForceCritical = false,
+                }
+            );
         }
 
         // --- Main-default overloads ---
@@ -64,10 +64,10 @@ namespace UniGame.StaticEcs.Features
             EntityGID target,
             float amount,
             DamageType type = DamageType.Physical,
-            bool forceCritical = false)
-            => RaiseDamage<Main>(source, target, amount, type, forceCritical);
+            bool forceCritical = false
+        ) => RaiseDamage<Main>(source, target, amount, type, forceCritical);
 
-        public static bool RaiseHealing(EntityGID source, EntityGID target, float amount)
-            => RaiseHealing<Main>(source, target, amount);
+        public static bool RaiseHealing(EntityGID source, EntityGID target, float amount) =>
+            RaiseHealing<Main>(source, target, amount);
     }
 }

@@ -1,14 +1,16 @@
-using System.Reflection;
-using FFS.Libraries.StaticEcs;
-using FFS.Libraries.StaticEcs.Unity;
-using NUnit.Framework;
-using Pathfinding;
-using Pathfinding.Graphs.Grid;
-using UnityEngine;
+namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
+{
+    using System.Reflection;
+    using FFS.Libraries.StaticEcs;
+    using FFS.Libraries.StaticEcs.Unity;
+    using NUnit.Framework;
+    using Pathfinding;
+    using Pathfinding.Graphs.Grid;
+    using UnityEngine;
 
-namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
     [TestFixture]
-    public sealed class AstarMovementSystemTests {
+    public sealed class AstarMovementSystemTests
+    {
         private GameObject _host;
         private RecordingAIPath _ai;
         private GameObject _graphHost;
@@ -17,7 +19,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         private AstarMovementSystem<TestAstarWorld> _system;
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestAstarWorld>.Create(WorldConfig.Default());
             new AstarMovementFeature<TestAstarWorld>().RegisterTypes(World<TestAstarWorld>.Types());
             new SpeedFeature<TestAstarWorld>().RegisterTypes(World<TestAstarWorld>.Types());
@@ -36,27 +39,39 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
             _backend.Scan(graph);
             _graphEntity = World<TestAstarWorld>.NewEntity<Default>();
             _graphEntity.Set(new AstarPathComponent { Backend = _backend });
-            _graphEntity.Set(new AstarGridGraphRuntimeComponent { Graph = graph, NodeCount = 64, WalkableNodeCount = 64 });
+            _graphEntity.Set(
+                new AstarGridGraphComponent
+                {
+                    Graph = graph,
+                    NodeCount = 64,
+                    WalkableNodeCount = 64,
+                }
+            );
             _graphEntity.Set<AstarGraphInitializedTag>();
             _system = new AstarMovementSystem<TestAstarWorld>();
         }
 
         [TearDown]
-        public void TearDown() {
-            if (World<TestAstarWorld>.Status != WorldStatus.NotCreated) {
+        public void TearDown()
+        {
+            if (World<TestAstarWorld>.Status != WorldStatus.NotCreated)
+            {
                 World<TestAstarWorld>.Destroy();
             }
 
-            if (_host != null) {
+            if (_host != null)
+            {
                 Object.DestroyImmediate(_host);
             }
-            if (_graphHost != null) {
+            if (_graphHost != null)
+            {
                 Object.DestroyImmediate(_graphHost);
             }
         }
 
         [Test]
-        public void Update_StartAndResume_RequestOnePathEach() {
+        public void Update_StartAndResume_RequestOnePathEach()
+        {
             var entity = CreateAgent(new Vector3(2f, 0f, 3f), active: true);
 
             _system.Update();
@@ -65,8 +80,11 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
             Assert.AreEqual(1, _ai.SearchCount);
             Assert.IsFalse(_ai.isStopped);
             Assert.IsFalse(_ai.canSearch);
-            Assert.IsTrue(_host.GetComponent<Seeker>().graphMask.Contains(
-                _graphEntity.Read<AstarGridGraphRuntimeComponent>().Graph));
+            Assert.IsTrue(
+                _host
+                    .GetComponent<Seeker>()
+                    .graphMask.Contains(_graphEntity.Read<AstarGridGraphComponent>().Graph)
+            );
 
             entity.Mut<MovementDestinationComponent>().IsActive = false;
             _system.Update();
@@ -80,7 +98,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void Update_WaitsForLinkedGraphAndRequestsAfterInitialization() {
+        public void Update_WaitsForLinkedGraphAndRequestsAfterInitialization()
+        {
             var graphEntity = World<TestAstarWorld>.NewEntity<Default>();
             var entity = CreateAgent(Vector3.forward, active: true, graphEntity.GID);
 
@@ -91,7 +110,7 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
 
             graphEntity.Set<AstarGraphInitializedTag>();
             graphEntity.Set(new AstarPathComponent { Backend = _backend });
-            graphEntity.Set(_graphEntity.Read<AstarGridGraphRuntimeComponent>());
+            graphEntity.Set(_graphEntity.Read<AstarGridGraphComponent>());
             _system.Update();
 
             Assert.AreEqual(1, _ai.SearchCount);
@@ -99,7 +118,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void Update_ChangedDestination_RequestsOnceForNewValue() {
+        public void Update_ChangedDestination_RequestsOnceForNewValue()
+        {
             var entity = CreateAgent(Vector3.right, active: true);
             _system.Update();
 
@@ -112,9 +132,11 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void Update_BackendMismatch_DoesNotRequestPath() {
+        public void Update_BackendMismatch_DoesNotRequestPath()
+        {
             var otherHost = new GameObject("Other Astar backend");
-            try {
+            try
+            {
                 var otherBackend = otherHost.AddComponent<AstarPath>();
                 var entity = CreateAgent(Vector3.right, active: true);
                 var graphEntity = _graphEntity;
@@ -125,13 +147,15 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 Assert.AreEqual(0, _ai.SearchCount);
                 Assert.IsTrue(_ai.isStopped);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(otherHost);
             }
         }
 
         [Test]
-        public void Update_StartOutsideNearestDistance_DoesNotRequestPath() {
+        public void Update_StartOutsideNearestDistance_DoesNotRequestPath()
+        {
             _host.transform.position = Vector3.one * 1000f;
             CreateAgent(Vector3.right, active: true);
 
@@ -142,7 +166,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void Update_ChangedDestinationWhilePending_IsRequestedAfterPendingCompletes() {
+        public void Update_ChangedDestinationWhilePending_IsRequestedAfterPendingCompletes()
+        {
             var entity = CreateAgent(Vector3.right, active: true);
             _system.Update();
 
@@ -155,15 +180,21 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
             _system.Update();
 
             Assert.AreEqual(2, _ai.SearchCount);
-            Assert.AreEqual(Vector3.back * 5f, entity.Read<AstarAIComponent>().LastRequestedDestination);
+            Assert.AreEqual(
+                Vector3.back * 5f,
+                entity.Read<AstarAIComponent>().LastRequestedDestination
+            );
         }
 
         [Test]
-        public void Update_AppliesSpeedAndIgnoresNullAI() {
+        public void Update_AppliesSpeedAndIgnoresNullAI()
+        {
             var entity = CreateAgent(Vector3.one, active: true);
             entity.Set(CharacteristicComponent<SpeedCharacteristic>.Create(7.5f, 0f, 20f));
             var nullAgent = World<TestAstarWorld>.NewEntity<Default>();
-            nullAgent.Set(new MovementDestinationComponent { Destination = Vector3.left, IsActive = true });
+            nullAgent.Set(
+                new MovementDestinationComponent { Destination = Vector3.left, IsActive = true }
+            );
             nullAgent.Set(new AstarAIComponent());
 
             Assert.DoesNotThrow(() => _system.Update());
@@ -171,7 +202,8 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         }
 
         [Test]
-        public void Converter_ReadsAstarAIFromHost() {
+        public void Converter_ReadsAstarAIFromHost()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
             var converter = _host.AddComponent<TestAstarMovementConverter>();
             var providerHost = new GameObject("Astar graph provider");
@@ -182,45 +214,58 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
                 .GetField("_graphProvider", BindingFlags.Instance | BindingFlags.NonPublic)
                 ?.SetValue(converter, provider);
 
-            try {
+            try
+            {
                 converter.Apply(entity, _host);
                 converter.ResolveLinks(entity, _host);
 
                 Assert.AreSame(_ai, entity.Read<AstarAIComponent>().AI);
-                Assert.AreSame(_host.GetComponent<Seeker>(), entity.Read<AstarAIComponent>().Seeker);
+                Assert.AreSame(
+                    _host.GetComponent<Seeker>(),
+                    entity.Read<AstarAIComponent>().Seeker
+                );
                 Assert.AreEqual(graphEntity.GID, entity.Read<AstarAIComponent>().GraphEntity);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(providerHost);
             }
         }
 
         [Test]
-        public void SerializableConverter_ReadsHostAndResolvesGraphProvider() {
+        public void SerializableConverter_ReadsHostAndResolvesGraphProvider()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
             var providerHost = new GameObject("Astar serializable graph provider");
             var provider = providerHost.AddComponent<TestAstarEntityProvider>();
             var graphEntity = World<TestAstarWorld>.NewEntity<Default>();
             provider.EntityGid = graphEntity.GID;
-            var converter = new AstarMovementSerializableConverter<TestAstarWorld> {
+            var converter = new AstarMovementSerializableConverter<TestAstarWorld>
+            {
                 GraphProvider = provider,
             };
 
-            try {
+            try
+            {
                 converter.Apply(entity, _host);
                 converter.ResolveLinks(entity, _host);
 
                 Assert.AreSame(_ai, entity.Read<AstarAIComponent>().AI);
-                Assert.AreSame(_host.GetComponent<Seeker>(), entity.Read<AstarAIComponent>().Seeker);
+                Assert.AreSame(
+                    _host.GetComponent<Seeker>(),
+                    entity.Read<AstarAIComponent>().Seeker
+                );
                 Assert.AreEqual(graphEntity.GID, entity.Read<AstarAIComponent>().GraphEntity);
             }
-            finally {
+            finally
+            {
                 Object.DestroyImmediate(providerHost);
             }
         }
 
         [Test]
-        public void MovementOperations_CreateUpdateAndStopDestination() {
+        public void MovementOperations_CreateUpdateAndStopDestination()
+        {
             var entity = World<TestAstarWorld>.NewEntity<Default>();
 
             MovementOperations.SetDestination<TestAstarWorld>(entity.GID, Vector3.right);
@@ -228,7 +273,10 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
             Assert.AreEqual(Vector3.right, entity.Read<MovementDestinationComponent>().Destination);
 
             MovementOperations.SetDestination<TestAstarWorld>(entity.GID, Vector3.forward);
-            Assert.AreEqual(Vector3.forward, entity.Read<MovementDestinationComponent>().Destination);
+            Assert.AreEqual(
+                Vector3.forward,
+                entity.Read<MovementDestinationComponent>().Destination
+            );
 
             MovementOperations.StopMovement<TestAstarWorld>(entity.GID);
             Assert.IsFalse(MovementOperations.IsMoving<TestAstarWorld>(entity.GID));
@@ -237,16 +285,24 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
         private World<TestAstarWorld>.Entity CreateAgent(
             Vector3 destination,
             bool active,
-            EntityGID graphGid = default) {
-            if (graphGid.Equals(default(EntityGID))) graphGid = _graphEntity.GID;
+            EntityGID graphGid = default
+        )
+        {
+            if (graphGid.Equals(default(EntityGID)))
+                graphGid = _graphEntity.GID;
 
             var entity = World<TestAstarWorld>.NewEntity<Default>();
-            entity.Set(new MovementDestinationComponent { Destination = destination, IsActive = active });
-            entity.Set(new AstarAIComponent {
-                AI = _ai,
-                Seeker = _host.GetComponent<Seeker>(),
-                GraphEntity = graphGid,
-            });
+            entity.Set(
+                new MovementDestinationComponent { Destination = destination, IsActive = active }
+            );
+            entity.Set(
+                new AstarAIComponent
+                {
+                    AI = _ai,
+                    Seeker = _host.GetComponent<Seeker>(),
+                    GraphEntity = graphGid,
+                }
+            );
             return entity;
         }
     }
@@ -255,14 +311,17 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar {
 
     public sealed class TestAstarMovementConverter : AstarMovementConverter<TestAstarWorld> { }
 
-    public sealed class RecordingAIPath : AIPath {
+    public sealed class RecordingAIPath : AIPath
+    {
         public int SearchCount { get; private set; }
 
-        public override void SearchPath() {
+        public override void SearchPath()
+        {
             SearchCount++;
         }
 
-        public void SetPending(bool value) {
+        public void SetPending(bool value)
+        {
             waitingForPathCalculation = value;
         }
     }

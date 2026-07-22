@@ -1,36 +1,45 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Cancels the damage event when the target carries <see cref="BlockableTag"/> and a roll
     /// against <see cref="BlockChanceCharacteristic"/> succeeds. Healing events bypass the filter.
     /// </summary>
     public sealed class BlockFilter<TWorld> : IDamageFilter<TWorld>
-        where TWorld : struct, IWorldType {
-        public void Apply(ref DamageContext ctx) {
-            if (ctx.Cancelled || ctx.Type == DamageType.Healing) {
+        where TWorld : struct, IWorldType
+    {
+        public void Apply(ref DamageContext ctx)
+        {
+            if (ctx.Cancelled || ctx.Type == DamageType.Healing)
+            {
                 return;
             }
 
-            if (!ctx.Target.TryUnpack<TWorld>(out var target)) {
+            if (!ctx.Target.TryUnpack<TWorld>(out var target))
+            {
                 return;
             }
 
-            if (!target.Has<BlockableTag>()) {
+            if (!target.Has<BlockableTag>())
+            {
                 return;
             }
 
-            if (!target.Has<CharacteristicComponent<BlockChanceCharacteristic>>()) {
+            if (!target.Has<CharacteristicComponent<BlockChanceCharacteristic>>())
+            {
                 return;
             }
 
             var chance = target.Read<CharacteristicComponent<BlockChanceCharacteristic>>().Value;
-            if (chance <= 0f) {
+            if (chance <= 0f)
+            {
                 return;
             }
 
             ref var rng = ref World<TWorld>.GetResource<IDamageRng>();
-            if (!rng.RollChance(chance)) {
+            if (!rng.RollChance(chance))
+            {
                 return;
             }
 

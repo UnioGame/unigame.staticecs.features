@@ -1,27 +1,50 @@
-using FFS.Libraries.StaticEcs;
-using NUnit.Framework;
+namespace UniGame.StaticEcs.Features.Tests
+{
+    using FFS.Libraries.StaticEcs;
+    using NUnit.Framework;
 
-namespace UniGame.StaticEcs.Features.Tests {
     [TestFixture]
-    public sealed class ApplyDamageSystemTests {
+    public sealed class ApplyDamageSystemTests
+    {
         private FakeDamageRng _rng;
         private ApplyDamageSystem<TestDamageWorld> _system;
 
         [SetUp]
-        public void SetUp() {
+        public void SetUp()
+        {
             World<TestDamageWorld>.Create(WorldConfig.Default());
             _rng = new FakeDamageRng();
             World<TestDamageWorld>.SetResource<IDamageRng>(_rng);
 
-            new ModifierBackRefFeature<TestDamageWorld>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, CriticalChanceCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new CharacteristicFeature<TestDamageWorld, CriticalMultiplierCharacteristic>().RegisterTypes(World<TestDamageWorld>.Types());
-            new DamageFeature<TestDamageWorld>(registerApplySystem: false).RegisterTypes(World<TestDamageWorld>.Types());
+            new ModifierBackRefFeature<TestDamageWorld>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
+            new CharacteristicFeature<
+                TestDamageWorld,
+                CriticalChanceCharacteristic
+            >().RegisterTypes(World<TestDamageWorld>.Types());
+            new CharacteristicFeature<
+                TestDamageWorld,
+                CriticalMultiplierCharacteristic
+            >().RegisterTypes(World<TestDamageWorld>.Types());
+            new DamageFeature<TestDamageWorld>(registerApplySystem: false).RegisterTypes(
+                World<TestDamageWorld>.Types()
+            );
 
             World<TestDamageWorld>.Initialize();
 
@@ -30,15 +53,18 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [TearDown]
-        public void TearDown() {
-            if (World<TestDamageWorld>.Status != WorldStatus.NotCreated) {
+        public void TearDown()
+        {
+            if (World<TestDamageWorld>.Status != WorldStatus.NotCreated)
+            {
                 _system.Destroy();
                 World<TestDamageWorld>.Destroy();
             }
         }
 
         [Test]
-        public void RaiseDamage_AppliesToHealth_NoFilters() {
+        public void RaiseDamage_AppliesToHealth_NoFilters()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<HealthCharacteristic>.Create(100f, 0f, 100f));
@@ -46,12 +72,16 @@ namespace UniGame.StaticEcs.Features.Tests {
             DamageOperations.RaiseDamage<TestDamageWorld>(source.GID, target.GID, 30f);
             _system.Update();
 
-            Assert.AreEqual(70f, target.Read<CharacteristicComponent<HealthCharacteristic>>().Value);
+            Assert.AreEqual(
+                70f,
+                target.Read<CharacteristicComponent<HealthCharacteristic>>().Value
+            );
             Assert.IsFalse(target.Has<DeathPendingTag>());
         }
 
         [Test]
-        public void LethalHit_SetsDeathPendingTag() {
+        public void LethalHit_SetsDeathPendingTag()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<HealthCharacteristic>.Create(20f, 0f, 100f));
@@ -64,7 +94,8 @@ namespace UniGame.StaticEcs.Features.Tests {
         }
 
         [Test]
-        public void RaiseHealing_IncreasesHealth() {
+        public void RaiseHealing_IncreasesHealth()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<HealthCharacteristic>.Create(40f, 0f, 100f));
@@ -72,11 +103,15 @@ namespace UniGame.StaticEcs.Features.Tests {
             DamageOperations.RaiseHealing<TestDamageWorld>(source.GID, target.GID, 25f);
             _system.Update();
 
-            Assert.AreEqual(65f, target.Read<CharacteristicComponent<HealthCharacteristic>>().Value);
+            Assert.AreEqual(
+                65f,
+                target.Read<CharacteristicComponent<HealthCharacteristic>>().Value
+            );
         }
 
         [Test]
-        public void DodgedDamage_DoesNotChangeHealth() {
+        public void DodgedDamage_DoesNotChangeHealth()
+        {
             var source = World<TestDamageWorld>.NewEntity<Default>();
             var target = World<TestDamageWorld>.NewEntity<Default>();
             target.Set(CharacteristicComponent<HealthCharacteristic>.Create(100f, 0f, 100f));
@@ -86,7 +121,10 @@ namespace UniGame.StaticEcs.Features.Tests {
             DamageOperations.RaiseDamage<TestDamageWorld>(source.GID, target.GID, 30f);
             _system.Update();
 
-            Assert.AreEqual(100f, target.Read<CharacteristicComponent<HealthCharacteristic>>().Value);
+            Assert.AreEqual(
+                100f,
+                target.Read<CharacteristicComponent<HealthCharacteristic>>().Value
+            );
         }
     }
 }

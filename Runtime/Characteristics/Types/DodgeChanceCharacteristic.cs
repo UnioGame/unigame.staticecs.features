@@ -1,4 +1,5 @@
-namespace UniGame.StaticEcs.Features {
+namespace UniGame.StaticEcs.Features
+{
     /// <summary>
     /// Marker for the dodge-chance characteristic. Value is a 0..1 probability to fully avoid an
     /// incoming damage event before any other filter in the damage pipeline runs.

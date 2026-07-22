@@ -1,12 +1,12 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
-
 namespace UniGame.StaticEcs.Features
 {
-    public class ManaFeature<TWorld> :
-        CharacteristicFeature<TWorld, ManaCharacteristic>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
+
+    public class ManaFeature<TWorld>
+        : CharacteristicFeature<TWorld, ManaCharacteristic>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
         where TWorld : struct, IWorldType
     {
         public const short DefaultRegenOrder = 0;
@@ -28,7 +28,8 @@ namespace UniGame.StaticEcs.Features
 
         public UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken
+        )
         {
             if (!_registerRegen)
             {

@@ -1,8 +1,10 @@
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     public struct CharacteristicChangedEvent<TCharacteristic> : IEvent
-        where TCharacteristic : struct, ICharacteristicType {
+        where TCharacteristic : struct, ICharacteristicType
+    {
         public EntityGID Target;
         public float PreviousValue;
         public float Value;

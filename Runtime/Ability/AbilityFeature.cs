@@ -1,11 +1,12 @@
-using System.Threading;
-using Cysharp.Threading.Tasks;
-using FFS.Libraries.StaticEcs;
+namespace UniGame.StaticEcs.Features
+{
+    using System.Threading;
+    using Cysharp.Threading.Tasks;
+    using FFS.Libraries.StaticEcs;
 
-namespace UniGame.StaticEcs.Features {
     /// <summary>
     /// Wires the ability slice for a world: registers cast-entity components / tags, the
-    /// caster-side <see cref="AbilityActiveCastRef"/> + <see cref="AbilityChannelCastRef"/>
+    /// caster-side <see cref="AbilityActiveCastComponent"/> + <see cref="AbilityChannelCastComponent"/>
     /// roster, the lifecycle events, the world-scoped <see cref="AbilityRegistry{TWorld}"/>
     /// and <see cref="AbilityStepActivatorRegistry{TWorld}"/> resources, and the smoke-pipeline
     /// systems (<see cref="AbilityCastSystem{TWorld}"/>, <see cref="AbilityWaitSystem{TWorld}"/>,
@@ -13,10 +14,11 @@ namespace UniGame.StaticEcs.Features {
     ///
     /// Registers built-in leaf activators for the runtime ability pipeline.
     /// </summary>
-    public class AbilityFeature<TWorld> :
-        StaticEcsFeature<TWorld>,
-        IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
-        where TWorld : struct, IWorldType {
+    public class AbilityFeature<TWorld>
+        : StaticEcsFeature<TWorld>,
+            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+        where TWorld : struct, IWorldType
+    {
         public const short DefaultCastOrder = 150;
         public const short DefaultWaitOrder = 155;
         public const short DefaultProgressionOrder = 160;
@@ -30,30 +32,33 @@ namespace UniGame.StaticEcs.Features {
             bool registerSystems = true,
             short castOrder = DefaultCastOrder,
             short waitOrder = DefaultWaitOrder,
-            short progressionOrder = DefaultProgressionOrder) {
+            short progressionOrder = DefaultProgressionOrder
+        )
+        {
             _registerSystems = registerSystems;
             _castOrder = castOrder;
             _waitOrder = waitOrder;
             _progressionOrder = progressionOrder;
         }
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types) {
+        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        {
             types
-                .Component<AbilityCastRuntimeComponent>()
-                .Component<AbilityCastOwnerRef>()
-                .Component<AbilityCastParentRef>()
-                .Component<AbilityActiveCastRef>()
-                .Component<AbilityCurrentLeaf>()
-                .Component<AbilityStepLastStatus>()
-                .Component<AbilityWaitState>()
-                .Component<AbilityInlineRootConfig>()
-                .Multi<AbilityRosterEntry>()
-                .Multi<CooldownEntry>()
-                .Multi<AbilityChannelCastRef>()
-                .Multi<AbilityStackFrame>()
-                .Multi<AbilityActiveStepEntry>()
-                .Multi<AbilityAoeBufferEntry>()
-                .Multi<AbilityParallelBranchEntry>()
+                .Component<AbilityCastComponent>()
+                .Component<AbilityCastOwnerComponent>()
+                .Component<AbilityParentCastComponent>()
+                .Component<AbilityActiveCastComponent>()
+                .Component<AbilityCurrentStepComponent>()
+                .Component<AbilityStepStatusComponent>()
+                .Component<AbilityWaitComponent>()
+                .Component<AbilityRootComponent>()
+                .Multi<AbilitySlotComponent>()
+                .Multi<CooldownComponent>()
+                .Multi<AbilityChannelCastComponent>()
+                .Multi<AbilityStackComponent>()
+                .Multi<AbilityActiveStepComponent>()
+                .Multi<AbilityAoeTargetComponent>()
+                .Multi<AbilityBranchComponent>()
                 .Tag<AbilityStepReadyTag>()
                 .Tag<AbilityChannelCastTag>()
                 .Tag<AbilityDetachedSubcastTag>()
@@ -67,33 +72,42 @@ namespace UniGame.StaticEcs.Features {
                 .Event<AbilityStepCompletedEvent>()
                 .Event<CooldownReadyEvent>();
 
-            if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>()) {
+            if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>())
+            {
                 World<TWorld>.SetResource(new AbilityRegistry<TWorld>());
             }
 
-            if (!World<TWorld>.HasResource<AbilityEffectDispatchRegistry<TWorld>>()) {
+            if (!World<TWorld>.HasResource<AbilityEffectDispatchRegistry<TWorld>>())
+            {
                 World<TWorld>.SetResource(new AbilityEffectDispatchRegistry<TWorld>());
             }
 
-            if (!World<TWorld>.HasResource<IAbilityRng<TWorld>>()) {
+            if (!World<TWorld>.HasResource<IAbilityRng<TWorld>>())
+            {
                 World<TWorld>.SetResource<IAbilityRng<TWorld>>(new UnityAbilityRng<TWorld>());
             }
 
-            if (!World<TWorld>.HasResource<AbilityStepActivatorRegistry<TWorld>>()) {
+            if (!World<TWorld>.HasResource<AbilityStepActivatorRegistry<TWorld>>())
+            {
                 var activators = new AbilityStepActivatorRegistry<TWorld>();
                 activators.Register<WaitStepConfig>(new WaitStepActivator<TWorld>());
                 activators.Register<ApplyDamageStepConfig>(new ApplyDamageStepActivator<TWorld>());
                 activators.Register<ApplyEffectStepConfig>(new ApplyEffectStepActivator<TWorld>());
                 activators.Register<AoeQueryStepConfig>(new AoeQueryStepActivator<TWorld>());
-                activators.Register<SetPrimaryTargetFromAoeStepConfig>(new SetPrimaryTargetFromAoeStepActivator<TWorld>());
+                activators.Register<SetPrimaryTargetFromAoeStepConfig>(
+                    new SetPrimaryTargetFromAoeStepActivator<TWorld>()
+                );
                 World<TWorld>.SetResource(activators);
             }
         }
 
         public UniTask RegisterSystemsAsync(
             StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken) {
-            if (!_registerSystems) {
+            CancellationToken cancellationToken
+        )
+        {
+            if (!_registerSystems)
+            {
                 return UniTask.CompletedTask;
             }
             systems.Add(new AbilityCastSystem<TWorld>(), _castOrder);
