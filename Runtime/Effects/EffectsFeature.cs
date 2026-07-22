@@ -10,16 +10,12 @@ namespace UniGame.StaticEcs.Features
             IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
         where TWorld : struct, IWorldType
     {
-        private readonly HealOverTimeFeature<TWorld> _heal = new();
-        private readonly StunEffectFeature<TWorld> _stun = new();
-        private readonly ModificationEffectFeature<TWorld, SpeedCharacteristic> _speed = new();
-
         /// <inheritdoc />
         public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
         {
-            _heal.RegisterTypes(types);
-            _stun.RegisterTypes(types);
-            _speed.RegisterTypes(types);
+            new HealOverTimeFeature<TWorld>().RegisterTypes(types);
+            new StunEffectFeature<TWorld>().RegisterTypes(types);
+            new ModificationEffectFeature<TWorld, SpeedCharacteristic>().RegisterTypes(types);
         }
 
         /// <inheritdoc />
@@ -28,9 +24,10 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            await _heal.RegisterSystemsAsync(systems, cancellationToken);
-            await _stun.RegisterSystemsAsync(systems, cancellationToken);
-            await _speed.RegisterSystemsAsync(systems, cancellationToken);
+            await new HealOverTimeFeature<TWorld>().RegisterSystemsAsync(systems, cancellationToken);
+            await new StunEffectFeature<TWorld>().RegisterSystemsAsync(systems, cancellationToken);
+            await new ModificationEffectFeature<TWorld, SpeedCharacteristic>()
+                .RegisterSystemsAsync(systems, cancellationToken);
         }
     }
 }

@@ -20,9 +20,14 @@ namespace UniGame.StaticEcs.Features
     {
         public const short DefaultApplyOrder = 100;
 
-        private readonly short _applyOrder;
-        private readonly bool _registerApplySystem;
-        private readonly bool _registerDefaultChain;
+        /// <summary>Whether the damage application system is installed.</summary>
+        public bool registerApplySystem = true;
+
+        /// <summary>Whether the default damage filter chain is installed.</summary>
+        public bool registerDefaultChain = true;
+
+        /// <summary>Execution order of damage application.</summary>
+        public short applyOrder = DefaultApplyOrder;
 
         public DamageFeature(
             bool registerApplySystem = true,
@@ -30,9 +35,9 @@ namespace UniGame.StaticEcs.Features
             short applyOrder = DefaultApplyOrder
         )
         {
-            _registerApplySystem = registerApplySystem;
-            _registerDefaultChain = registerDefaultChain;
-            _applyOrder = applyOrder;
+            this.registerApplySystem = registerApplySystem;
+            this.registerDefaultChain = registerDefaultChain;
+            this.applyOrder = applyOrder;
         }
 
         public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
@@ -52,7 +57,7 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.SetResource<IDamageRng>(new UnityDamageRng());
             }
 
-            if (_registerDefaultChain && !World<TWorld>.HasResource<DamageFilterChain<TWorld>>())
+            if (registerDefaultChain && !World<TWorld>.HasResource<DamageFilterChain<TWorld>>())
             {
                 var chain = new DamageFilterChain<TWorld>()
                     .Add(new DodgeFilter<TWorld>())
@@ -69,12 +74,12 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            if (!_registerApplySystem)
+            if (!registerApplySystem)
             {
                 return UniTask.CompletedTask;
             }
 
-            systems.Add(new ApplyDamageSystem<TWorld>(), _applyOrder);
+            systems.Add(new ApplyDamageSystem<TWorld>(), applyOrder);
             return UniTask.CompletedTask;
         }
     }

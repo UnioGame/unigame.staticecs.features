@@ -20,7 +20,9 @@ Every independently enabled family owns its runtime asmdef and feature asset. Ab
 
 ## Usage
 
-Create the feature assets required by the game, add them to a `StaticEcsServiceSource`, and keep dependency order explicit. The demo source is a complete composition example.
+Create the feature assets required by the game, configure their inline serializable feature,
+add them to a `StaticEcsServiceSource`, and keep dependency order explicit. The asset wrapper
+contains no duplicated feature settings. The demo source is a complete composition example.
 
 Gameplay code uses feature operations after startup:
 

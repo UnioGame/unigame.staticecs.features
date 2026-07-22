@@ -10,7 +10,11 @@ namespace UniGame.StaticEcs.Features
             IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
         where TWorld : struct, IWorldType
     {
-        private readonly ManaFeature<TWorld> _mana;
+        /// <summary>Whether mana regeneration is installed in the update group.</summary>
+        public bool registerManaRegen = true;
+
+        /// <summary>Execution order of mana regeneration.</summary>
+        public short manaRegenOrder = ManaFeature<TWorld>.DefaultRegenOrder;
 
         /// <summary>Creates the standard characteristics feature.</summary>
         public CharacteristicsFeature(
@@ -18,7 +22,8 @@ namespace UniGame.StaticEcs.Features
             short manaRegenOrder = ManaFeature<TWorld>.DefaultRegenOrder
         )
         {
-            _mana = new ManaFeature<TWorld>(registerManaRegen, manaRegenOrder);
+            this.registerManaRegen = registerManaRegen;
+            this.manaRegenOrder = manaRegenOrder;
         }
 
         /// <inheritdoc />
@@ -26,7 +31,7 @@ namespace UniGame.StaticEcs.Features
         {
             new ModifierBackRefFeature<TWorld>().RegisterTypes(types);
             new HealthFeature<TWorld>().RegisterTypes(types);
-            _mana.RegisterTypes(types);
+            new ManaFeature<TWorld>(registerManaRegen, manaRegenOrder).RegisterTypes(types);
             new SpeedFeature<TWorld>().RegisterTypes(types);
             new ShieldFeature<TWorld>().RegisterTypes(types);
             new CharacteristicFeature<TWorld, BlockChanceCharacteristic>().RegisterTypes(types);
@@ -44,7 +49,8 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            return _mana.RegisterSystemsAsync(systems, cancellationToken);
+            return new ManaFeature<TWorld>(registerManaRegen, manaRegenOrder)
+                .RegisterSystemsAsync(systems, cancellationToken);
         }
     }
 }

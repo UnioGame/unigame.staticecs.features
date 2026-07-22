@@ -1,6 +1,5 @@
 namespace UniGame.StaticEcs.Features
 {
-    using UniGame.Core.Runtime;
     using UniGame.StaticEcs.Unity;
     using UnityEngine;
 
@@ -9,10 +8,5 @@ namespace UniGame.StaticEcs.Features
         menuName = "Static ECS/Features/Movement",
         fileName = nameof(MovementFeatureAsset)
     )]
-    public sealed class MovementFeatureAsset : StaticEcsFeatureAsset
-    {
-        /// <inheritdoc />
-        public override IStaticEcsFeature<Main> CreateFeature(IContext context) =>
-            new MovementFeature();
-    }
+    public sealed class MovementFeatureAsset : StaticEcsMainFeatureAsset<MovementFeature> { }
 }

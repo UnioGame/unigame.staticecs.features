@@ -18,10 +18,17 @@ namespace UniGame.StaticEcs.Features
         /// <summary>Default order for agent movement synchronization.</summary>
         public const short DefaultMovementOrder = 0;
 
-        private readonly bool _registerGraphSystem;
-        private readonly bool _registerMovementSystem;
-        private readonly short _graphOrder;
-        private readonly short _movementOrder;
+        /// <summary>Whether graph lifecycle synchronization is installed.</summary>
+        public bool registerGraphSystem = true;
+
+        /// <summary>Whether agent movement synchronization is installed.</summary>
+        public bool registerMovementSystem = true;
+
+        /// <summary>Execution order of graph synchronization.</summary>
+        public short graphOrder = DefaultGraphOrder;
+
+        /// <summary>Execution order of agent movement.</summary>
+        public short movementOrder = DefaultMovementOrder;
 
         /// <summary>Creates the feature with optional graph and movement system registration.</summary>
         public AstarMovementFeature(
@@ -31,10 +38,10 @@ namespace UniGame.StaticEcs.Features
             short movementOrder = DefaultMovementOrder
         )
         {
-            _registerGraphSystem = registerGraphSystem;
-            _registerMovementSystem = registerMovementSystem;
-            _graphOrder = graphOrder;
-            _movementOrder = movementOrder;
+            this.registerGraphSystem = registerGraphSystem;
+            this.registerMovementSystem = registerMovementSystem;
+            this.graphOrder = graphOrder;
+            this.movementOrder = movementOrder;
         }
 
         /// <inheritdoc/>
@@ -57,13 +64,13 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            if (_registerGraphSystem)
+            if (registerGraphSystem)
             {
-                systems.Add(new AstarGraphSystem<TWorld>(), _graphOrder);
+                systems.Add(new AstarGraphSystem<TWorld>(), graphOrder);
             }
-            if (_registerMovementSystem)
+            if (registerMovementSystem)
             {
-                systems.Add(new AstarMovementSystem<TWorld>(), _movementOrder);
+                systems.Add(new AstarMovementSystem<TWorld>(), movementOrder);
             }
             return UniTask.CompletedTask;
         }

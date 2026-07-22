@@ -1,6 +1,5 @@
 namespace UniGame.StaticEcs.Features
 {
-    using UniGame.Core.Runtime;
     using UniGame.StaticEcs.Unity;
     using UnityEngine;
 
@@ -9,10 +8,5 @@ namespace UniGame.StaticEcs.Features
         menuName = "Static ECS/Features/Effects",
         fileName = nameof(EffectsFeatureAsset)
     )]
-    public sealed class EffectsFeatureAsset : StaticEcsFeatureAsset
-    {
-        /// <inheritdoc />
-        public override IStaticEcsFeature<Main> CreateFeature(IContext context) =>
-            new EffectsFeature();
-    }
+    public sealed class EffectsFeatureAsset : StaticEcsMainFeatureAsset<EffectsFeature> { }
 }

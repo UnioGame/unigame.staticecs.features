@@ -23,10 +23,17 @@ namespace UniGame.StaticEcs.Features
         public const short DefaultWaitOrder = 155;
         public const short DefaultProgressionOrder = 160;
 
-        private readonly short _castOrder;
-        private readonly short _waitOrder;
-        private readonly short _progressionOrder;
-        private readonly bool _registerSystems;
+        /// <summary>Whether the standard ability systems are installed.</summary>
+        public bool registerSystems = true;
+
+        /// <summary>Execution order of cast processing.</summary>
+        public short castOrder = DefaultCastOrder;
+
+        /// <summary>Execution order of wait processing.</summary>
+        public short waitOrder = DefaultWaitOrder;
+
+        /// <summary>Execution order of step progression.</summary>
+        public short progressionOrder = DefaultProgressionOrder;
 
         public AbilityFeature(
             bool registerSystems = true,
@@ -35,10 +42,10 @@ namespace UniGame.StaticEcs.Features
             short progressionOrder = DefaultProgressionOrder
         )
         {
-            _registerSystems = registerSystems;
-            _castOrder = castOrder;
-            _waitOrder = waitOrder;
-            _progressionOrder = progressionOrder;
+            this.registerSystems = registerSystems;
+            this.castOrder = castOrder;
+            this.waitOrder = waitOrder;
+            this.progressionOrder = progressionOrder;
         }
 
         public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
@@ -106,13 +113,13 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            if (!_registerSystems)
+            if (!registerSystems)
             {
                 return UniTask.CompletedTask;
             }
-            systems.Add(new AbilityCastSystem<TWorld>(), _castOrder);
-            systems.Add(new AbilityWaitSystem<TWorld>(), _waitOrder);
-            systems.Add(new AbilityStepProgressionSystem<TWorld>(), _progressionOrder);
+            systems.Add(new AbilityCastSystem<TWorld>(), castOrder);
+            systems.Add(new AbilityWaitSystem<TWorld>(), waitOrder);
+            systems.Add(new AbilityStepProgressionSystem<TWorld>(), progressionOrder);
             return UniTask.CompletedTask;
         }
     }

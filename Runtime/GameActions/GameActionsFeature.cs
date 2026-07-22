@@ -23,14 +23,17 @@ namespace UniGame.StaticEcs.Features
             IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
         where TWorld : struct, IWorldType
     {
-        private readonly bool _registerMaintenance;
-        private readonly short _maintenanceOrder;
+        /// <summary>Whether action masks track stun events.</summary>
+        public bool registerMaintenance = true;
+
+        /// <summary>Execution order of action mask maintenance.</summary>
+        public short maintenanceOrder = 25;
 
         /// <summary>Creates the action mask feature.</summary>
         public GameActionsFeature(bool registerMaintenance = true, short maintenanceOrder = 25)
         {
-            _registerMaintenance = registerMaintenance;
-            _maintenanceOrder = maintenanceOrder;
+            this.registerMaintenance = registerMaintenance;
+            this.maintenanceOrder = maintenanceOrder;
         }
 
         /// <inheritdoc/>
@@ -45,9 +48,9 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            if (_registerMaintenance)
+            if (registerMaintenance)
             {
-                systems.Add(new ActionMaskMaintenanceSystem<TWorld>(), _maintenanceOrder);
+                systems.Add(new ActionMaskMaintenanceSystem<TWorld>(), maintenanceOrder);
             }
 
             return UniTask.CompletedTask;

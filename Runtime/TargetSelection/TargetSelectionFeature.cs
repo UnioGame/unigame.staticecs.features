@@ -16,16 +16,19 @@ namespace UniGame.StaticEcs.Features
     {
         public const short DefaultRebuildOrder = 50;
 
-        private readonly short _rebuildOrder;
-        private readonly bool _registerRebuildSystem;
+        /// <summary>Whether the target index rebuild system is installed.</summary>
+        public bool registerRebuildSystem = true;
+
+        /// <summary>Execution order of target index rebuilding.</summary>
+        public short rebuildOrder = DefaultRebuildOrder;
 
         public TargetSelectionFeature(
             bool registerRebuildSystem = true,
             short rebuildOrder = DefaultRebuildOrder
         )
         {
-            _registerRebuildSystem = registerRebuildSystem;
-            _rebuildOrder = rebuildOrder;
+            this.registerRebuildSystem = registerRebuildSystem;
+            this.rebuildOrder = rebuildOrder;
         }
 
         public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
@@ -43,11 +46,11 @@ namespace UniGame.StaticEcs.Features
             CancellationToken cancellationToken
         )
         {
-            if (!_registerRebuildSystem)
+            if (!registerRebuildSystem)
             {
                 return UniTask.CompletedTask;
             }
-            systems.Add(new TargetIndexRebuildSystem<TWorld>(), _rebuildOrder);
+            systems.Add(new TargetIndexRebuildSystem<TWorld>(), rebuildOrder);
             return UniTask.CompletedTask;
         }
     }
