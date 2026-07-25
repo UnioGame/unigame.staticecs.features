@@ -2,7 +2,7 @@ namespace UniGame.StaticEcs.Features
 {
     /// <summary>
     /// Default <see cref="IDamageRng"/> implementation backed by <see cref="Random"/>. Chosen
-    /// when no other implementation has been registered before <c>DamageFeature.RegisterTypes</c>.
+    /// when no other implementation has been published before feature initialization.
     /// </summary>
     public sealed class UnityDamageRng : IDamageRng
     {

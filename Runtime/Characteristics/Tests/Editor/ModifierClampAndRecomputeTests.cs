@@ -2,30 +2,32 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
 
     [TestFixture]
     public sealed class ModifierClampAndRecomputeTests
     {
+        private StaticEcsTestWorld<TestModifierWorld> _world;
+
         [SetUp]
         public void SetUp()
         {
-            World<TestModifierWorld>.Create(WorldConfig.Default());
-            new ModifierBackRefFeature<TestModifierWorld>().RegisterTypes(
-                World<TestModifierWorld>.Types()
+            _world = new StaticEcsTestWorld<TestModifierWorld>();
+            CharacteristicTypeRegistration.Register<TestModifierWorld, SpeedCharacteristic>(
+                _world.Types);
+            new ModifierBackRefFeature<TestModifierWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestModifierWorld, SpeedCharacteristic>().RegisterTypes(
-                World<TestModifierWorld>.Types()
+            new CharacteristicFeature<TestModifierWorld, SpeedCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestModifierWorld>.Initialize();
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestModifierWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestModifierWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

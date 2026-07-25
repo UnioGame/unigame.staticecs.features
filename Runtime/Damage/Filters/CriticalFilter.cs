@@ -8,7 +8,7 @@ namespace UniGame.StaticEcs.Features
     /// multiplier is read from <see cref="CriticalMultiplierCharacteristic"/> on the source and
     /// falls back to <see cref="DefaultMultiplier"/> when the source has no value configured.
     /// </summary>
-    public sealed class CriticalFilter<TWorld> : IDamageFilter<TWorld>
+    public class CriticalFilter<TWorld> : IDamageFilter<TWorld>
         where TWorld : struct, IWorldType
     {
         public const float DefaultMultiplier = 2f;

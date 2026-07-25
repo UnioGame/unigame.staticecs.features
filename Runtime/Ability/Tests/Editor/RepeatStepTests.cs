@@ -2,6 +2,7 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
@@ -12,21 +13,22 @@ namespace UniGame.StaticEcs.Features.Tests
         private AbilityCastSystem<TestAbilityWorld> _castSystem;
         private AbilityWaitSystem<TestAbilityWorld> _waitSystem;
         private AbilityStepProgressionSystem<TestAbilityWorld> _progressionSystem;
+        private StaticEcsTestWorld<TestAbilityWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            _world = new StaticEcsTestWorld<TestAbilityWorld>();
+            new EcsTimeFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new DamageFeature<TestAbilityWorld>(registerApplySystem: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new DamageFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestAbilityWorld>.Initialize();
+            _world.Initialize();
 
             _castSystem = new AbilityCastSystem<TestAbilityWorld>();
             _waitSystem = new AbilityWaitSystem<TestAbilityWorld>();
@@ -38,12 +40,10 @@ namespace UniGame.StaticEcs.Features.Tests
         [TearDown]
         public void TearDown()
         {
+            _world?.TerminateLifeTime();
             _castSystem.Destroy();
             _progressionSystem.Destroy();
-            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAbilityWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

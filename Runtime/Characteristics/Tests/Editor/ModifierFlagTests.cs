@@ -3,33 +3,36 @@ namespace UniGame.StaticEcs.Features.Tests
     using System;
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
 
     [TestFixture]
     public sealed class ModifierFlagTests
     {
+        private StaticEcsTestWorld<TestModifierWorld> _world;
+
         [SetUp]
         public void SetUp()
         {
-            World<TestModifierWorld>.Create(WorldConfig.Default());
-            new ModifierBackRefFeature<TestModifierWorld>().RegisterTypes(
-                World<TestModifierWorld>.Types()
+            _world = new StaticEcsTestWorld<TestModifierWorld>();
+            var types = _world.Types;
+            CharacteristicTypeRegistration.Register<TestModifierWorld, SpeedCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestModifierWorld, ManaCharacteristic>(types);
+            new ModifierBackRefFeature<TestModifierWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestModifierWorld, SpeedCharacteristic>().RegisterTypes(
-                World<TestModifierWorld>.Types()
+            new CharacteristicFeature<TestModifierWorld, SpeedCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestModifierWorld, ManaCharacteristic>().RegisterTypes(
-                World<TestModifierWorld>.Types()
+            new CharacteristicFeature<TestModifierWorld, ManaCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestModifierWorld>.Initialize();
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestModifierWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestModifierWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

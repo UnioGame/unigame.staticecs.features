@@ -2,6 +2,7 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
@@ -10,65 +11,85 @@ namespace UniGame.StaticEcs.Features.Tests
         private EffectTickSystem<TestEffectsWorld, HealOverTimeEffect> _tick;
         private ApplyDamageSystem<TestEffectsWorld> _apply;
         private FakeDamageRng _rng;
+        private StaticEcsTestWorld<TestEffectsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestEffectsWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestEffectsWorld>();
+            RegisterClosedTypes();
             _rng = new FakeDamageRng();
             World<TestEffectsWorld>.SetResource<IDamageRng>(_rng);
 
-            new EcsTimeFeature<TestEffectsWorld>(registerFixed: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new ModifierBackRefFeature<TestEffectsWorld>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestEffectsWorld, HealthCharacteristic>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new ModifierBackRefFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestEffectsWorld, ShieldCharacteristic>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new CharacteristicFeature<TestEffectsWorld, HealthCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestEffectsWorld, BlockChanceCharacteristic>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new CharacteristicFeature<TestEffectsWorld, ShieldCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestEffectsWorld, DodgeChanceCharacteristic>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new CharacteristicFeature<TestEffectsWorld, BlockChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestEffectsWorld, ArmorResistCharacteristic>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new CharacteristicFeature<TestEffectsWorld, DodgeChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
+            );
+            new CharacteristicFeature<TestEffectsWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
             new CharacteristicFeature<
                 TestEffectsWorld,
                 CriticalChanceCharacteristic
-            >().RegisterTypes(World<TestEffectsWorld>.Types());
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestEffectsWorld,
                 CriticalMultiplierCharacteristic
-            >().RegisterTypes(World<TestEffectsWorld>.Types());
-            new DamageFeature<TestEffectsWorld>(registerApplySystem: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new DamageFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new HealOverTimeFeature<TestEffectsWorld>(registerTickSystem: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new HealOverTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
 
-            World<TestEffectsWorld>.Initialize();
+            _world.Initialize();
 
             _tick = new EffectTickSystem<TestEffectsWorld, HealOverTimeEffect>();
             _apply = new ApplyDamageSystem<TestEffectsWorld>();
             _apply.Init();
         }
 
+        private static void RegisterClosedTypes()
+        {
+            var types = World<TestEffectsWorld>.Types();
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, HealthCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, ShieldCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, BlockChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, DodgeChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, ArmorResistCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, CriticalChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, CriticalMultiplierCharacteristic>(types);
+            EffectTypeRegistration.Register<TestEffectsWorld, HealOverTimeEffect>(types);
+        }
+
         [TearDown]
         public void TearDown()
         {
-            if (World<TestEffectsWorld>.Status != WorldStatus.NotCreated)
+            _world?.TerminateLifeTime();
+            if (World<TestEffectsWorld>.Status == WorldStatus.Initialized)
             {
                 _apply.Destroy();
-                World<TestEffectsWorld>.Destroy();
             }
+
+            _world?.Dispose();
         }
 
         private static void Tick(float dt)

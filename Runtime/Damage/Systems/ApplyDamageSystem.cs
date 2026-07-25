@@ -86,7 +86,7 @@ namespace UniGame.StaticEcs.Features
 
             ref var health = ref target.Ref<CharacteristicComponent<HealthCharacteristic>>();
             var killing = false;
-            float appliedAmount;
+            var beforeValue = health.Value;
 
             if (ctx.Type == DamageType.Healing)
             {
@@ -95,13 +95,11 @@ namespace UniGame.StaticEcs.Features
                     ctx.Target,
                     ctx.Amount
                 );
-                appliedAmount = ctx.Amount;
             }
             else
             {
                 if (ctx.Amount <= 0f)
                 {
-                    appliedAmount = 0f;
                 }
                 else
                 {
@@ -116,7 +114,6 @@ namespace UniGame.StaticEcs.Features
                         ctx.Target,
                         newValue
                     );
-                    appliedAmount = ctx.Amount;
 
                     if (health.Value <= health.MinValue && !target.Has<DeathPendingTag>())
                     {
@@ -126,12 +123,17 @@ namespace UniGame.StaticEcs.Features
                 }
             }
 
+            var appliedAmount = ctx.Type == DamageType.Healing
+                ? health.Value - beforeValue
+                : beforeValue - health.Value;
+
             World<TWorld>.SendEvent(
                 new DamageAppliedEvent
                 {
                     Source = ctx.Source,
                     Target = ctx.Target,
-                    Amount = appliedAmount,
+                    Amount = ctx.Amount,
+                    AppliedAmount = appliedAmount,
                     Type = ctx.Type,
                     IsCritical = ctx.IsCritical,
                     KillingBlow = killing,

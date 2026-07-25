@@ -11,7 +11,13 @@ namespace UniGame.StaticEcs.Features
     {
         public EntityGID Source;
         public EntityGID Target;
+
+        /// <summary>Filtered amount requested from the health transition.</summary>
         public float Amount;
+
+        /// <summary>Actual positive health delta after min/max clamping.</summary>
+        public float AppliedAmount;
+
         public DamageType Type;
         public bool IsCritical;
         public bool KillingBlow;

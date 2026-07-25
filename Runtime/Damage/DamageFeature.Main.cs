@@ -9,16 +9,5 @@ namespace UniGame.StaticEcs.Features
     /// </summary>
     [Serializable]
     public sealed class DamageFeature : DamageFeature<Main>
-    {
-        /// <summary>Creates the Main-world damage feature with default configuration.</summary>
-        public DamageFeature() { }
-
-        /// <summary>Creates the Main-world damage feature.</summary>
-        public DamageFeature(
-            bool registerApplySystem = true,
-            bool registerDefaultChain = true,
-            short applyOrder = DefaultApplyOrder
-        )
-            : base(registerApplySystem, registerDefaultChain, applyOrder) { }
-    }
+    { }
 }

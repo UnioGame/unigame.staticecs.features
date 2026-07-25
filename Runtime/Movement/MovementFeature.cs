@@ -1,12 +1,8 @@
 namespace UniGame.StaticEcs.Features
 {
-    using System;
+    using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
-    using Unity;
-
-    /// <summary>Main-world alias for <see cref="MovementFeature{TWorld}"/>.</summary>
-    [Serializable]
-    public sealed class MovementFeature : MovementFeature<Main> { }
+    using UniGame.Core.Runtime;
 
     /// <summary>
     /// Registers <see cref="MovementDestinationComponent"/> with the world.
@@ -17,9 +13,9 @@ namespace UniGame.StaticEcs.Features
         where TWorld : struct, IWorldType
     {
         /// <inheritdoc/>
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            types.Component<MovementDestinationComponent>();
+            return UniTask.CompletedTask;
         }
     }
 }

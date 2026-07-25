@@ -1,8 +1,8 @@
 namespace UniGame.StaticEcs.Features
 {
-    using System.Threading;
     using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
+    using UniGame.Core.Runtime;
 
     /// <summary>
     /// Wires the damage pipeline: registers events, tags, the default filter chain
@@ -13,9 +13,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="HealthFeature{TWorld}"/>, <see cref="ShieldFeature{TWorld}"/>, and
     /// <see cref="CharacteristicFeature{TWorld, TCharacteristic}"/> for each combat stat.
     /// </summary>
-    public class DamageFeature<TWorld>
-        : StaticEcsFeature<TWorld>,
-            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+    public class DamageFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
         public const short DefaultApplyOrder = 100;
@@ -23,64 +21,71 @@ namespace UniGame.StaticEcs.Features
         /// <summary>Whether the damage application system is installed.</summary>
         public bool registerApplySystem = true;
 
-        /// <summary>Whether the default damage filter chain is installed.</summary>
+        /// <summary>Whether the standard filter chain is installed.</summary>
         public bool registerDefaultChain = true;
 
         /// <summary>Execution order of damage application.</summary>
         public short applyOrder = DefaultApplyOrder;
 
-        public DamageFeature(
-            bool registerApplySystem = true,
-            bool registerDefaultChain = true,
-            short applyOrder = DefaultApplyOrder
-        )
+        /// <inheritdoc />
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            this.registerApplySystem = registerApplySystem;
-            this.registerDefaultChain = registerDefaultChain;
-            this.applyOrder = applyOrder;
-        }
+            if (!World<TWorld>.HasResource<DamageConfig>())
+            {
+                var configuration = new DamageConfig
+                {
+                    RegisterApplySystem = registerApplySystem,
+                    RegisterDefaultChain = registerDefaultChain,
+                    ApplyOrder = applyOrder,
+                };
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
-        {
-            types
-                .Tag<BlockableTag>()
-                .Tag<DeathPendingTag>()
-                .Event<IncomingDamageEvent>()
-                .Event<DamageDodgedEvent>()
-                .Event<DamageBlockedEvent>()
-                .Event<DamageCriticalEvent>()
-                .Event<ShieldDeltaEvent>()
-                .Event<DamageAppliedEvent>();
+                World<TWorld>.SetResource(configuration);
+            }
 
             if (!World<TWorld>.HasResource<IDamageRng>())
             {
-                World<TWorld>.SetResource<IDamageRng>(new UnityDamageRng());
+                IDamageRng rng = new UnityDamageRng();
+                World<TWorld>.SetResource(rng);
             }
 
-            if (registerDefaultChain && !World<TWorld>.HasResource<DamageFilterChain<TWorld>>())
+            ref var config = ref World<TWorld>.GetResource<DamageConfig>();
+            if (config.RegisterDefaultChain &&
+                !World<TWorld>.HasResource<DamageFilterChain<TWorld>>())
             {
-                var chain = new DamageFilterChain<TWorld>()
-                    .Add(new DodgeFilter<TWorld>())
-                    .Add(new BlockFilter<TWorld>())
-                    .Add(new ArmorResistFilter<TWorld>())
-                    .Add(new CriticalFilter<TWorld>())
-                    .Add(new ShieldFilter<TWorld>());
+                var chain = new DamageFilterChain<TWorld>();
+                chain.Add(new DodgeFilter<TWorld>());
+                chain.Add(new BlockFilter<TWorld>());
+                chain.Add(new ArmorResistFilter<TWorld>());
+                chain.Add(new CriticalFilter<TWorld>());
+                chain.Add(new ShieldFilter<TWorld>());
                 World<TWorld>.SetResource(chain);
             }
-        }
 
-        public UniTask RegisterSystemsAsync(
-            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken
-        )
-        {
-            if (!registerApplySystem)
+            var updateEnabled =
+                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
+                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
+            if (!updateEnabled || !config.RegisterApplySystem)
             {
                 return UniTask.CompletedTask;
             }
 
-            systems.Add(new ApplyDamageSystem<TWorld>(), applyOrder);
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new ApplyDamageSystem<TWorld>(),
+                config.ApplyOrder);
             return UniTask.CompletedTask;
         }
+    }
+
+    /// <summary>Controls damage pipeline composition and execution order.</summary>
+    public sealed class DamageConfig : IResource
+    {
+        /// <summary>Whether the damage application system is installed.</summary>
+        public bool RegisterApplySystem = true;
+
+        /// <summary>Whether the standard filter chain is installed.</summary>
+        public bool RegisterDefaultChain = true;
+
+        /// <summary>Execution order of damage application.</summary>
+        public short ApplyOrder = 100;
     }
 }

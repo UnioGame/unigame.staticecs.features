@@ -1,8 +1,8 @@
 namespace UniGame.StaticEcs.Features
 {
-    using System.Threading;
     using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
+    using UniGame.Core.Runtime;
 
     /// <summary>
     /// Generic effect feature: registers <see cref="EffectComponent{TEffect}"/>, lifecycle
@@ -14,100 +14,80 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="EffectRegistry"/> keyed by <see cref="EffectFlagOf{T}.Value"/>.
     ///
     /// Concrete effects derive from this feature and provide a <see cref="IEffectHandler{TWorld,TEffect}"/>
-    /// implementation in their own RegisterTypes call (e.g. <c>HealOverTimeFeature</c>).
+    /// implementation during initialization (for example <c>HealOverTimeFeature</c>).
     /// </summary>
-    public class EffectFeature<TWorld, TEffect>
-        : StaticEcsFeature<TWorld>,
-            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+    public class EffectFeature<TWorld, TEffect> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
         where TEffect : struct, IEffectType
     {
+        /// <summary>Default update order for typed effect tick systems.</summary>
         public const short DefaultTickOrder = 200;
 
-        private readonly IEffectHandler<TWorld, TEffect> _handler;
-        private readonly int _maxStacks;
-        private readonly bool _refreshOnReapply;
-        private readonly short _tickOrder;
-        private readonly bool _registerTickSystem;
+        /// <summary>Gets the safe default stack limit installed by a concrete effect.</summary>
+        protected virtual int DefaultMaxStacks => 1;
 
-        public EffectFeature(
-            IEffectHandler<TWorld, TEffect> handler,
-            int maxStacks = 1,
-            bool refreshOnReapply = true,
-            short tickOrder = DefaultTickOrder,
-            bool registerTickSystem = true
-        )
+        /// <summary>Gets whether reapplication refreshes effect timing by default.</summary>
+        protected virtual bool DefaultRefreshOnReapply => true;
+
+        /// <summary>Creates the default handler supplied by a concrete effect feature.</summary>
+        protected virtual IEffectHandler<TWorld, TEffect> CreateDefaultHandler() => null;
+
+        /// <inheritdoc />
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            _handler = handler;
-            _maxStacks = maxStacks;
-            _refreshOnReapply = refreshOnReapply;
-            _tickOrder = tickOrder;
-            _registerTickSystem = registerTickSystem;
-        }
-
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
-        {
-            // Resolve flag eagerly — throws InvalidOperationException if [EffectFlag] is missing.
-            var flag = EffectFlagOf<TEffect>.Value;
-
-            // Per-effect types: unique per closed TEffect, always safe to register.
-            types
-                .Component<EffectComponent<TEffect>>()
-                .Event<EffectAppliedEvent<TEffect>>()
-                .Event<EffectRefreshedEvent<TEffect>>()
-                .Event<EffectRemovedEvent<TEffect>>();
-
-            // Shared types: registered once per world. EffectIdRegistry resource doubles as
-            // the "shared types already installed" sentinel — its presence is set up by the
-            // first EffectFeature that runs, so subsequent features skip the duplicate register.
-            if (!World<TWorld>.HasResource<EffectIdRegistry>())
+            if (!World<TWorld>.HasResource<IEffectHandler<TWorld, TEffect>>())
             {
-                types
-                    .Component<EffectTrackerComponent>()
-                    .Multi<EffectSummaryComponent>()
-                    .Multi<EffectTargetComponent>();
+                var handler = CreateDefaultHandler();
+                if (handler == null)
+                {
+                    throw new System.InvalidOperationException(
+                        $"Effect `{typeof(TEffect).FullName}` requires an " +
+                        $"`IEffectHandler<{typeof(TWorld).Name}, {typeof(TEffect).Name}>` resource.");
+                }
 
-                World<TWorld>.SetResource(new EffectIdRegistry());
+                World<TWorld>.SetResource<IEffectHandler<TWorld, TEffect>>(handler);
+            }
+
+            if (!World<TWorld>.HasResource<EffectConfig<TWorld, TEffect>>())
+            {
+                var defaultConfig = new EffectConfig<TWorld, TEffect>(
+                    DefaultMaxStacks,
+                    DefaultRefreshOnReapply,
+                    DefaultTickOrder,
+                    true);
+
+                World<TWorld>.SetResource(defaultConfig);
+            }
+
+            if (!World<TWorld>.HasResource<EffectIdRegistry>() ||
+                !World<TWorld>.HasResource<EffectRegistry>())
+            {
+                throw new System.InvalidOperationException(
+                    $"Effect `{typeof(TEffect).FullName}` requires EffectsCoreFeature " +
+                    "to install its registries first.");
             }
 
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             idRegistry.Register<TEffect>();
-
-            if (!World<TWorld>.HasResource<EffectRegistry>())
-            {
-                World<TWorld>.SetResource(new EffectRegistry());
-            }
-
             ref var effectRegistry = ref World<TWorld>.GetResource<EffectRegistry>();
+            var flag = EffectFlagOf<TEffect>.Value;
             if (!effectRegistry.IsRegistered(flag))
             {
                 effectRegistry.Register(flag, RemoveOnSourceCleanup, RemoveUnconditional);
             }
 
-            if (!World<TWorld>.HasResource<IEffectHandler<TWorld, TEffect>>())
-            {
-                World<TWorld>.SetResource<IEffectHandler<TWorld, TEffect>>(_handler);
-            }
-
-            if (!World<TWorld>.HasResource<EffectConfig<TWorld, TEffect>>())
-            {
-                World<TWorld>.SetResource(
-                    new EffectConfig<TWorld, TEffect>(_maxStacks, _refreshOnReapply)
-                );
-            }
-        }
-
-        public UniTask RegisterSystemsAsync(
-            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken
-        )
-        {
-            if (!_registerTickSystem)
+            ref var config = ref World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>();
+            var updateEnabled =
+                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
+                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
+            if (!updateEnabled || !config.RegisterTickSystem)
             {
                 return UniTask.CompletedTask;
             }
 
-            systems.Add(new EffectTickSystem<TWorld, TEffect>(), _tickOrder);
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new EffectTickSystem<TWorld, TEffect>(),
+                config.TickOrder);
             return UniTask.CompletedTask;
         }
 

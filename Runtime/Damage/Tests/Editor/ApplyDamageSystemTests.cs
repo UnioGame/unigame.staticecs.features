@@ -2,51 +2,54 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
 
     [TestFixture]
     public sealed class ApplyDamageSystemTests
     {
         private FakeDamageRng _rng;
         private ApplyDamageSystem<TestDamageWorld> _system;
+        private StaticEcsTestWorld<TestDamageWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestDamageWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestDamageWorld>();
+            RegisterCharacteristicTypes();
             _rng = new FakeDamageRng();
             World<TestDamageWorld>.SetResource<IDamageRng>(_rng);
 
-            new ModifierBackRefFeature<TestDamageWorld>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new ModifierBackRefFeature<TestDamageWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
             new CharacteristicFeature<
                 TestDamageWorld,
                 CriticalChanceCharacteristic
-            >().RegisterTypes(World<TestDamageWorld>.Types());
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestDamageWorld,
                 CriticalMultiplierCharacteristic
-            >().RegisterTypes(World<TestDamageWorld>.Types());
-            new DamageFeature<TestDamageWorld>(registerApplySystem: false).RegisterTypes(
-                World<TestDamageWorld>.Types()
+            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new DamageFeature<TestDamageWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
 
-            World<TestDamageWorld>.Initialize();
+            _world.Initialize();
 
             _system = new ApplyDamageSystem<TestDamageWorld>();
             _system.Init();
@@ -55,11 +58,13 @@ namespace UniGame.StaticEcs.Features.Tests
         [TearDown]
         public void TearDown()
         {
-            if (World<TestDamageWorld>.Status != WorldStatus.NotCreated)
+            _world?.TerminateLifeTime();
+            if (World<TestDamageWorld>.Status == WorldStatus.Initialized)
             {
                 _system.Destroy();
-                World<TestDamageWorld>.Destroy();
             }
+
+            _world?.Dispose();
         }
 
         [Test]
@@ -93,6 +98,38 @@ namespace UniGame.StaticEcs.Features.Tests
             Assert.IsTrue(target.Has<DeathPendingTag>());
         }
 
+        private static void RegisterCharacteristicTypes()
+        {
+            var types = World<TestDamageWorld>.Types();
+            CharacteristicTypeRegistration.Register<TestDamageWorld, HealthCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, ShieldCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, BlockChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, DodgeChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, ArmorResistCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, CriticalChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, CriticalMultiplierCharacteristic>(types);
+        }
+
+        [Test]
+        public void Overkill_ReportsRequestedAndAppliedAmounts()
+        {
+            var receiver = World<TestDamageWorld>.RegisterEventReceiver<DamageAppliedEvent>();
+            var source = World<TestDamageWorld>.NewEntity<Default>();
+            var target = World<TestDamageWorld>.NewEntity<Default>();
+            target.Set(CharacteristicComponent<HealthCharacteristic>.Create(20f, 0f, 100f));
+
+            DamageOperations.RaiseDamage<TestDamageWorld>(source.GID, target.GID, 50f);
+            _system.Update();
+
+            foreach (var damageEvent in receiver)
+            {
+                Assert.AreEqual(50f, damageEvent.Value.Amount);
+                Assert.AreEqual(20f, damageEvent.Value.AppliedAmount);
+            }
+
+            World<TestDamageWorld>.DeleteEventReceiver(ref receiver);
+        }
+
         [Test]
         public void RaiseHealing_IncreasesHealth()
         {
@@ -107,6 +144,26 @@ namespace UniGame.StaticEcs.Features.Tests
                 65f,
                 target.Read<CharacteristicComponent<HealthCharacteristic>>().Value
             );
+        }
+
+        [Test]
+        public void ClampedHealing_ReportsActualAppliedAmount()
+        {
+            var receiver = World<TestDamageWorld>.RegisterEventReceiver<DamageAppliedEvent>();
+            var source = World<TestDamageWorld>.NewEntity<Default>();
+            var target = World<TestDamageWorld>.NewEntity<Default>();
+            target.Set(CharacteristicComponent<HealthCharacteristic>.Create(90f, 0f, 100f));
+
+            DamageOperations.RaiseHealing<TestDamageWorld>(source.GID, target.GID, 25f);
+            _system.Update();
+
+            foreach (var damageEvent in receiver)
+            {
+                Assert.AreEqual(25f, damageEvent.Value.Amount);
+                Assert.AreEqual(10f, damageEvent.Value.AppliedAmount);
+            }
+
+            World<TestDamageWorld>.DeleteEventReceiver(ref receiver);
         }
 
         [Test]

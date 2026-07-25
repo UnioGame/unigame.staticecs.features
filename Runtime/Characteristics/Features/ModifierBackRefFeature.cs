@@ -1,19 +1,23 @@
 namespace UniGame.StaticEcs.Features
 {
+    using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
     using Modifiers;
+    using UniGame.Core.Runtime;
 
     public class ModifierBackRefFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        /// <inheritdoc />
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            types.Component<ModifierTrackerComponent>().Multi<ModifierTargetComponent>();
-
             if (!World<TWorld>.HasResource<ModifierRegistry>())
             {
-                World<TWorld>.SetResource(new ModifierRegistry());
+                var registry = new ModifierRegistry();
+                World<TWorld>.SetResource(registry);
             }
+
+            return UniTask.CompletedTask;
         }
     }
 }

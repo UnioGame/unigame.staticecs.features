@@ -9,7 +9,7 @@ namespace UniGame.StaticEcs.Features
 
     /// <summary>
     /// Per-world resource that maps <see cref="EffectFlag"/> bits to a removal callback. Each
-    /// <c>EffectFeature&lt;TWorld, TEffect&gt;</c> registers a slot on <c>RegisterTypes</c>;
+    /// <c>EffectFeature&lt;TWorld, TEffect&gt;</c> registers a slot during initialization;
     /// <see cref="EffectTrackerComponent"/> consumes the registry on source destroy and
     /// <c>EffectOperations.RemoveByMask</c> uses it for grouped removal.
     /// </summary>

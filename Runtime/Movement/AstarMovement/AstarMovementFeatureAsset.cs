@@ -9,5 +9,7 @@ namespace UniGame.StaticEcs.Features
         fileName = nameof(AstarMovementFeatureAsset)
     )]
     public sealed class AstarMovementFeatureAsset :
-        StaticEcsMainFeatureAsset<AstarMovementFeature> { }
+        StaticEcsMainFeatureAsset<AstarMovementFeature>
+    {
+    }
 }

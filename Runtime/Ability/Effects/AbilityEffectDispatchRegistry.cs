@@ -4,7 +4,7 @@ namespace UniGame.StaticEcs.Features
     using System.Collections.Generic;
     using FFS.Libraries.StaticEcs;
 
-    public sealed class AbilityEffectDispatchRegistry<TWorld> : IResource
+    public class AbilityEffectDispatchRegistry<TWorld> : IResource
         where TWorld : struct, IWorldType
     {
         private readonly Dictionary<int, AbilityEffectDispatcher<TWorld>> _dispatchers = new();

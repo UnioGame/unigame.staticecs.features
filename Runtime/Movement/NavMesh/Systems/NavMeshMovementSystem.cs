@@ -1,11 +1,6 @@
 namespace UniGame.StaticEcs.Features
 {
     using FFS.Libraries.StaticEcs;
-    using Unity;
-
-    /// <summary>Main-world alias for <see cref="NavMeshMovementSystem{TWorld}"/>.</summary>
-    public sealed class NavMeshMovementSystem : NavMeshMovementSystem<Main> { }
-
     /// <summary>
     /// Drives Unity <see cref="UnityEngine.AI.NavMeshAgent"/> from
     /// <see cref="MovementDestinationComponent"/> and <see cref="CharacteristicComponent{SpeedCharacteristic}"/>.
@@ -33,16 +28,24 @@ namespace UniGame.StaticEcs.Features
 
                 if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
                 {
-                    agent.Agent.speed = entity
+                    var speed = entity
                         .Read<CharacteristicComponent<SpeedCharacteristic>>()
                         .Value;
+                    if (!UnityEngine.Mathf.Approximately(agent.Agent.speed, speed))
+                    {
+                        agent.Agent.speed = speed;
+                    }
                 }
 
                 if (dest.IsActive)
                 {
-                    agent.Agent.SetDestination(dest.Destination);
+                    if (!agent.Agent.hasPath ||
+                        (agent.Agent.destination - dest.Destination).sqrMagnitude > 0.0001f)
+                    {
+                        agent.Agent.SetDestination(dest.Destination);
+                    }
                 }
-                else
+                else if (agent.Agent.hasPath)
                 {
                     agent.Agent.ResetPath();
                 }

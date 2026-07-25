@@ -6,6 +6,7 @@
         "unigame.staticecs.features.movement",
         "unigame.staticecs.features.characteristics",
         "unigame.staticecs",
+        "unigame.staticecs.testsupport",
         "unigame.staticecs.unity",
         "FFS.StaticEcs",
         "FFS.StaticEcs.Unity",

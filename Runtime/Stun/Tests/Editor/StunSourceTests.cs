@@ -2,26 +2,28 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
 
     [TestFixture]
     public sealed class StunSourceTests
     {
+        private StaticEcsTestWorld<TestStunWorld> _world;
+
         [SetUp]
         public void SetUp()
         {
-            World<TestStunWorld>.Create(WorldConfig.Default());
-            new ModifierBackRefFeature<TestStunWorld>().RegisterTypes(World<TestStunWorld>.Types());
-            new StunFeature<TestStunWorld>().RegisterTypes(World<TestStunWorld>.Types());
-            World<TestStunWorld>.Initialize();
+            _world = new StaticEcsTestWorld<TestStunWorld>();
+            new ModifierBackRefFeature<TestStunWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            new StunFeature<TestStunWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestStunWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestStunWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

@@ -2,7 +2,7 @@ namespace UniGame.StaticEcs.Features
 {
     using FFS.Libraries.StaticEcs;
 
-    public sealed class ApplyEffectStepActivator<TWorld>
+    public class ApplyEffectStepActivator<TWorld>
         : AbilityStepActivatorBase<ApplyEffectStepConfig, TWorld>
         where TWorld : struct, IWorldType
     {

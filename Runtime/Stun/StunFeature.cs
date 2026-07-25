@@ -1,26 +1,28 @@
 namespace UniGame.StaticEcs.Features
 {
+    using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
     using Modifiers;
+    using UniGame.Core.Runtime;
 
     public class StunFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        /// <inheritdoc />
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            types.Tag<StunActiveTag>().Multi<StunSourceComponent>().Event<StunChangedEvent>();
-
             if (!World<TWorld>.HasResource<ModifierRegistry>())
             {
-                World<TWorld>.SetResource(new ModifierRegistry());
+                var modifierRegistry = new ModifierRegistry();
+                World<TWorld>.SetResource(modifierRegistry);
             }
 
             ref var registry = ref World<TWorld>.GetResource<ModifierRegistry>();
             ModifierFlagCache<TWorld, StunSourceComponent>.EnsureRegistered(
                 registry,
                 (ulong)CharacteristicFlag.Stun,
-                static (src, tgt) => StunOperations.RemoveSource<TWorld>(tgt, src)
-            );
+                static (src, tgt) => StunOperations.RemoveSource<TWorld>(tgt, src));
+            return UniTask.CompletedTask;
         }
     }
 }

@@ -11,7 +11,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="AbilityStepReadyTag"/> with status Success — the progression system then
     /// descends into the root step in the same frame (it is scheduled right after this system).
     /// </summary>
-    public sealed class AbilityCastSystem<TWorld> : ISystem
+    public class AbilityCastSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType
     {
         private EventReceiver<TWorld, CastAbilityEvent> _receiver;

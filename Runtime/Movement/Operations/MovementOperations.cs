@@ -4,26 +4,10 @@ namespace UniGame.StaticEcs.Features
     using Unity;
     using UnityEngine;
 
-    /// <summary>Main-world static helpers. See <see cref="MovementOperations"/> generic overloads.</summary>
-    public static partial class MovementOperations
-    {
-        /// <inheritdoc cref="SetDestination{TWorld}(EntityGID, Vector3)"/>
-        public static void SetDestination(EntityGID target, Vector3 destination) =>
-            SetDestination<Main>(target, destination);
-
-        /// <inheritdoc cref="StopMovement{TWorld}(EntityGID)"/>
-        public static void StopMovement(EntityGID target) => StopMovement<Main>(target);
-
-        /// <inheritdoc cref="IsMoving{TWorld}(EntityGID)"/>
-        public static bool IsMoving(EntityGID target) => IsMoving<Main>(target);
-    }
-
-    // --- Generic overloads ---
-
     /// <summary>
     /// Operations for reading and writing <see cref="MovementDestinationComponent"/> on entities.
     /// </summary>
-    public static partial class MovementOperations
+    public static class MovementOperations
     {
         /// <summary>
         /// Sets the navigation destination and marks the entity as actively moving.
@@ -83,5 +67,17 @@ namespace UniGame.StaticEcs.Features
             return entity.Has<MovementDestinationComponent>()
                 && entity.Read<MovementDestinationComponent>().IsActive;
         }
+
+        // --- Main-default overloads ---
+
+        /// <inheritdoc cref="SetDestination{TWorld}(EntityGID, Vector3)"/>
+        public static void SetDestination(EntityGID target, Vector3 destination) =>
+            SetDestination<Main>(target, destination);
+
+        /// <inheritdoc cref="StopMovement{TWorld}(EntityGID)"/>
+        public static void StopMovement(EntityGID target) => StopMovement<Main>(target);
+
+        /// <inheritdoc cref="IsMoving{TWorld}(EntityGID)"/>
+        public static bool IsMoving(EntityGID target) => IsMoving<Main>(target);
     }
 }

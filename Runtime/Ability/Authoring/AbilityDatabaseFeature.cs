@@ -1,76 +1,61 @@
 namespace UniGame.StaticEcs.Features
 {
     using System;
-    using System.Collections.Generic;
+    using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
+    using UniGame.Core.Runtime;
+    using UniGame.StaticEcs.Unity;
 
+    /// <summary>Publishes an authored ability database and installs its initialization system.</summary>
     public class AbilityDatabaseFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
-        private readonly AbilityDatabase _database;
-        private readonly bool _instantiateAssets;
-        private readonly List<AbilityAsset> _runtimeInstances = new();
+        private const short InitializationOrder = short.MinValue;
 
-        public AbilityDatabaseFeature(AbilityDatabase database, bool instantiateAssets = true)
+        /// <summary>Authored database registered during world startup.</summary>
+        public AbilityDatabase database;
+
+        /// <summary>Whether ability assets are cloned for the runtime world.</summary>
+        public bool instantiateAssets = true;
+
+        /// <inheritdoc />
+        public override async UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            _database = database;
-            _instantiateAssets = instantiateAssets;
+            World<TWorld>.Resource<AbilityRegistry<TWorld>> registry = default;
+            await registry.GetAsync(lifeTime);
+
+            if (!World<TWorld>.HasResource<AbilityDatabaseConfig>())
+            {
+                var config = new AbilityDatabaseConfig
+                {
+                    Database = database,
+                    InstantiateAssets = instantiateAssets,
+                };
+
+                World<TWorld>.SetResource(config);
+            }
+
+            var systemsConfig = World<TWorld>
+                .GetResource<Unity.StaticEcsSystemsConfig>();
+            if (!systemsConfig.update)
+            {
+                throw new InvalidOperationException(
+                    "Ability database initialization requires the Static ECS Update group.");
+            }
+
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new AbilityDatabaseInitializationSystem<TWorld>(),
+                InitializationOrder);
         }
+    }
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
-        {
-            if (_database == null)
-            {
-                return;
-            }
+    /// <summary>References the authored ability database used during world startup.</summary>
+    public sealed class AbilityDatabaseConfig : IResource
+    {
+        /// <summary>Authored database registered during world startup.</summary>
+        public AbilityDatabase Database;
 
-            if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>())
-            {
-                World<TWorld>.SetResource(new AbilityRegistry<TWorld>());
-            }
-
-            var registry = World<TWorld>.GetResource<AbilityRegistry<TWorld>>();
-            var ids = new HashSet<int>();
-            _runtimeInstances.Clear();
-
-            for (var i = 0; i < _database.Count; i++)
-            {
-                var source = _database.GetAbility(i);
-                if (source == null)
-                {
-                    continue;
-                }
-
-                var asset = _instantiateAssets ? UnityEngine.Object.Instantiate(source) : source;
-                if (_instantiateAssets)
-                {
-                    _runtimeInstances.Add(asset);
-                }
-
-                var id = asset.Id;
-                if (!ids.Add(id.Value))
-                {
-                    throw new InvalidOperationException(
-                        $"Ability database contains duplicate ability id {id}."
-                    );
-                }
-
-                if (registry.Contains(id))
-                {
-                    throw new InvalidOperationException(
-                        $"Ability registry already contains ability id {id}."
-                    );
-                }
-
-                if (asset.Root == null)
-                {
-                    throw new InvalidOperationException(
-                        $"Ability asset {asset.name} has no root step."
-                    );
-                }
-
-                registry.Register(asset.BuildDefinition(), asset.Root);
-            }
-        }
+        /// <summary>Whether ability assets are cloned and owned by the runtime feature.</summary>
+        public bool InstantiateAssets = true;
     }
 }

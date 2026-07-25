@@ -5,6 +5,7 @@
         "unigame.staticecs.features.damage",
         "unigame.staticecs.features.characteristics",
         "unigame.staticecs",
+        "unigame.staticecs.testsupport",
         "unigame.staticecs.unity",
         "FFS.StaticEcs"
     ],

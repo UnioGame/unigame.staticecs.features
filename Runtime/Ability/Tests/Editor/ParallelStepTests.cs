@@ -2,6 +2,7 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
@@ -12,21 +13,22 @@ namespace UniGame.StaticEcs.Features.Tests
         private AbilityCastSystem<TestAbilityWorld> _castSystem;
         private AbilityWaitSystem<TestAbilityWorld> _waitSystem;
         private AbilityStepProgressionSystem<TestAbilityWorld> _progressionSystem;
+        private StaticEcsTestWorld<TestAbilityWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            _world = new StaticEcsTestWorld<TestAbilityWorld>();
+            new EcsTimeFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new DamageFeature<TestAbilityWorld>(registerApplySystem: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new DamageFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestAbilityWorld>.Initialize();
+            _world.Initialize();
 
             _castSystem = new AbilityCastSystem<TestAbilityWorld>();
             _waitSystem = new AbilityWaitSystem<TestAbilityWorld>();
@@ -38,12 +40,10 @@ namespace UniGame.StaticEcs.Features.Tests
         [TearDown]
         public void TearDown()
         {
+            _world?.TerminateLifeTime();
             _castSystem.Destroy();
             _progressionSystem.Destroy();
-            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAbilityWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]
@@ -135,6 +135,52 @@ namespace UniGame.StaticEcs.Features.Tests
 
             Assert.IsFalse(caster.Has<AbilityActiveCastComponent>());
             Assert.AreEqual(0, CountBranchCasts());
+        }
+
+        [Test]
+        public void ExternalCancel_RecursivelyDestroysParallelBranches()
+        {
+            Register(
+                new ParallelStepConfig(
+                    new IAbilityStepConfig[]
+                    {
+                        new WaitStepConfig(5f),
+                        new WaitStepConfig(10f),
+                    }));
+
+            var caster = StartCast();
+            RunFrame();
+            var rootCast = caster.Read<AbilityActiveCastComponent>().Cast;
+            Assert.AreEqual(2, CountBranchCasts());
+            var receiver =
+                World<TestAbilityWorld>.RegisterEventReceiver<AbilityCompletedEvent>();
+            try
+            {
+                Assert.IsTrue(
+                    AbilityOperations.Cancel<TestAbilityWorld>(caster.GID));
+
+                Assert.IsFalse(caster.Has<AbilityActiveCastComponent>());
+                Assert.IsFalse(rootCast.TryUnpack<TestAbilityWorld>(out _));
+                Assert.AreEqual(0, CountBranchCasts());
+
+                var rootCompletions = 0;
+                foreach (var e in receiver)
+                {
+                    if (e.Value.CastEntity.Equals(rootCast))
+                    {
+                        rootCompletions++;
+                        Assert.AreEqual(
+                            AbilityCompletedReason.Cancelled,
+                            e.Value.Reason);
+                    }
+                }
+
+                Assert.AreEqual(1, rootCompletions);
+            }
+            finally
+            {
+                World<TestAbilityWorld>.DeleteEventReceiver(ref receiver);
+            }
         }
 
         private static void Register(IAbilityStepConfig root)

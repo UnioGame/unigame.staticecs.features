@@ -7,13 +7,5 @@ namespace UniGame.StaticEcs.Features
     /// </summary>
     public sealed class ModificationEffectFeature<TStat> : ModificationEffectFeature<Main, TStat>
         where TStat : struct, ICharacteristicType
-    {
-        public ModificationEffectFeature(
-            int maxStacks = 1,
-            bool refreshOnReapply = true,
-            short tickOrder = DefaultTickOrder,
-            bool registerTickSystem = true
-        )
-            : base(maxStacks, refreshOnReapply, tickOrder, registerTickSystem) { }
-    }
+    { }
 }

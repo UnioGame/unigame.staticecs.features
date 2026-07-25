@@ -9,7 +9,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="AbilityStepReadyTag"/> + <see cref="AbilityStepStatusComponent"/>. Zero durations
     /// resolve synchronously inside <see cref="OnActivate"/>.
     /// </summary>
-    public sealed class WaitStepActivator<TWorld> : AbilityStepActivatorBase<WaitStepConfig, TWorld>
+    public class WaitStepActivator<TWorld> : AbilityStepActivatorBase<WaitStepConfig, TWorld>
         where TWorld : struct, IWorldType
     {
         protected override StepStatus OnActivate(

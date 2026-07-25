@@ -7,11 +7,5 @@ namespace UniGame.StaticEcs.Features
     [Serializable]
     public sealed class GameActionsFeature : GameActionsFeature<Main>
     {
-        /// <summary>Creates the Main-world action mask feature with default configuration.</summary>
-        public GameActionsFeature() { }
-
-        /// <summary>Creates the Main-world action mask feature.</summary>
-        public GameActionsFeature(bool registerMaintenance = true, short maintenanceOrder = 25)
-            : base(registerMaintenance, maintenanceOrder) { }
     }
 }

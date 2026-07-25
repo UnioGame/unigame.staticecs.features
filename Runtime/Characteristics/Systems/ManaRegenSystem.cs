@@ -3,7 +3,7 @@ namespace UniGame.StaticEcs.Features
     using FFS.Libraries.StaticEcs;
     using Time;
 
-    public sealed class ManaRegenSystem<TWorld> : ISystem
+    public class ManaRegenSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType
     {
         public void Update()

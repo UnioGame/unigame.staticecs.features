@@ -3,6 +3,7 @@ namespace UniGame.StaticEcs.Features.Tests
     using System;
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UnityEditor;
     using UnityEngine;
 
@@ -12,16 +13,26 @@ namespace UniGame.StaticEcs.Features.Tests
         private AbilityDatabase _database;
         private AbilityAsset _firstAsset;
         private AbilityAsset _secondAsset;
+        private bool _systemsCreated;
+        private StaticEcsTestWorld<TestAbilityWorld> _world;
 
         [TearDown]
         public void TearDown()
         {
             try
             {
+                _world?.TerminateLifeTime();
                 if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
                 {
-                    World<TestAbilityWorld>.Destroy();
+                    if (_systemsCreated)
+                    {
+                        World<TestAbilityWorld>.Systems<StaticEcsUpdateSystems>.Destroy();
+                        _systemsCreated = false;
+                    }
+
                 }
+
+                _world?.Dispose();
             }
             finally
             {
@@ -58,19 +69,18 @@ namespace UniGame.StaticEcs.Features.Tests
             _secondAsset = CreateAbilityAsset(502, "Second", new WaitStepConfig(0.2f));
             _database = CreateDatabase(_firstAsset, _secondAsset);
 
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            PrepareWorld();
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
+            var config = new AbilityDatabaseConfig { Database = _database };
+            World<TestAbilityWorld>.SetResource(config);
 
+            new AbilityDatabaseFeature<TestAbilityWorld>().InstallTestResources(_world);
+            _world.Initialize();
             var exception = Assert.Throws<InvalidOperationException>(() =>
-                new AbilityDatabaseFeature<TestAbilityWorld>(_database).RegisterTypes(
-                    World<TestAbilityWorld>.Types()
-                )
-            );
+                World<TestAbilityWorld>.Systems<StaticEcsUpdateSystems>.Initialize());
             StringAssert.Contains("duplicate ability id", exception.Message);
-
-            World<TestAbilityWorld>.Initialize();
         }
 
         [Test]
@@ -91,16 +101,28 @@ namespace UniGame.StaticEcs.Features.Tests
             Assert.AreEqual(0.5f, ((WaitStepConfig)runtimeRoot).Duration);
         }
 
-        private static void CreateWorld(AbilityDatabase database)
+        private void CreateWorld(AbilityDatabase database)
         {
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            PrepareWorld();
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new AbilityDatabaseFeature<TestAbilityWorld>(database).RegisterTypes(
-                World<TestAbilityWorld>.Types()
-            );
-            World<TestAbilityWorld>.Initialize();
+            var config = new AbilityDatabaseConfig { Database = database };
+            World<TestAbilityWorld>.SetResource(config);
+            new AbilityDatabaseFeature<TestAbilityWorld>().InstallTestResources(_world);
+            _world.Initialize();
+            World<TestAbilityWorld>.Systems<StaticEcsUpdateSystems>.Initialize();
+        }
+
+        private void PrepareWorld()
+        {
+            _world = new StaticEcsTestWorld<TestAbilityWorld>();
+            var systems = UniGame.StaticEcs.Unity.StaticEcsSystemsConfig.Default;
+            World<TestAbilityWorld>.SetResource(systems);
+            World<TestAbilityWorld>.Systems<StaticEcsUpdateSystems>.Create(
+                systems.baseSize,
+                UniGame.StaticEcs.Unity.StaticEcsSystemGroupIds.Update);
+            _systemsCreated = true;
         }
 
         private static AbilityAsset CreateAbilityAsset(

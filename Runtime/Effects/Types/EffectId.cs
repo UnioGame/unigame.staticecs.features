@@ -4,7 +4,7 @@ namespace UniGame.StaticEcs.Features
 
     /// <summary>
     /// Stable integer identifier for an effect type. Allocated once per process by
-    /// <see cref="EffectIdRegistry"/> on the first <c>EffectFeature.RegisterTypes</c> call for a
+    /// <see cref="EffectIdRegistry"/> when the corresponding effect feature initializes for a
     /// given <c>TEffect</c>; rosters and UI store this id instead of <see cref="Type"/>.
     /// </summary>
     [Serializable]

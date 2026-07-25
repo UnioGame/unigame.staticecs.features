@@ -4,7 +4,7 @@ namespace UniGame.StaticEcs.Features
     using FFS.Libraries.StaticEcs;
     using Unity;
 
-    public sealed class AoeQueryStepActivator<TWorld>
+    public class AoeQueryStepActivator<TWorld>
         : AbilityStepActivatorBase<AoeQueryStepConfig, TWorld>
         where TWorld : struct, IWorldType
     {
@@ -44,7 +44,11 @@ namespace UniGame.StaticEcs.Features
             Span<EntityGID> buffer = stackalloc EntityGID[config.MaxTargets];
             var count = World<TWorld>
                 .GetResource<ITargetIndex<TWorld>>()
-                .FillSphere(binding.Transform.position, config.Radius, buffer);
+                .FillNearestSphere(
+                    binding.Transform.position,
+                    config.Radius,
+                    buffer,
+                    config.ExcludeCaster ? ctx.Caster : default);
 
             if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
             {
@@ -56,11 +60,6 @@ namespace UniGame.StaticEcs.Features
             for (var i = 0; i < count; i++)
             {
                 var target = buffer[i];
-                if (config.ExcludeCaster && target.Equals(ctx.Caster))
-                {
-                    continue;
-                }
-
                 entries.Add(new AbilityAoeTargetComponent { Target = target });
             }
 

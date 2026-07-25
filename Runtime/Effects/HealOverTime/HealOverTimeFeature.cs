@@ -10,24 +10,11 @@ namespace UniGame.StaticEcs.Features
     public class HealOverTimeFeature<TWorld> : EffectFeature<TWorld, HealOverTimeEffect>
         where TWorld : struct, IWorldType
     {
-        public HealOverTimeFeature(
-            int maxStacks = 5,
-            bool refreshOnReapply = true,
-            short tickOrder = DefaultTickOrder,
-            bool registerTickSystem = true
-        )
-            : base(
-                new HealOverTimeHandler<TWorld>(),
-                maxStacks,
-                refreshOnReapply,
-                tickOrder,
-                registerTickSystem
-            ) { }
+        protected override int DefaultMaxStacks => 5;
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        protected override IEffectHandler<TWorld, HealOverTimeEffect> CreateDefaultHandler()
         {
-            types.Component<HealOverTimeComponent>();
-            base.RegisterTypes(types);
+            return new HealOverTimeHandler<TWorld>();
         }
     }
 }

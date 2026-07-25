@@ -9,5 +9,7 @@ namespace UniGame.StaticEcs.Features
         fileName = nameof(TargetSelectionFeatureAsset)
     )]
     public sealed class TargetSelectionFeatureAsset :
-        StaticEcsMainFeatureAsset<TargetSelectionFeature> { }
+        StaticEcsMainFeatureAsset<TargetSelectionFeature>
+    {
+    }
 }

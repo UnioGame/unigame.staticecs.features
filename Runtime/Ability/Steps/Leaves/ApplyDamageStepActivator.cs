@@ -8,7 +8,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="DamageOperations.RaiseHealing{TWorld}"/> and reports
     /// <see cref="StepStatus.Success"/> in the same tick.
     /// </summary>
-    public sealed class ApplyDamageStepActivator<TWorld>
+    public class ApplyDamageStepActivator<TWorld>
         : AbilityStepActivatorBase<ApplyDamageStepConfig, TWorld>
         where TWorld : struct, IWorldType
     {

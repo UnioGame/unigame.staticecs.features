@@ -4,7 +4,7 @@ namespace UniGame.StaticEcs.Features
     using Unity;
     using UnityEngine;
 
-    public sealed class SetPrimaryTargetFromAoeStepActivator<TWorld>
+    public class SetPrimaryTargetFromAoeStepActivator<TWorld>
         : AbilityStepActivatorBase<SetPrimaryTargetFromAoeStepConfig, TWorld>
         where TWorld : struct, IWorldType
     {

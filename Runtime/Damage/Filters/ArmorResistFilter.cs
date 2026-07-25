@@ -7,7 +7,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="ArmorResistCharacteristic"/> value (clamped to [0, 1]). Other damage types
     /// pass through unchanged.
     /// </summary>
-    public sealed class ArmorResistFilter<TWorld> : IDamageFilter<TWorld>
+    public class ArmorResistFilter<TWorld> : IDamageFilter<TWorld>
         where TWorld : struct, IWorldType
     {
         public void Apply(ref DamageContext ctx)

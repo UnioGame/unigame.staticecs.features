@@ -4,7 +4,7 @@ namespace UniGame.StaticEcs.Features
     using FFS.Libraries.StaticEcs;
     using Time;
 
-    public sealed class AbilityStepProgressionSystem<TWorld> : ISystem
+    public class AbilityStepProgressionSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType
     {
         private readonly List<EntityGID> _readyBuffer = new(8);
@@ -190,7 +190,9 @@ namespace UniGame.StaticEcs.Features
                 }
                 if (branches[i].BranchCast.TryUnpack<TWorld>(out var branch))
                 {
-                    branch.Destroy();
+                    AbilityCastTermination<TWorld>.TerminateSilently(
+                        branch.GID,
+                        AbilityCompletedReason.Cancelled);
                 }
             }
         }
@@ -680,51 +682,13 @@ namespace UniGame.StaticEcs.Features
             AbilityCompletedReason reason
         )
         {
-            var runtime = castEntity.Read<AbilityCastComponent>();
-            var caster = runtime.Caster;
-
-            if (
-                castEntity.Has<AbilityBranchSubcastTag>()
-                && castEntity.Has<AbilityParentCastComponent>()
-            )
+            if (castEntity.Has<AbilityBranchSubcastTag>())
             {
-                World<TWorld>.SendEvent(
-                    new AbilityBranchCompletedEvent
-                    {
-                        ParentCast = castEntity.Read<AbilityParentCastComponent>().Parent,
-                        BranchCast = castGid,
-                        AbilityId = runtime.AbilityId,
-                        Status =
-                            reason == AbilityCompletedReason.Success
-                                ? StepStatus.Success
-                                : StepStatus.Failed,
-                    }
-                );
+                AbilityCastTermination<TWorld>.TerminateBranch(castGid, reason);
+                return;
             }
 
-            if (
-                caster.TryUnpack<TWorld>(out var casterEntity)
-                && casterEntity.Has<AbilityActiveCastComponent>()
-            )
-            {
-                var current = casterEntity.Read<AbilityActiveCastComponent>().Cast;
-                if (current.Equals(castGid))
-                {
-                    casterEntity.Delete<AbilityActiveCastComponent>();
-                }
-            }
-
-            castEntity.Destroy();
-
-            World<TWorld>.SendEvent(
-                new AbilityCompletedEvent
-                {
-                    Caster = caster,
-                    AbilityId = runtime.AbilityId,
-                    CastEntity = castGid,
-                    Reason = reason,
-                }
-            );
+            AbilityCastTermination<TWorld>.TerminateRoot(castGid, reason);
         }
 
         private readonly struct TraversalResult

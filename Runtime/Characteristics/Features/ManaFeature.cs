@@ -1,43 +1,47 @@
 namespace UniGame.StaticEcs.Features
 {
-    using System.Threading;
     using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
+    using UniGame.Core.Runtime;
 
     public class ManaFeature<TWorld>
-        : CharacteristicFeature<TWorld, ManaCharacteristic>,
-            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+        : CharacteristicFeature<TWorld, ManaCharacteristic>
         where TWorld : struct, IWorldType
     {
         public const short DefaultRegenOrder = 0;
 
-        private readonly short _regenOrder;
-        private readonly bool _registerRegen;
-
-        public ManaFeature(bool registerRegen = true, short regenOrder = DefaultRegenOrder)
+        /// <inheritdoc />
+        public override async UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            _registerRegen = registerRegen;
-            _regenOrder = regenOrder;
-        }
-
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
-        {
-            base.RegisterTypes(types);
-            types.Component<ManaRegenComponent>();
-        }
-
-        public UniTask RegisterSystemsAsync(
-            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken
-        )
-        {
-            if (!_registerRegen)
+            await base.InitializeAsync(lifeTime);
+            if (!World<TWorld>.HasResource<ManaRegenConfig>())
             {
-                return UniTask.CompletedTask;
+                var defaultConfig = new ManaRegenConfig();
+                World<TWorld>.SetResource(defaultConfig);
             }
 
-            systems.Add(new ManaRegenSystem<TWorld>(), _regenOrder);
-            return UniTask.CompletedTask;
+            var config = World<TWorld>.GetResource<ManaRegenConfig>();
+            var updateEnabled =
+                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
+                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
+            if (!updateEnabled || !config.RegisterRegen)
+            {
+                return;
+            }
+
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new ManaRegenSystem<TWorld>(),
+                config.RegenOrder);
         }
+    }
+
+    /// <summary>Controls mana regeneration system composition.</summary>
+    public sealed class ManaRegenConfig : IResource
+    {
+        /// <summary>Whether mana regeneration is installed.</summary>
+        public bool RegisterRegen = true;
+
+        /// <summary>Execution order of mana regeneration.</summary>
+        public short RegenOrder;
     }
 }

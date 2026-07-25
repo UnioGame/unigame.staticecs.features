@@ -2,59 +2,71 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
 
     [TestFixture]
     public sealed class DamagePipelineTests
     {
         private FakeDamageRng _rng;
+        private StaticEcsTestWorld<TestDamageWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestDamageWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestDamageWorld>();
+            RegisterCharacteristicTypes();
             _rng = new FakeDamageRng();
             World<TestDamageWorld>.SetResource<IDamageRng>(_rng);
 
-            new ModifierBackRefFeature<TestDamageWorld>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new ModifierBackRefFeature<TestDamageWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, HealthCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, ShieldCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, BlockChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, DodgeChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().RegisterTypes(
-                World<TestDamageWorld>.Types()
+            new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
             new CharacteristicFeature<
                 TestDamageWorld,
                 CriticalChanceCharacteristic
-            >().RegisterTypes(World<TestDamageWorld>.Types());
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestDamageWorld,
                 CriticalMultiplierCharacteristic
-            >().RegisterTypes(World<TestDamageWorld>.Types());
-            new DamageFeature<TestDamageWorld>(registerApplySystem: false).RegisterTypes(
-                World<TestDamageWorld>.Types()
+            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new DamageFeature<TestDamageWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
 
-            World<TestDamageWorld>.Initialize();
+            _world.Initialize();
+        }
+
+        private static void RegisterCharacteristicTypes()
+        {
+            var types = World<TestDamageWorld>.Types();
+            CharacteristicTypeRegistration.Register<TestDamageWorld, HealthCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, ShieldCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, BlockChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, DodgeChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, ArmorResistCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, CriticalChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestDamageWorld, CriticalMultiplierCharacteristic>(types);
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestDamageWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestDamageWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

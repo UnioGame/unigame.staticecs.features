@@ -2,6 +2,7 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
@@ -9,36 +10,49 @@ namespace UniGame.StaticEcs.Features.Tests
     {
         private RecordingEffectHandler<TestEffectsWorld, TestEffectMarker> _handlerA;
         private RecordingEffectHandler<TestEffectsWorld, TestEffectMarkerB> _handlerB;
+        private StaticEcsTestWorld<TestEffectsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestEffectsWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestEffectsWorld>();
+            var types = _world.Types;
+            EffectTypeRegistration.Register<TestEffectsWorld, TestEffectMarker>(types);
+            EffectTypeRegistration.Register<TestEffectsWorld, TestEffectMarkerB>(types);
             _handlerA = new RecordingEffectHandler<TestEffectsWorld, TestEffectMarker>();
             _handlerB = new RecordingEffectHandler<TestEffectsWorld, TestEffectMarkerB>();
 
-            new EcsTimeFeature<TestEffectsWorld>(registerFixed: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new EffectFeature<TestEffectsWorld, TestEffectMarker>(
-                _handlerA,
-                registerTickSystem: false
-            ).RegisterTypes(World<TestEffectsWorld>.Types());
-            new EffectFeature<TestEffectsWorld, TestEffectMarkerB>(
-                _handlerB,
-                registerTickSystem: false
-            ).RegisterTypes(World<TestEffectsWorld>.Types());
+            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
+            );
+            World<TestEffectsWorld>.SetResource<
+                IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handlerA);
+            var configA =
+                new EffectConfig<TestEffectsWorld, TestEffectMarker>(
+                    registerTickSystem: false);
+            World<TestEffectsWorld>.SetResource<
+                IEffectHandler<TestEffectsWorld, TestEffectMarkerB>>(_handlerB);
+            var configB =
+                new EffectConfig<TestEffectsWorld, TestEffectMarkerB>(
+                    registerTickSystem: false);
 
-            World<TestEffectsWorld>.Initialize();
+            World<TestEffectsWorld>.SetResource(configA);
+            World<TestEffectsWorld>.SetResource(configB);
+            new EffectFeature<TestEffectsWorld, TestEffectMarker>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            new EffectFeature<TestEffectsWorld, TestEffectMarkerB>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestEffectsWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestEffectsWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

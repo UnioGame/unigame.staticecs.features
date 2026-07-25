@@ -7,7 +7,7 @@ namespace UniGame.StaticEcs.Features
     /// "rebuild always" — cheap enough at sandbox scale and correct under entity churn. Replace
     /// with an incremental rebuild once entity count grows beyond a few hundred.
     /// </summary>
-    public sealed class TargetIndexRebuildSystem<TWorld> : ISystem
+    public class TargetIndexRebuildSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType
     {
         public void Update()

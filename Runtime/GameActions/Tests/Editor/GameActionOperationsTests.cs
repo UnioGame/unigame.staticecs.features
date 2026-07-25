@@ -2,6 +2,10 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
+    using UnityEditor;
+    using UnityEngine;
+    using Object = UnityEngine.Object;
 
     // Minimal action types used only in tests.
     internal struct JumpAction : IGameAction
@@ -17,47 +21,78 @@ namespace UniGame.StaticEcs.Features.Tests
     [TestFixture]
     public sealed class GameActionOperationsTests
     {
+        private StaticEcsTestWorld<TestGameActionsWorld> _world;
+
         [SetUp]
         public void SetUp()
         {
-            World<TestGameActionsWorld>.Create(WorldConfig.Default());
-            new ModifierBackRefFeature<TestGameActionsWorld>().RegisterTypes(
-                World<TestGameActionsWorld>.Types()
+            _world = new StaticEcsTestWorld<TestGameActionsWorld>();
+            new ModifierBackRefFeature<TestGameActionsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new StunFeature<TestGameActionsWorld>().RegisterTypes(
-                World<TestGameActionsWorld>.Types()
+            new StunFeature<TestGameActionsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new GameActionsFeature<TestGameActionsWorld>().RegisterTypes(
-                World<TestGameActionsWorld>.Types()
+            new GameActionsFeature<TestGameActionsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestGameActionsWorld>
-                .Types()
-                .Event<GameActionEvent<JumpAction>>()
-                .Event<GameActionEvent<AttackAction>>();
-            World<TestGameActionsWorld>.Initialize();
+            var types = _world.Types;
+            GameActionRegistrar.Register<TestGameActionsWorld, JumpAction>(types, 0);
+            GameActionRegistrar.Register<TestGameActionsWorld, AttackAction>(types, 1);
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestGameActionsWorld>.Status != WorldStatus.NotCreated)
+            _world?.Dispose();
+        }
+
+        // --- Stable registry tests ---
+
+        [Test]
+        public void Registry_DifferentTypes_HaveUniqueMasks()
+        {
+            ref var registry =
+                ref World<TestGameActionsWorld>
+                    .GetResource<GameActionRegistry<TestGameActionsWorld>>();
+            Assert.AreNotEqual(
+                registry.GetMask<JumpAction>(),
+                registry.GetMask<AttackAction>());
+        }
+
+        [Test]
+        public void Registry_SameType_ReturnsSameMask()
+        {
+            ref var registry =
+                ref World<TestGameActionsWorld>
+                    .GetResource<GameActionRegistry<TestGameActionsWorld>>();
+            Assert.AreEqual(
+                registry.GetMask<JumpAction>(),
+                registry.GetMask<JumpAction>());
+        }
+
+        [Test]
+        public void FeatureAssetConfigurationSurvivesUnitySerialization()
+        {
+            var source = ScriptableObject.CreateInstance<GameActionsFeatureAsset>();
+            var target = ScriptableObject.CreateInstance<GameActionsFeatureAsset>();
+            try
             {
-                World<TestGameActionsWorld>.Destroy();
+                source.feature.registerMaintenance = false;
+                source.feature.maintenanceOrder = 73;
+
+                var json = EditorJsonUtility.ToJson(source);
+                EditorJsonUtility.FromJsonOverwrite(json, target);
+
+                Assert.IsFalse(target.feature.registerMaintenance);
+                Assert.AreEqual(73, target.feature.maintenanceOrder);
             }
-        }
-
-        // --- ActionBit tests ---
-
-        [Test]
-        public void ActionBit_DifferentTypes_HaveUniqueIndices()
-        {
-            Assert.AreNotEqual(ActionBit<JumpAction>.Index, ActionBit<AttackAction>.Index);
-        }
-
-        [Test]
-        public void ActionBit_SameType_ReturnsSameIndex()
-        {
-            Assert.AreEqual(ActionBit<JumpAction>.Index, ActionBit<JumpAction>.Index);
+            finally
+            {
+                Object.DestroyImmediate(target);
+                Object.DestroyImmediate(source);
+            }
         }
 
         // --- IsAvailable tests ---

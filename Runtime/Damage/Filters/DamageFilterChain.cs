@@ -9,7 +9,7 @@ namespace UniGame.StaticEcs.Features
     /// <c>DamageFilterChain&lt;TWorld&gt;</c> world resource by <c>DamageFeature</c>; tests can
     /// replace it to drive a different chain.
     /// </summary>
-    public sealed class DamageFilterChain<TWorld> : IResource
+    public class DamageFilterChain<TWorld> : IResource
         where TWorld : struct, IWorldType
     {
         private readonly List<IDamageFilter<TWorld>> _filters;

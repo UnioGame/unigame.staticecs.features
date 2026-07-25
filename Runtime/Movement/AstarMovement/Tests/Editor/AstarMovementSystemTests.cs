@@ -6,9 +6,12 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
     using NUnit.Framework;
     using Pathfinding;
     using Pathfinding.Graphs.Grid;
+    using UniGame.StaticEcs.Tests;
     using UnityEngine;
 
     [TestFixture]
+    [Category("StaticEcsAstar")]
+    [Explicit("Run separately when STATIC_ECS_ASTAR and its backend are available.")]
     public sealed class AstarMovementSystemTests
     {
         private GameObject _host;
@@ -17,14 +20,19 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
         private AstarPath _backend;
         private World<TestAstarWorld>.Entity _graphEntity;
         private AstarMovementSystem<TestAstarWorld> _system;
+        private StaticEcsTestWorld<TestAstarWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAstarWorld>.Create(WorldConfig.Default());
-            new AstarMovementFeature<TestAstarWorld>().RegisterTypes(World<TestAstarWorld>.Types());
-            new SpeedFeature<TestAstarWorld>().RegisterTypes(World<TestAstarWorld>.Types());
-            World<TestAstarWorld>.Initialize();
+            _world = new StaticEcsTestWorld<TestAstarWorld>();
+            CharacteristicTypeRegistration.Register<TestAstarWorld, SpeedCharacteristic>(
+                _world.Types);
+            new AstarMovementFeature<TestAstarWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            new SpeedFeature<TestAstarWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            _world.Initialize();
 
             _host = new GameObject("Astar movement test agent");
             _ai = _host.AddComponent<RecordingAIPath>();
@@ -54,10 +62,7 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
         [TearDown]
         public void TearDown()
         {
-            if (World<TestAstarWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAstarWorld>.Destroy();
-            }
+            _world?.Dispose();
 
             if (_host != null)
             {

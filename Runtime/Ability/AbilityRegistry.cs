@@ -10,7 +10,7 @@ namespace UniGame.StaticEcs.Features
     /// step pipeline. Runtime behaviour lives in the step graph; the registry holds only
     /// configuration.
     /// </summary>
-    public sealed class AbilityRegistry<TWorld> : IResource
+    public class AbilityRegistry<TWorld> : IResource
         where TWorld : struct, IWorldType
     {
         private readonly Dictionary<int, Entry> _entries = new();

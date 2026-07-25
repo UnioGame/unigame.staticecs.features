@@ -6,6 +6,8 @@
         "unigame.staticecs.features.stun",
         "unigame.staticecs.features.characteristics",
         "unigame.staticecs",
+        "unigame.staticecs.unity",
+        "unigame.staticecs.testsupport",
         "FFS.StaticEcs"
     ],
     "includePlatforms": ["Editor"],

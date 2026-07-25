@@ -1,8 +1,8 @@
 namespace UniGame.StaticEcs.Features
 {
-    using System.Threading;
     using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
+    using UniGame.Core.Runtime;
 
     /// <summary>
     /// Wires the ability slice for a world: registers cast-entity components / tags, the
@@ -14,9 +14,7 @@ namespace UniGame.StaticEcs.Features
     ///
     /// Registers built-in leaf activators for the runtime ability pipeline.
     /// </summary>
-    public class AbilityFeature<TWorld>
-        : StaticEcsFeature<TWorld>,
-            IStaticEcsSystemsFeature<TWorld, StaticEcsUpdateSystems>
+    public class AbilityFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
         public const short DefaultCastOrder = 150;
@@ -26,7 +24,7 @@ namespace UniGame.StaticEcs.Features
         /// <summary>Whether the standard ability systems are installed.</summary>
         public bool registerSystems = true;
 
-        /// <summary>Execution order of cast processing.</summary>
+        /// <summary>Execution order of cast request processing.</summary>
         public short castOrder = DefaultCastOrder;
 
         /// <summary>Execution order of wait processing.</summary>
@@ -35,92 +33,93 @@ namespace UniGame.StaticEcs.Features
         /// <summary>Execution order of step progression.</summary>
         public short progressionOrder = DefaultProgressionOrder;
 
-        public AbilityFeature(
-            bool registerSystems = true,
-            short castOrder = DefaultCastOrder,
-            short waitOrder = DefaultWaitOrder,
-            short progressionOrder = DefaultProgressionOrder
-        )
+        /// <inheritdoc />
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            this.registerSystems = registerSystems;
-            this.castOrder = castOrder;
-            this.waitOrder = waitOrder;
-            this.progressionOrder = progressionOrder;
-        }
+            if (!World<TWorld>.HasResource<AbilityConfig>())
+            {
+                var configuration = new AbilityConfig
+                {
+                    RegisterSystems = registerSystems,
+                    CastOrder = castOrder,
+                    WaitOrder = waitOrder,
+                    ProgressionOrder = progressionOrder,
+                };
 
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
-        {
-            types
-                .Component<AbilityCastComponent>()
-                .Component<AbilityCastOwnerComponent>()
-                .Component<AbilityParentCastComponent>()
-                .Component<AbilityActiveCastComponent>()
-                .Component<AbilityCurrentStepComponent>()
-                .Component<AbilityStepStatusComponent>()
-                .Component<AbilityWaitComponent>()
-                .Component<AbilityRootComponent>()
-                .Multi<AbilitySlotComponent>()
-                .Multi<CooldownComponent>()
-                .Multi<AbilityChannelCastComponent>()
-                .Multi<AbilityStackComponent>()
-                .Multi<AbilityActiveStepComponent>()
-                .Multi<AbilityAoeTargetComponent>()
-                .Multi<AbilityBranchComponent>()
-                .Tag<AbilityStepReadyTag>()
-                .Tag<AbilityChannelCastTag>()
-                .Tag<AbilityDetachedSubcastTag>()
-                .Tag<AbilityBranchSubcastTag>()
-                .Tag<AbilityParallelWaitingTag>()
-                .Event<CastAbilityEvent>()
-                .Event<AbilityStartedEvent>()
-                .Event<AbilityCompletedEvent>()
-                .Event<AbilityBranchCompletedEvent>()
-                .Event<AbilityStepStartedEvent>()
-                .Event<AbilityStepCompletedEvent>()
-                .Event<CooldownReadyEvent>();
+                World<TWorld>.SetResource(configuration);
+            }
 
             if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>())
             {
-                World<TWorld>.SetResource(new AbilityRegistry<TWorld>());
+                var registry = new AbilityRegistry<TWorld>();
+                World<TWorld>.SetResource(registry);
             }
 
             if (!World<TWorld>.HasResource<AbilityEffectDispatchRegistry<TWorld>>())
             {
-                World<TWorld>.SetResource(new AbilityEffectDispatchRegistry<TWorld>());
+                var dispatchRegistry =
+                    new AbilityEffectDispatchRegistry<TWorld>();
+                World<TWorld>.SetResource(dispatchRegistry);
             }
 
             if (!World<TWorld>.HasResource<IAbilityRng<TWorld>>())
             {
-                World<TWorld>.SetResource<IAbilityRng<TWorld>>(new UnityAbilityRng<TWorld>());
+                IAbilityRng<TWorld> rng = new UnityAbilityRng<TWorld>();
+                World<TWorld>.SetResource(rng);
             }
 
             if (!World<TWorld>.HasResource<AbilityStepActivatorRegistry<TWorld>>())
             {
-                var activators = new AbilityStepActivatorRegistry<TWorld>();
-                activators.Register<WaitStepConfig>(new WaitStepActivator<TWorld>());
-                activators.Register<ApplyDamageStepConfig>(new ApplyDamageStepActivator<TWorld>());
-                activators.Register<ApplyEffectStepConfig>(new ApplyEffectStepActivator<TWorld>());
-                activators.Register<AoeQueryStepConfig>(new AoeQueryStepActivator<TWorld>());
-                activators.Register<SetPrimaryTargetFromAoeStepConfig>(
-                    new SetPrimaryTargetFromAoeStepActivator<TWorld>()
-                );
+                var activators = CreateActivators();
                 World<TWorld>.SetResource(activators);
             }
-        }
 
-        public UniTask RegisterSystemsAsync(
-            StaticEcsSystemsBuilder<TWorld, StaticEcsUpdateSystems> systems,
-            CancellationToken cancellationToken
-        )
-        {
-            if (!registerSystems)
+            ref var config = ref World<TWorld>.GetResource<AbilityConfig>();
+            var updateEnabled =
+                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
+                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
+            if (!updateEnabled || !config.RegisterSystems)
             {
                 return UniTask.CompletedTask;
             }
-            systems.Add(new AbilityCastSystem<TWorld>(), castOrder);
-            systems.Add(new AbilityWaitSystem<TWorld>(), waitOrder);
-            systems.Add(new AbilityStepProgressionSystem<TWorld>(), progressionOrder);
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new AbilityCastSystem<TWorld>(),
+                config.CastOrder);
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new AbilityWaitSystem<TWorld>(),
+                config.WaitOrder);
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new AbilityStepProgressionSystem<TWorld>(),
+                config.ProgressionOrder);
             return UniTask.CompletedTask;
         }
+
+        private static AbilityStepActivatorRegistry<TWorld> CreateActivators()
+        {
+            var activators = new AbilityStepActivatorRegistry<TWorld>();
+            activators.Register<WaitStepConfig>(new WaitStepActivator<TWorld>());
+            activators.Register<ApplyDamageStepConfig>(new ApplyDamageStepActivator<TWorld>());
+            activators.Register<ApplyEffectStepConfig>(new ApplyEffectStepActivator<TWorld>());
+            activators.Register<AoeQueryStepConfig>(new AoeQueryStepActivator<TWorld>());
+            activators.Register<SetPrimaryTargetFromAoeStepConfig>(
+                new SetPrimaryTargetFromAoeStepActivator<TWorld>());
+            return activators;
+        }
+    }
+
+    /// <summary>Controls ability system composition and execution order.</summary>
+    public sealed class AbilityConfig : IResource
+    {
+        /// <summary>Whether the standard ability systems are installed.</summary>
+        public bool RegisterSystems = true;
+
+        /// <summary>Execution order of cast request processing.</summary>
+        public short CastOrder = 150;
+
+        /// <summary>Execution order of wait processing.</summary>
+        public short WaitOrder = 155;
+
+        /// <summary>Execution order of step progression.</summary>
+        public short ProgressionOrder = 160;
     }
 }

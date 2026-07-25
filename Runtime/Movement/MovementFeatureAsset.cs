@@ -8,5 +8,8 @@ namespace UniGame.StaticEcs.Features
         menuName = "Static ECS/Features/Movement",
         fileName = nameof(MovementFeatureAsset)
     )]
-    public sealed class MovementFeatureAsset : StaticEcsMainFeatureAsset<MovementFeature> { }
+    public sealed class MovementFeatureAsset :
+        StaticEcsMainFeatureAsset<MovementFeature>
+    {
+    }
 }

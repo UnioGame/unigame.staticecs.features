@@ -6,7 +6,7 @@ namespace UniGame.StaticEcs.Features
     /// Routes <see cref="HealOverTimeEffect"/> ticks through <c>DamageOperations.RaiseHealing</c>
     /// using the per-target <see cref="HealOverTimeComponent"/> payload, scaled by current stacks.
     /// </summary>
-    public sealed class HealOverTimeHandler<TWorld> : IEffectHandler<TWorld, HealOverTimeEffect>
+    public class HealOverTimeHandler<TWorld> : IEffectHandler<TWorld, HealOverTimeEffect>
         where TWorld : struct, IWorldType
     {
         public void OnApplied(

@@ -16,6 +16,14 @@ namespace UniGame.StaticEcs.Features
 
         void Rebuild();
 
+        /// <summary>Fills the output with the nearest targets ordered by distance and entity id.</summary>
+        int FillNearestSphere(
+            Vector3 center,
+            float radius,
+            System.Span<EntityGID> output,
+            EntityGID excluded = default);
+
+        /// <summary>Fills the output with an unordered bounded radius query.</summary>
         int FillSphere(Vector3 center, float radius, System.Span<EntityGID> output);
     }
 }

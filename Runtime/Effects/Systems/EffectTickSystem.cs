@@ -10,7 +10,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="EffectTrackerComponent"/> and the <see cref="EffectRegistry"/> back-ref pipeline,
     /// so this system does not poll <c>Source.Status</c>.
     /// </summary>
-    public sealed class EffectTickSystem<TWorld, TEffect> : ISystem
+    public class EffectTickSystem<TWorld, TEffect> : ISystem
         where TWorld : struct, IWorldType
         where TEffect : struct, IEffectType
     {
@@ -27,22 +27,12 @@ namespace UniGame.StaticEcs.Features
             foreach (var entity in World<TWorld>.Query<All<EffectComponent<TEffect>>>().Entities())
             {
                 ref var data = ref entity.Mut<EffectComponent<TEffect>>();
-
-                if (data.DelayLeft > 0f)
-                {
-                    data.DelayLeft -= dt;
-                    if (data.DelayLeft < 0f)
-                    {
-                        data.DelayLeft = 0f;
-                    }
-                }
-
                 data.TimeLeft -= dt;
 
                 if (data.Period > 0f)
                 {
                     data.PeriodLeft -= dt;
-                    while (data.DelayLeft <= 0f && data.PeriodLeft <= 0f && data.TimeLeft > 0f)
+                    while (data.PeriodLeft <= 0f && data.TimeLeft > 0f)
                     {
                         handler.OnTick(entity.GID, data.Source, data.Stacks);
                         data.PeriodLeft += data.Period;
@@ -52,6 +42,19 @@ namespace UniGame.StaticEcs.Features
                 if (data.TimeLeft <= 0f)
                 {
                     EffectOperations.Expire<TWorld, TEffect>(entity, entity.GID);
+                }
+            }
+
+            foreach (var entity in
+                     World<TWorld>.Query<All<PendingEffectComponent<TEffect>>>().Entities())
+            {
+                ref var pending = ref entity.Mut<PendingEffectComponent<TEffect>>();
+                pending.DelayLeft -= dt;
+                if (pending.DelayLeft <= 0f)
+                {
+                    EffectOperations.ActivatePending<TWorld, TEffect>(
+                        entity,
+                        entity.GID);
                 }
             }
         }

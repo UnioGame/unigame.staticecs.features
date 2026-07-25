@@ -179,20 +179,9 @@ namespace UniGame.StaticEcs.Features
                 return false;
             }
 
-            var runtime = castEntity.Read<AbilityCastComponent>();
-            casterEntity.Delete<AbilityActiveCastComponent>();
-            castEntity.Destroy();
-
-            World<TWorld>.SendEvent(
-                new AbilityCompletedEvent
-                {
-                    Caster = caster,
-                    AbilityId = runtime.AbilityId,
-                    CastEntity = castGid,
-                    Reason = AbilityCompletedReason.Cancelled,
-                }
-            );
-            return true;
+            return AbilityCastTermination<TWorld>.TerminateRoot(
+                castEntity.GID,
+                AbilityCompletedReason.Cancelled);
         }
 
         // --- Main-default overloads ---

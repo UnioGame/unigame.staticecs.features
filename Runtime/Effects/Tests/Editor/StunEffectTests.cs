@@ -2,40 +2,45 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
     public sealed class StunEffectTests
     {
         private EffectTickSystem<TestEffectsWorld, StunEffect> _tick;
+        private StaticEcsTestWorld<TestEffectsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestEffectsWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestEffectsWorld>();
+            EffectTypeRegistration.Register<TestEffectsWorld, StunEffect>(
+                _world.Types);
 
-            new EcsTimeFeature<TestEffectsWorld>(registerFixed: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new ModifierBackRefFeature<TestEffectsWorld>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new StunFeature<TestEffectsWorld>().RegisterTypes(World<TestEffectsWorld>.Types());
-            new StunEffectFeature<TestEffectsWorld>(registerTickSystem: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new ModifierBackRefFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
+            );
+            new StunFeature<TestEffectsWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            new StunEffectFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
 
-            World<TestEffectsWorld>.Initialize();
+            _world.Initialize();
             _tick = new EffectTickSystem<TestEffectsWorld, StunEffect>();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestEffectsWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestEffectsWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         private static void Tick(float dt)

@@ -2,34 +2,33 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
     public sealed class CooldownOperationsTests
     {
         private static readonly AbilityId Ability = new(42);
+        private StaticEcsTestWorld<TestAbilityWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            _world = new StaticEcsTestWorld<TestAbilityWorld>();
+            new EcsTimeFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestAbilityWorld>.Initialize();
+            _world.Initialize();
             SetNow(0f);
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAbilityWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         private static void SetNow(float value)

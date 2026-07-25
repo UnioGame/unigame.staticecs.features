@@ -2,7 +2,7 @@ namespace UniGame.StaticEcs.Features
 {
     using FFS.Libraries.StaticEcs;
 
-    public sealed class UnityAbilityRng<TWorld> : IAbilityRng<TWorld>
+    public class UnityAbilityRng<TWorld> : IAbilityRng<TWorld>
         where TWorld : struct, IWorldType
     {
         public int Range(int minInclusive, int maxExclusive)

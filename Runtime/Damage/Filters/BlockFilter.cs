@@ -6,7 +6,7 @@ namespace UniGame.StaticEcs.Features
     /// Cancels the damage event when the target carries <see cref="BlockableTag"/> and a roll
     /// against <see cref="BlockChanceCharacteristic"/> succeeds. Healing events bypass the filter.
     /// </summary>
-    public sealed class BlockFilter<TWorld> : IDamageFilter<TWorld>
+    public class BlockFilter<TWorld> : IDamageFilter<TWorld>
         where TWorld : struct, IWorldType
     {
         public void Apply(ref DamageContext ctx)

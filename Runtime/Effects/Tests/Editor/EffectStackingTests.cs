@@ -2,39 +2,46 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
     public sealed class EffectStackingTests
     {
         private RecordingEffectHandler<TestEffectsWorld, TestEffectMarker> _handler;
+        private StaticEcsTestWorld<TestEffectsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestEffectsWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestEffectsWorld>();
+            EffectTypeRegistration.Register<TestEffectsWorld, TestEffectMarker>(
+                _world.Types);
             _handler = new RecordingEffectHandler<TestEffectsWorld, TestEffectMarker>();
 
-            new EcsTimeFeature<TestEffectsWorld>(registerFixed: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new EffectFeature<TestEffectsWorld, TestEffectMarker>(
-                _handler,
+            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
+            );
+            World<TestEffectsWorld>.SetResource<
+                IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
+            var config = new EffectConfig<TestEffectsWorld, TestEffectMarker>(
                 maxStacks: 3,
                 refreshOnReapply: true,
-                registerTickSystem: false
-            ).RegisterTypes(World<TestEffectsWorld>.Types());
+                registerTickSystem: false);
+            World<TestEffectsWorld>.SetResource(config);
+            new EffectFeature<TestEffectsWorld, TestEffectMarker>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
 
-            World<TestEffectsWorld>.Initialize();
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestEffectsWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestEffectsWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

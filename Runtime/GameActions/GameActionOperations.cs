@@ -50,12 +50,13 @@ namespace UniGame.StaticEcs.Features
                 return false;
             }
 
+            var actionMask = GetActionMask<TWorld, TAction>();
             if (!entity.Has<ActionMaskComponent>())
             {
                 return true;
             }
 
-            return (entity.Read<ActionMaskComponent>().Bits & ActionBit<TAction>.Mask) != 0;
+            return (entity.Read<ActionMaskComponent>().Bits & actionMask) != 0;
         }
 
         /// <summary>Sets the action bit for <typeparamref name="TAction"/> on the source entity.</summary>
@@ -73,7 +74,7 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            entity.Mut<ActionMaskComponent>().Bits |= ActionBit<TAction>.Mask;
+            entity.Mut<ActionMaskComponent>().Bits |= GetActionMask<TWorld, TAction>();
         }
 
         /// <summary>Clears the action bit for <typeparamref name="TAction"/> on the source entity.</summary>
@@ -91,7 +92,22 @@ namespace UniGame.StaticEcs.Features
                 return;
             }
 
-            entity.Mut<ActionMaskComponent>().Bits &= ~ActionBit<TAction>.Mask;
+            entity.Mut<ActionMaskComponent>().Bits &= ~GetActionMask<TWorld, TAction>();
+        }
+
+        private static uint GetActionMask<TWorld, TAction>()
+            where TWorld : struct, IWorldType
+            where TAction : struct, IGameAction
+        {
+            if (!World<TWorld>.HasResource<GameActionRegistry<TWorld>>())
+            {
+                throw new System.InvalidOperationException(
+                    $"World `{typeof(TWorld).Name}` has no game action registry.");
+            }
+
+            ref var registry =
+                ref World<TWorld>.GetResource<GameActionRegistry<TWorld>>();
+            return registry.GetMask<TAction>();
         }
 
         // --- Main-default overloads ---

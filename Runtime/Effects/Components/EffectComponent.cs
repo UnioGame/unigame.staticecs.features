@@ -18,7 +18,6 @@ namespace UniGame.StaticEcs.Features
         where TEffect : struct, IEffectType
     {
         public EntityGIDCompact Source;
-        public float DelayLeft;
         public float TimeLeft;
         public float PeriodLeft;
         public float Period;

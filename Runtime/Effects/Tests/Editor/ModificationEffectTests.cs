@@ -2,32 +2,42 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
     public sealed class ModificationEffectTests
     {
         private EffectTickSystem<TestEffectsWorld, ModificationEffect<SpeedCharacteristic>> _tick;
+        private StaticEcsTestWorld<TestEffectsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestEffectsWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestEffectsWorld>();
+            var types = _world.Types;
+            CharacteristicTypeRegistration.Register<TestEffectsWorld, SpeedCharacteristic>(types);
+            EffectTypeRegistration.Register<
+                TestEffectsWorld,
+                ModificationEffect<SpeedCharacteristic>>(types);
+            types.Component<ModificationEffectComponent<SpeedCharacteristic>>();
 
-            new EcsTimeFeature<TestEffectsWorld>(registerFixed: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new ModifierBackRefFeature<TestEffectsWorld>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new CharacteristicFeature<TestEffectsWorld, SpeedCharacteristic>().RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new ModifierBackRefFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new ModificationEffectFeature<TestEffectsWorld, SpeedCharacteristic>(
-                registerTickSystem: false
-            ).RegisterTypes(World<TestEffectsWorld>.Types());
+            new CharacteristicFeature<TestEffectsWorld, SpeedCharacteristic>().InstallResourcesAndRegisterTypesForTest(
+                _world
+            );
+            new ModificationEffectFeature<TestEffectsWorld, SpeedCharacteristic>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
 
-            World<TestEffectsWorld>.Initialize();
+            _world.Initialize();
             _tick =
                 new EffectTickSystem<TestEffectsWorld, ModificationEffect<SpeedCharacteristic>>();
         }
@@ -35,10 +45,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [TearDown]
         public void TearDown()
         {
-            if (World<TestEffectsWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestEffectsWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         private static void Tick(float dt)

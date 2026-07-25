@@ -4,7 +4,8 @@ namespace UniGame.StaticEcs.Features
 
     /// <summary>
     /// Per-entity bitmask that gates <see cref="GameActionOperations.Raise{TWorld,TAction}"/> calls.
-    /// Each bit corresponds to one <see cref="IGameAction"/> type via <see cref="ActionBit{TAction}"/>.
+    /// Each bit corresponds to one explicitly declared <see cref="IGameAction"/> type in the
+    /// world-local <c>GameActionRegistry&lt;TWorld&gt;</c>.
     /// <para>
     /// <c>uint.MaxValue</c> — all 32 slots enabled (default after adding the component).<br/>
     /// <c>0</c> — all actions disabled (e.g. fully stunned entity).<br/>

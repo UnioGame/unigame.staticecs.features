@@ -2,6 +2,7 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
@@ -9,27 +10,25 @@ namespace UniGame.StaticEcs.Features.Tests
     {
         private static readonly AbilityId AbilityA = new(1);
         private static readonly AbilityId AbilityB = new(2);
+        private StaticEcsTestWorld<TestAbilityWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            _world = new StaticEcsTestWorld<TestAbilityWorld>();
+            new EcsTimeFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestAbilityWorld>.Initialize();
+            _world.Initialize();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAbilityWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         private static IAbilityStepConfig InstantTree() => new WaitStepConfig(0f);

@@ -9,5 +9,7 @@ namespace UniGame.StaticEcs.Features
         fileName = nameof(CharacteristicsFeatureAsset)
     )]
     public sealed class CharacteristicsFeatureAsset :
-        StaticEcsMainFeatureAsset<CharacteristicsFeature> { }
+        StaticEcsMainFeatureAsset<CharacteristicsFeature>
+    {
+    }
 }

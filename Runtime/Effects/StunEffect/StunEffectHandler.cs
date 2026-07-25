@@ -7,7 +7,7 @@ namespace UniGame.StaticEcs.Features
     /// counter. Stack-up does not register additional sources — the counter is keyed by source
     /// entity, not by stack count.
     /// </summary>
-    public sealed class StunEffectHandler<TWorld> : IEffectHandler<TWorld, StunEffect>
+    public class StunEffectHandler<TWorld> : IEffectHandler<TWorld, StunEffect>
         where TWorld : struct, IWorldType
     {
         public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)

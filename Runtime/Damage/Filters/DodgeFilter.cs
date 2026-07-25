@@ -6,7 +6,7 @@ namespace UniGame.StaticEcs.Features
     /// Cancels the damage event when a roll against the target's
     /// <see cref="DodgeChanceCharacteristic"/> succeeds. Healing events bypass the filter.
     /// </summary>
-    public sealed class DodgeFilter<TWorld> : IDamageFilter<TWorld>
+    public class DodgeFilter<TWorld> : IDamageFilter<TWorld>
         where TWorld : struct, IWorldType
     {
         public void Apply(ref DamageContext ctx)

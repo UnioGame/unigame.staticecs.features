@@ -2,6 +2,7 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
 
     [TestFixture]
@@ -9,34 +10,40 @@ namespace UniGame.StaticEcs.Features.Tests
     {
         private RecordingEffectHandler<TestEffectsWorld, TestEffectMarker> _handler;
         private EffectTickSystem<TestEffectsWorld, TestEffectMarker> _system;
+        private StaticEcsTestWorld<TestEffectsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestEffectsWorld>.Create(WorldConfig.Default());
+            _world = new StaticEcsTestWorld<TestEffectsWorld>();
+            EffectTypeRegistration.Register<TestEffectsWorld, TestEffectMarker>(
+                _world.Types);
             _handler = new RecordingEffectHandler<TestEffectsWorld, TestEffectMarker>();
 
-            new EcsTimeFeature<TestEffectsWorld>(registerFixed: false).RegisterTypes(
-                World<TestEffectsWorld>.Types()
+            new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new EffectFeature<TestEffectsWorld, TestEffectMarker>(
-                _handler,
+            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
+            );
+            World<TestEffectsWorld>.SetResource<
+                IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
+            var config = new EffectConfig<TestEffectsWorld, TestEffectMarker>(
                 maxStacks: 3,
                 refreshOnReapply: true,
-                registerTickSystem: false
-            ).RegisterTypes(World<TestEffectsWorld>.Types());
+                registerTickSystem: false);
+            World<TestEffectsWorld>.SetResource(config);
+            new EffectFeature<TestEffectsWorld, TestEffectMarker>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
 
-            World<TestEffectsWorld>.Initialize();
+            _world.Initialize();
             _system = new EffectTickSystem<TestEffectsWorld, TestEffectMarker>();
         }
 
         [TearDown]
         public void TearDown()
         {
-            if (World<TestEffectsWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestEffectsWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         private static void Tick(float dt)
@@ -192,6 +199,114 @@ namespace UniGame.StaticEcs.Features.Tests
             Tick(2f);
             _system.Update();
             Assert.AreEqual(3, _handler.Ticks.Count);
+        }
+
+        [Test]
+        public void DelayedApply_ActivatesAfterDelayWithoutConsumingDuration()
+        {
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<
+                EffectAppliedEvent<TestEffectMarker>
+            >();
+            try
+            {
+                var source = World<TestEffectsWorld>.NewEntity<Default>();
+                var target = World<TestEffectsWorld>.NewEntity<Default>();
+
+                EffectOperations.Apply<TestEffectsWorld, TestEffectMarker>(
+                    target.GID,
+                    source.GID,
+                    duration: 1f,
+                    period: 0.5f,
+                    delay: 2f);
+
+                Assert.IsTrue(target.Has<PendingEffectComponent<TestEffectMarker>>());
+                Assert.IsFalse(target.Has<EffectComponent<TestEffectMarker>>());
+                Assert.IsFalse(
+                    target.Has<World<TestEffectsWorld>.Multi<EffectSummaryComponent>>());
+                Assert.AreEqual(0, _handler.Applied.Count);
+
+                Tick(1.5f);
+                _system.Update();
+                Assert.IsTrue(target.Has<PendingEffectComponent<TestEffectMarker>>());
+
+                Tick(0.5f);
+                _system.Update();
+                Assert.IsFalse(target.Has<PendingEffectComponent<TestEffectMarker>>());
+                Assert.IsTrue(target.Has<EffectComponent<TestEffectMarker>>());
+                Assert.AreEqual(
+                    1f,
+                    target.Read<EffectComponent<TestEffectMarker>>().TimeLeft,
+                    0.0001f);
+                Assert.AreEqual(1, _handler.Applied.Count);
+                Assert.AreEqual(0, _handler.Ticks.Count);
+
+                var appliedEvents = 0;
+                foreach (var _ in receiver)
+                {
+                    appliedEvents++;
+                }
+
+                Assert.AreEqual(1, appliedEvents);
+
+                Tick(0.5f);
+                _system.Update();
+                Assert.AreEqual(1, _handler.Ticks.Count);
+                Assert.IsTrue(target.Has<EffectComponent<TestEffectMarker>>());
+            }
+            finally
+            {
+                World<TestEffectsWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        [Test]
+        public void ReapplyDuringDelay_AccumulatesStacksAndAppliesOnce()
+        {
+            var source = World<TestEffectsWorld>.NewEntity<Default>();
+            var target = World<TestEffectsWorld>.NewEntity<Default>();
+
+            EffectOperations.Apply<TestEffectsWorld, TestEffectMarker>(
+                target.GID,
+                source.GID,
+                duration: 1f,
+                delay: 2f);
+            EffectOperations.Apply<TestEffectsWorld, TestEffectMarker>(
+                target.GID,
+                source.GID,
+                duration: 3f,
+                delay: 1f);
+
+            Assert.AreEqual(
+                2,
+                target.Read<PendingEffectComponent<TestEffectMarker>>().Stacks);
+            Tick(1f);
+            _system.Update();
+
+            Assert.AreEqual(1, _handler.Applied.Count);
+            Assert.AreEqual(2, _handler.Applied[0].Stacks);
+            Assert.AreEqual(
+                3f,
+                target.Read<EffectComponent<TestEffectMarker>>().TimeLeft,
+                0.0001f);
+        }
+
+        [Test]
+        public void PendingEffect_IsRemovedWhenSourceIsDestroyed()
+        {
+            var source = World<TestEffectsWorld>.NewEntity<Default>();
+            var target = World<TestEffectsWorld>.NewEntity<Default>();
+            EffectOperations.Apply<TestEffectsWorld, TestEffectMarker>(
+                target.GID,
+                source.GID,
+                duration: 1f,
+                delay: 10f);
+
+            source.Destroy();
+
+            Assert.IsFalse(target.Has<PendingEffectComponent<TestEffectMarker>>());
+            Assert.IsFalse(target.Has<EffectComponent<TestEffectMarker>>());
+            Assert.AreEqual(0, _handler.Applied.Count);
+            Assert.AreEqual(0, _handler.Removed.Count);
         }
 
         [Test]

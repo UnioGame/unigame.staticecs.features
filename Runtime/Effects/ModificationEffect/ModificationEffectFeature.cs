@@ -15,24 +15,10 @@ namespace UniGame.StaticEcs.Features
         where TWorld : struct, IWorldType
         where TStat : struct, ICharacteristicType
     {
-        public ModificationEffectFeature(
-            int maxStacks = 1,
-            bool refreshOnReapply = true,
-            short tickOrder = DefaultTickOrder,
-            bool registerTickSystem = true
-        )
-            : base(
-                new ModificationEffectHandler<TWorld, TStat>(),
-                maxStacks,
-                refreshOnReapply,
-                tickOrder,
-                registerTickSystem
-            ) { }
-
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        protected override IEffectHandler<TWorld, ModificationEffect<TStat>>
+            CreateDefaultHandler()
         {
-            types.Component<ModificationEffectComponent<TStat>>();
-            base.RegisterTypes(types);
+            return new ModificationEffectHandler<TWorld, TStat>();
         }
     }
 }

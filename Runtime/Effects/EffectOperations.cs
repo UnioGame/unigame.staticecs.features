@@ -71,6 +71,14 @@ namespace UniGame.StaticEcs.Features
             return entity.Read<EffectComponent<TEffect>>().Stacks;
         }
 
+        public static bool IsPending<TWorld, TEffect>(EntityGID target)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            return target.TryUnpack<TWorld>(out var entity) &&
+                   entity.Has<PendingEffectComponent<TEffect>>();
+        }
+
         public static bool Apply<TWorld, TEffect>(
             EntityGID target,
             EntityGID source,
@@ -103,103 +111,253 @@ namespace UniGame.StaticEcs.Features
                 delay = 0f;
             }
 
-            var initialPeriodLeft = period > 0f ? (delay > 0f ? delay + period : period) : 0f;
             var compactSource = (EntityGIDCompact)source;
-
-            var isFresh = !entity.Has<EffectComponent<TEffect>>();
-            if (isFresh)
+            if (entity.Has<PendingEffectComponent<TEffect>>())
             {
-                entity.Add<EffectComponent<TEffect>>();
+                return ReapplyPending<TWorld, TEffect>(
+                    entity,
+                    target,
+                    source,
+                    compactSource,
+                    duration,
+                    period,
+                    delay);
             }
 
-            ref var data = ref entity.Ref<EffectComponent<TEffect>>();
-
-            int previousStacks;
-            int newStacks;
-            float resultingTimeLeft;
-
-            if (isFresh)
+            if (entity.Has<EffectComponent<TEffect>>())
             {
-                previousStacks = 0;
-                newStacks = 1;
-                resultingTimeLeft = duration;
-
-                data.Source = compactSource;
-                data.DelayLeft = delay;
-                data.TimeLeft = duration;
-                data.Period = period;
-                data.PeriodLeft = initialPeriodLeft;
-                data.Stacks = 1;
+                return ReapplyActive<TWorld, TEffect>(
+                    entity,
+                    target,
+                    source,
+                    compactSource,
+                    duration,
+                    period);
             }
-            else
+
+            EffectBackRefRegistrar.Register<TWorld>(
+                source,
+                target,
+                EffectFlagOf<TEffect>.Value);
+
+            if (delay > 0f)
             {
-                ref var config = ref World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>();
-                previousStacks = data.Stacks;
-                newStacks = previousStacks + 1;
-                if (newStacks > config.MaxStacks)
-                {
-                    newStacks = config.MaxStacks;
-                }
-
-                data.Stacks = newStacks;
-                data.Source = compactSource;
-
-                if (config.RefreshOnReapply)
-                {
-                    if (duration > data.TimeLeft)
+                entity.Set(
+                    new PendingEffectComponent<TEffect>
                     {
-                        data.TimeLeft = duration;
-                    }
+                        Source = compactSource,
+                        DelayLeft = delay,
+                        Duration = duration,
+                        Period = period,
+                        Stacks = 1,
+                    });
+                return true;
+            }
 
-                    data.Period = period;
-                    data.DelayLeft = delay;
-                    data.PeriodLeft = initialPeriodLeft;
+            Activate<TWorld, TEffect>(
+                entity,
+                target,
+                source,
+                compactSource,
+                duration,
+                period,
+                1);
+            return true;
+        }
+
+        private static bool ReapplyPending<TWorld, TEffect>(
+            World<TWorld>.Entity entity,
+            EntityGID target,
+            EntityGID source,
+            EntityGIDCompact compactSource,
+            float duration,
+            float period,
+            float delay)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            ref var data = ref entity.Ref<PendingEffectComponent<TEffect>>();
+            ref var config = ref World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>();
+            var previousSource = data.Source;
+
+            data.Stacks++;
+            if (data.Stacks > config.MaxStacks)
+            {
+                data.Stacks = config.MaxStacks;
+            }
+
+            data.Source = compactSource;
+            if (config.RefreshOnReapply)
+            {
+                if (duration > data.Duration)
+                {
+                    data.Duration = duration;
                 }
 
-                resultingTimeLeft = data.TimeLeft;
+                data.DelayLeft = delay;
+                data.Period = period;
             }
 
-            EffectBackRefRegistrar.Register<TWorld>(source, target, EffectFlagOf<TEffect>.Value);
+            UpdateBackReference<TWorld, TEffect>(
+                previousSource,
+                compactSource,
+                source,
+                target);
 
-            if (isFresh)
+            if (data.DelayLeft > 0f)
             {
-                AddRosterEntry<TWorld, TEffect>(entity, newStacks, resultingTimeLeft);
+                return true;
             }
-            else
+
+            var snapshot = data;
+            entity.Delete<PendingEffectComponent<TEffect>>();
+            Activate<TWorld, TEffect>(
+                entity,
+                target,
+                source,
+                snapshot.Source,
+                snapshot.Duration,
+                snapshot.Period,
+                snapshot.Stacks);
+            return true;
+        }
+
+        private static bool ReapplyActive<TWorld, TEffect>(
+            World<TWorld>.Entity entity,
+            EntityGID target,
+            EntityGID source,
+            EntityGIDCompact compactSource,
+            float duration,
+            float period)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            ref var data = ref entity.Ref<EffectComponent<TEffect>>();
+            ref var config = ref World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>();
+            var previousSource = data.Source;
+            var previousStacks = data.Stacks;
+            var newStacks = previousStacks + 1;
+            if (newStacks > config.MaxStacks)
             {
-                UpdateRosterEntry<TWorld, TEffect>(entity, newStacks, resultingTimeLeft);
+                newStacks = config.MaxStacks;
             }
+
+            data.Stacks = newStacks;
+            data.Source = compactSource;
+            if (config.RefreshOnReapply)
+            {
+                if (duration > data.TimeLeft)
+                {
+                    data.TimeLeft = duration;
+                }
+
+                data.Period = period;
+                data.PeriodLeft = period > 0f ? period : 0f;
+            }
+
+            UpdateBackReference<TWorld, TEffect>(
+                previousSource,
+                compactSource,
+                source,
+                target);
+            UpdateRosterEntry<TWorld, TEffect>(entity, newStacks, data.TimeLeft);
 
             ref var handler = ref World<TWorld>.GetResource<IEffectHandler<TWorld, TEffect>>();
             handler.OnApplied(target, source, newStacks, previousStacks);
 
-            if (isFresh)
-            {
-                World<TWorld>.SendEvent(
-                    new EffectAppliedEvent<TEffect>
-                    {
-                        Source = source,
-                        Target = target,
-                        Stacks = newStacks,
-                        TimeLeft = resultingTimeLeft,
-                    }
-                );
-            }
-            else
-            {
-                World<TWorld>.SendEvent(
-                    new EffectRefreshedEvent<TEffect>
-                    {
-                        Source = source,
-                        Target = target,
-                        Stacks = newStacks,
-                        PreviousStacks = previousStacks,
-                        TimeLeft = resultingTimeLeft,
-                    }
-                );
-            }
+            World<TWorld>.SendEvent(
+                new EffectRefreshedEvent<TEffect>
+                {
+                    Source = source,
+                    Target = target,
+                    Stacks = newStacks,
+                    PreviousStacks = previousStacks,
+                    TimeLeft = data.TimeLeft,
+                });
 
             return true;
+        }
+
+        private static void Activate<TWorld, TEffect>(
+            World<TWorld>.Entity entity,
+            EntityGID target,
+            EntityGID source,
+            EntityGIDCompact compactSource,
+            float duration,
+            float period,
+            int stacks)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            entity.Set(
+                new EffectComponent<TEffect>
+                {
+                    Source = compactSource,
+                    TimeLeft = duration,
+                    Period = period,
+                    PeriodLeft = period > 0f ? period : 0f,
+                    Stacks = stacks,
+                });
+            AddRosterEntry<TWorld, TEffect>(entity, stacks, duration);
+
+            ref var handler = ref World<TWorld>.GetResource<IEffectHandler<TWorld, TEffect>>();
+            handler.OnApplied(target, source, stacks, 0);
+
+            World<TWorld>.SendEvent(
+                new EffectAppliedEvent<TEffect>
+                {
+                    Source = source,
+                    Target = target,
+                    Stacks = stacks,
+                    TimeLeft = duration,
+                });
+        }
+
+        internal static void ActivatePending<TWorld, TEffect>(
+            World<TWorld>.Entity entity,
+            EntityGID target)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            if (!entity.Has<PendingEffectComponent<TEffect>>())
+            {
+                return;
+            }
+
+            var pending = entity.Read<PendingEffectComponent<TEffect>>();
+            EntityGID source = pending.Source;
+            entity.Delete<PendingEffectComponent<TEffect>>();
+            Activate<TWorld, TEffect>(
+                entity,
+                target,
+                source,
+                pending.Source,
+                pending.Duration,
+                pending.Period,
+                pending.Stacks);
+        }
+
+        private static void UpdateBackReference<TWorld, TEffect>(
+            EntityGIDCompact previousSource,
+            EntityGIDCompact currentSource,
+            EntityGID source,
+            EntityGID target)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            if (!previousSource.Equals(currentSource))
+            {
+                EntityGID oldSource = previousSource;
+                EffectBackRefRegistrar.Unregister<TWorld>(
+                    oldSource,
+                    target,
+                    EffectFlagOf<TEffect>.Value);
+            }
+
+            EffectBackRefRegistrar.Register<TWorld>(
+                source,
+                target,
+                EffectFlagOf<TEffect>.Value);
         }
 
         public static bool Remove<TWorld, TEffect>(EntityGID target)
@@ -209,6 +367,12 @@ namespace UniGame.StaticEcs.Features
             if (!target.TryUnpack<TWorld>(out var entity))
             {
                 return false;
+            }
+
+            if (entity.Has<PendingEffectComponent<TEffect>>())
+            {
+                FinalizePending<TWorld, TEffect>(entity, target);
+                return true;
             }
 
             if (!entity.Has<EffectComponent<TEffect>>())
@@ -234,12 +398,24 @@ namespace UniGame.StaticEcs.Features
                 return false;
             }
 
+            var compactSource = (EntityGIDCompact)source;
+            if (entity.Has<PendingEffectComponent<TEffect>>())
+            {
+                ref var pending = ref entity.Ref<PendingEffectComponent<TEffect>>();
+                if (!pending.Source.Equals(compactSource))
+                {
+                    return false;
+                }
+
+                FinalizePending<TWorld, TEffect>(entity, target);
+                return true;
+            }
+
             if (!entity.Has<EffectComponent<TEffect>>())
             {
                 return false;
             }
 
-            var compactSource = (EntityGIDCompact)source;
             ref var data = ref entity.Ref<EffectComponent<TEffect>>();
             if (!data.Source.Equals(compactSource))
             {
@@ -368,6 +544,21 @@ namespace UniGame.StaticEcs.Features
                     Expired = expired,
                 }
             );
+        }
+
+        private static void FinalizePending<TWorld, TEffect>(
+            World<TWorld>.Entity entity,
+            EntityGID target)
+            where TWorld : struct, IWorldType
+            where TEffect : struct, IEffectType
+        {
+            var snapshot = entity.Read<PendingEffectComponent<TEffect>>();
+            EntityGID source = snapshot.Source;
+            entity.Delete<PendingEffectComponent<TEffect>>();
+            EffectBackRefRegistrar.Unregister<TWorld>(
+                source,
+                target,
+                EffectFlagOf<TEffect>.Value);
         }
 
         /// <summary>Tick-system entry point: completes the same finalize pipeline as
@@ -523,6 +714,9 @@ namespace UniGame.StaticEcs.Features
 
         public static int GetStacks<TEffect>(EntityGID target)
             where TEffect : struct, IEffectType => GetStacks<Main, TEffect>(target);
+
+        public static bool IsPending<TEffect>(EntityGID target)
+            where TEffect : struct, IEffectType => IsPending<Main, TEffect>(target);
 
         public static bool Apply<TEffect>(
             EntityGID target,

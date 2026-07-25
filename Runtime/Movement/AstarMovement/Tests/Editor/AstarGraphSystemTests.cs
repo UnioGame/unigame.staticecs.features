@@ -6,23 +6,28 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
     using NUnit.Framework;
     using Pathfinding;
     using Pathfinding.Graphs.Grid;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Unity;
     using UnityEngine;
     using UnityEngine.TestTools;
 
     [TestFixture]
+    [Category("StaticEcsAstar")]
+    [Explicit("Run separately when STATIC_ECS_ASTAR and its backend are available.")]
     public sealed class AstarGraphSystemTests
     {
         private GameObject _graphHost;
         private AstarPath _backend;
         private AstarGraphSystem<TestAstarWorld> _system;
+        private StaticEcsTestWorld<TestAstarWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAstarWorld>.Create(WorldConfig.Default());
-            new AstarMovementFeature<TestAstarWorld>().RegisterTypes(World<TestAstarWorld>.Types());
-            World<TestAstarWorld>.Initialize();
+            _world = new StaticEcsTestWorld<TestAstarWorld>();
+            new AstarMovementFeature<TestAstarWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
+            _world.Initialize();
 
             _graphHost = new GameObject("Astar graph test backend");
             _backend = _graphHost.AddComponent<AstarPath>();
@@ -32,10 +37,7 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
         [TearDown]
         public void TearDown()
         {
-            if (World<TestAstarWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAstarWorld>.Destroy();
-            }
+            _world?.Dispose();
 
             if (_graphHost != null)
             {

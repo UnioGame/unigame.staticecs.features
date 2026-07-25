@@ -1,22 +1,22 @@
 namespace UniGame.StaticEcs.Features
 {
+    using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
     using Modifiers;
+    using UniGame.Core.Runtime;
 
-    public class CharacteristicFeature<TWorld, TCharacteristic> : StaticEcsFeature<TWorld>
+    public class CharacteristicFeature<TWorld, TCharacteristic> :
+        StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
         where TCharacteristic : struct, ICharacteristicType
     {
-        public override void RegisterTypes(World<TWorld>.TypeRegistrar types)
+        /// <inheritdoc />
+        public override UniTask InitializeAsync(ILifeTime lifeTime)
         {
-            types
-                .Component<CharacteristicComponent<TCharacteristic>>()
-                .Event<CharacteristicChangedEvent<TCharacteristic>>()
-                .Multi<CharacteristicModifierComponent<TCharacteristic>>();
-
             if (!World<TWorld>.HasResource<ModifierRegistry>())
             {
-                World<TWorld>.SetResource(new ModifierRegistry());
+                var defaultRegistry = new ModifierRegistry();
+                World<TWorld>.SetResource(defaultRegistry);
             }
 
             ref var registry = ref World<TWorld>.GetResource<ModifierRegistry>();
@@ -27,8 +27,8 @@ namespace UniGame.StaticEcs.Features
                     CharacteristicModifierExtensions.RemoveModifiersFromSource<
                         TWorld,
                         TCharacteristic
-                    >(tgt, src)
-            );
+                    >(tgt, src));
+            return UniTask.CompletedTask;
         }
     }
 }

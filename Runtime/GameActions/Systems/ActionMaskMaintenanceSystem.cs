@@ -15,7 +15,7 @@ namespace UniGame.StaticEcs.Features
     /// system is added to the update group.
     /// </para>
     /// </summary>
-    public sealed class ActionMaskMaintenanceSystem<TWorld> : ISystem
+    public class ActionMaskMaintenanceSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType
     {
         private EventReceiver<TWorld, StunChangedEvent> _receiver;

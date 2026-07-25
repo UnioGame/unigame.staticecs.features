@@ -11,13 +11,9 @@ namespace UniGame.StaticEcs.Features
     public class StunEffectFeature<TWorld> : EffectFeature<TWorld, StunEffect>
         where TWorld : struct, IWorldType
     {
-        public StunEffectFeature(short tickOrder = DefaultTickOrder, bool registerTickSystem = true)
-            : base(
-                new StunEffectHandler<TWorld>(),
-                maxStacks: 1,
-                refreshOnReapply: true,
-                tickOrder,
-                registerTickSystem
-            ) { }
+        protected override IEffectHandler<TWorld, StunEffect> CreateDefaultHandler()
+        {
+            return new StunEffectHandler<TWorld>();
+        }
     }
 }

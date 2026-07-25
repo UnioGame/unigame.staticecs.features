@@ -1,6 +1,7 @@
 namespace UniGame.StaticEcs.Features
 {
     using System;
+    using System.Buffers;
     using System.Collections.Generic;
     using FFS.Libraries.StaticEcs;
     using Unity;
@@ -12,9 +13,11 @@ namespace UniGame.StaticEcs.Features
     /// The tree is rebuilt in full each call (no incremental updates); a DOD refactor is tracked
     /// separately. Allocations during query are bounded to the recursion stack.
     /// </summary>
-    public sealed class KdTreeTargetIndex<TWorld> : ITargetIndex<TWorld>
+    public class KdTreeTargetIndex<TWorld> : ITargetIndex<TWorld>
         where TWorld : struct, IWorldType
     {
+        private const int StackDistanceCapacity = 256;
+
         private readonly List<EntityGID> _ids = new();
         private readonly List<Vector3> _positions = new();
         private int[] _indices = Array.Empty<int>();
@@ -76,6 +79,47 @@ namespace UniGame.StaticEcs.Features
             var radiusSq = radius * radius;
             QuerySphere(_root, center, radiusSq, output, ref written);
             return written;
+        }
+
+        /// <inheritdoc />
+        public int FillNearestSphere(
+            Vector3 center,
+            float radius,
+            Span<EntityGID> output,
+            EntityGID excluded = default)
+        {
+            if (output.Length == 0 || _ids.Count == 0 || _root < 0)
+            {
+                return 0;
+            }
+
+            float[] rentedDistances = null;
+            Span<float> distances = output.Length <= StackDistanceCapacity
+                ? stackalloc float[output.Length]
+                : (rentedDistances = ArrayPool<float>.Shared.Rent(output.Length)).AsSpan(
+                    0,
+                    output.Length);
+            try
+            {
+                var written = 0;
+                var radiusSq = radius * radius;
+                QueryNearestSphere(
+                    _root,
+                    center,
+                    radiusSq,
+                    excluded,
+                    output,
+                    distances,
+                    ref written);
+                return written;
+            }
+            finally
+            {
+                if (rentedDistances != null)
+                {
+                    ArrayPool<float>.Shared.Return(rentedDistances);
+                }
+            }
         }
 
         private int Build(int from, int to, int depth)
@@ -191,6 +235,117 @@ namespace UniGame.StaticEcs.Features
                     QuerySphere(node.Left, center, radiusSq, output, ref written);
                 }
             }
+        }
+
+        private void QueryNearestSphere(
+            int nodeIndex,
+            Vector3 center,
+            float radiusSq,
+            EntityGID excluded,
+            Span<EntityGID> output,
+            Span<float> distances,
+            ref int written)
+        {
+            if (nodeIndex < 0)
+            {
+                return;
+            }
+
+            ref var node = ref _nodes[nodeIndex];
+            var pos = _positions[node.PointIndex];
+            var dx = pos.x - center.x;
+            var dy = pos.y - center.y;
+            var dz = pos.z - center.z;
+            var distanceSq = dx * dx + dy * dy + dz * dz;
+            var id = _ids[node.PointIndex];
+            if (distanceSq <= radiusSq && !id.Equals(excluded))
+            {
+                InsertNearest(id, distanceSq, output, distances, ref written);
+            }
+
+            var centerAxis = node.Axis == 0 ? center.x : (node.Axis == 1 ? center.y : center.z);
+            var pointAxis = node.Axis == 0 ? pos.x : (node.Axis == 1 ? pos.y : pos.z);
+            var diff = centerAxis - pointAxis;
+
+            if (diff <= 0f)
+            {
+                QueryNearestSphere(
+                    node.Left,
+                    center,
+                    radiusSq,
+                    excluded,
+                    output,
+                    distances,
+                    ref written);
+                if (diff * diff <= radiusSq)
+                {
+                    QueryNearestSphere(
+                        node.Right,
+                        center,
+                        radiusSq,
+                        excluded,
+                        output,
+                        distances,
+                        ref written);
+                }
+            }
+            else
+            {
+                QueryNearestSphere(
+                    node.Right,
+                    center,
+                    radiusSq,
+                    excluded,
+                    output,
+                    distances,
+                    ref written);
+                if (diff * diff <= radiusSq)
+                {
+                    QueryNearestSphere(
+                        node.Left,
+                        center,
+                        radiusSq,
+                        excluded,
+                        output,
+                        distances,
+                        ref written);
+                }
+            }
+        }
+
+        private static void InsertNearest(
+            EntityGID id,
+            float distanceSq,
+            Span<EntityGID> output,
+            Span<float> distances,
+            ref int written)
+        {
+            var insertAt = written;
+            for (var i = 0; i < written; i++)
+            {
+                if (distanceSq < distances[i] ||
+                    (distanceSq.Equals(distances[i]) && id.Raw < output[i].Raw))
+                {
+                    insertAt = i;
+                    break;
+                }
+            }
+
+            if (insertAt >= output.Length)
+            {
+                return;
+            }
+
+            var newWritten = written < output.Length ? written + 1 : written;
+            for (var i = newWritten - 1; i > insertAt; i--)
+            {
+                output[i] = output[i - 1];
+                distances[i] = distances[i - 1];
+            }
+
+            output[insertAt] = id;
+            distances[insertAt] = distanceSq;
+            written = newWritten;
         }
 
         private struct KdNode

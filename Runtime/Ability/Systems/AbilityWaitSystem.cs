@@ -9,7 +9,7 @@ namespace UniGame.StaticEcs.Features
     /// <see cref="AbilityStepStatusComponent"/>, and arms <see cref="AbilityStepReadyTag"/> so
     /// <c>AbilityStepProgressionSystem</c> can advance the cast in the next pass.
     /// </summary>
-    public sealed class AbilityWaitSystem<TWorld> : ISystem
+    public class AbilityWaitSystem<TWorld> : ISystem
         where TWorld : struct, IWorldType
     {
         public void Update()

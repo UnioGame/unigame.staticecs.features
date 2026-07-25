@@ -8,5 +8,8 @@ namespace UniGame.StaticEcs.Features
         menuName = "Static ECS/Features/Game Actions",
         fileName = nameof(GameActionsFeatureAsset)
     )]
-    public sealed class GameActionsFeatureAsset : StaticEcsMainFeatureAsset<GameActionsFeature> { }
+    public sealed class GameActionsFeatureAsset :
+        StaticEcsMainFeatureAsset<GameActionsFeature>
+    {
+    }
 }

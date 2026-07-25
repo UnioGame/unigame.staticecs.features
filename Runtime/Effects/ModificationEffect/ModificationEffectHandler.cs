@@ -8,7 +8,7 @@ namespace UniGame.StaticEcs.Features
     /// <c>(Op, Value)</c> modifier keyed by the effect source; on removal it strips every
     /// modifier originating from that source on the matching stat.
     /// </summary>
-    public sealed class ModificationEffectHandler<TWorld, TStat>
+    public class ModificationEffectHandler<TWorld, TStat>
         : IEffectHandler<TWorld, ModificationEffect<TStat>>
         where TWorld : struct, IWorldType
         where TStat : struct, ICharacteristicType

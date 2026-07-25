@@ -2,56 +2,68 @@ namespace UniGame.StaticEcs.Features.Tests
 {
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UnityEngine;
 
     [TestFixture]
     public sealed class AllCharacteristicsConverterTests
     {
         private GameObject _host;
+        private StaticEcsTestWorld<TestAllCharacteristicsWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAllCharacteristicsWorld>.Create(WorldConfig.Default());
-            var types = World<TestAllCharacteristicsWorld>.Types();
-            new ModifierBackRefFeature<TestAllCharacteristicsWorld>().RegisterTypes(types);
+            _world = new StaticEcsTestWorld<TestAllCharacteristicsWorld>();
+            var types = _world.Types;
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, HealthCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, ManaCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, SpeedCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, ShieldCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, BlockChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, DodgeChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, ArmorResistCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, CriticalChanceCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, CriticalMultiplierCharacteristic>(types);
+            new ModifierBackRefFeature<TestAllCharacteristicsWorld>()
+                .InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 HealthCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 ManaCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 SpeedCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 ShieldCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 ArmorResistCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 BlockChanceCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 DodgeChanceCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 CriticalChanceCharacteristic
-            >().RegisterTypes(types);
+            >().InstallResourcesAndRegisterTypesForTest(_world);
             new CharacteristicFeature<
                 TestAllCharacteristicsWorld,
                 CriticalMultiplierCharacteristic
-            >().RegisterTypes(types);
-            World<TestAllCharacteristicsWorld>.Initialize();
+            >().InstallResourcesAndRegisterTypesForTest(_world);
+            _world.Initialize();
             _host = new GameObject(nameof(AllCharacteristicsConverterTests));
         }
 
@@ -59,10 +71,7 @@ namespace UniGame.StaticEcs.Features.Tests
         public void TearDown()
         {
             Object.DestroyImmediate(_host);
-            if (World<TestAllCharacteristicsWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAllCharacteristicsWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]

@@ -7,7 +7,7 @@ namespace UniGame.StaticEcs.Features
     /// the shield characteristic in place and emits <see cref="ShieldDeltaEvent"/> when any
     /// amount is absorbed.
     /// </summary>
-    public sealed class ShieldFilter<TWorld> : IDamageFilter<TWorld>
+    public class ShieldFilter<TWorld> : IDamageFilter<TWorld>
         where TWorld : struct, IWorldType
     {
         public void Apply(ref DamageContext ctx)

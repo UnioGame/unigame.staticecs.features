@@ -10,7 +10,7 @@ namespace UniGame.StaticEcs.Features
     /// type-registration time and never mutated afterwards, so reads from
     /// <c>AbilityStepProgressionSystem</c> are allocation-free and thread-friendly.
     /// </summary>
-    public sealed class AbilityStepActivatorRegistry<TWorld> : IResource
+    public class AbilityStepActivatorRegistry<TWorld> : IResource
         where TWorld : struct, IWorldType
     {
         private readonly Dictionary<Type, IAbilityStepActivator<TWorld>> _activators = new();

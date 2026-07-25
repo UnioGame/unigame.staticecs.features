@@ -3,6 +3,7 @@ namespace UniGame.StaticEcs.Features.Tests
     using System.Collections.Generic;
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
+    using UniGame.StaticEcs.Tests;
     using UniGame.StaticEcs.Time;
     using UniGame.StaticEcs.Unity;
     using UnityEngine;
@@ -16,45 +17,45 @@ namespace UniGame.StaticEcs.Features.Tests
         private AbilityCastSystem<TestAbilityWorld> _castSystem;
         private AbilityWaitSystem<TestAbilityWorld> _waitSystem;
         private AbilityStepProgressionSystem<TestAbilityWorld> _progressionSystem;
+        private StaticEcsTestWorld<TestAbilityWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
-            World<TestAbilityWorld>.Create(WorldConfig.Default());
-            new EcsTimeFeature<TestAbilityWorld>(registerFixed: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            _world = new StaticEcsTestWorld<TestAbilityWorld>();
+            new EcsTimeFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new TargetSelectionFeature<TestAbilityWorld>(
-                registerRebuildSystem: false
-            ).RegisterTypes(World<TestAbilityWorld>.Types());
-            new DamageFeature<TestAbilityWorld>(registerApplySystem: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new TargetSelectionFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world);
+            new DamageFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            new AbilityFeature<TestAbilityWorld>(registerSystems: false).RegisterTypes(
-                World<TestAbilityWorld>.Types()
+            new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
+                _world
             );
-            World<TestAbilityWorld>.Types().Component<TransformComponent>();
-            World<TestAbilityWorld>.Initialize();
+            _world.Types.Component<TransformComponent>();
+            _world.Initialize();
 
             _castSystem = new AbilityCastSystem<TestAbilityWorld>();
             _waitSystem = new AbilityWaitSystem<TestAbilityWorld>();
             _progressionSystem = new AbilityStepProgressionSystem<TestAbilityWorld>();
             _castSystem.Init();
+            _progressionSystem.Init();
         }
 
         [TearDown]
         public void TearDown()
         {
+            _world?.TerminateLifeTime();
+            _progressionSystem.Destroy();
             _castSystem.Destroy();
             foreach (var go in _objects)
             {
                 Object.DestroyImmediate(go);
             }
             _objects.Clear();
-            if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
-            {
-                World<TestAbilityWorld>.Destroy();
-            }
+            _world?.Dispose();
         }
 
         [Test]
