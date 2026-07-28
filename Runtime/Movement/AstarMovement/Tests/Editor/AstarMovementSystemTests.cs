@@ -65,13 +65,9 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
             _world?.Dispose();
 
             if (_host != null)
-            {
                 Object.DestroyImmediate(_host);
-            }
             if (_graphHost != null)
-            {
                 Object.DestroyImmediate(_graphHost);
-            }
         }
 
         [Test]

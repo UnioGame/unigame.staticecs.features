@@ -26,8 +26,7 @@ namespace UniGame.StaticEcs.Features.Tests
             new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            World<TestEffectsWorld>.SetResource<
-                IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
+            World<TestEffectsWorld>.SetResource<IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
             var config = new EffectConfig<TestEffectsWorld, TestEffectMarker>(
                 maxStacks: 3,
                 refreshOnReapply: true,
@@ -55,9 +54,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void Apply_AddsComponentAndRoster_RaisesAppliedEvent()
         {
-            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<
-                EffectAppliedEvent<TestEffectMarker>
-            >();
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectAppliedEvent<TestEffectMarker>>();
             try
             {
                 var source = World<TestEffectsWorld>.NewEntity<Default>();
@@ -99,9 +96,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void Remove_DeletesComponentAndRoster_RaisesRemovedEvent()
         {
-            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<
-                EffectRemovedEvent<TestEffectMarker>
-            >();
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectRemovedEvent<TestEffectMarker>>();
             try
             {
                 var source = World<TestEffectsWorld>.NewEntity<Default>();
@@ -139,9 +134,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void Tick_WithoutPeriod_DoesNotInvokeHandler_AndExpiresOnTimeOut()
         {
-            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<
-                EffectRemovedEvent<TestEffectMarker>
-            >();
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectRemovedEvent<TestEffectMarker>>();
             try
             {
                 var source = World<TestEffectsWorld>.NewEntity<Default>();
@@ -165,9 +158,7 @@ namespace UniGame.StaticEcs.Features.Tests
                 foreach (var e in receiver)
                 {
                     if (e.Value.Expired)
-                    {
                         expiredFound = true;
-                    }
                 }
 
                 Assert.IsTrue(expiredFound);
@@ -204,9 +195,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void DelayedApply_ActivatesAfterDelayWithoutConsumingDuration()
         {
-            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<
-                EffectAppliedEvent<TestEffectMarker>
-            >();
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectAppliedEvent<TestEffectMarker>>();
             try
             {
                 var source = World<TestEffectsWorld>.NewEntity<Default>();

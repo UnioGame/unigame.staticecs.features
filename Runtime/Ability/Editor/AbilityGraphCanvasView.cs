@@ -49,17 +49,11 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             foreach (var port in ports)
             {
                 if (port == startPort)
-                {
                     continue;
-                }
                 if (port.node == startPort.node)
-                {
                     continue;
-                }
                 if (port.direction == startPort.direction)
-                {
                     continue;
-                }
                 result.Add(port);
             }
             return result;
@@ -138,24 +132,16 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             {
                 var edge = _projection.Edges[i];
                 if (!nodesById.TryGetValue(edge.FromId, out var outputNode))
-                {
                     continue;
-                }
 
                 if (!nodesById.TryGetValue(edge.ToId, out var inputNode))
-                {
                     continue;
-                }
 
                 if (!outputNode.TryGetOutputPort(edge.Label, out var outputPort))
-                {
                     continue;
-                }
 
                 if (inputNode.InputPort == null)
-                {
                     continue;
-                }
 
                 var viewEdge = outputPort.ConnectTo(inputNode.InputPort);
                 viewEdge.capabilities = Capabilities.Selectable;
@@ -173,14 +159,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void OnKeyDown(KeyDownEvent evt)
         {
             if (evt.keyCode != KeyCode.Delete && evt.keyCode != KeyCode.Backspace)
-            {
                 return;
-            }
 
             if (_asset == null || selection.Count == 0)
-            {
                 return;
-            }
 
             DeleteSelectedElements();
             evt.StopPropagation();
@@ -200,15 +182,12 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                             nodeView.ProjectionNode.Config
                         )
                     )
-                    {
                         changed = true;
-                    }
                 }
                 else if (
                     selection[i] is Edge edge
                     && edge.output?.node is AbilityGraphNodeView outputNode
                 )
-                {
                     if (
                         AbilityGraphAssetEditing.DisconnectPort(
                             _asset,
@@ -216,10 +195,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                             edge.output.portName
                         )
                     )
-                    {
                         changed = true;
-                    }
-                }
             }
 
             if (changed)
@@ -236,9 +212,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void OnBackgroundMouseDown(MouseDownEvent evt)
         {
             if (evt.button != 0)
-            {
                 return;
-            }
 
             if (evt.target == this || evt.target is GridBackground)
             {
@@ -268,9 +242,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             while (element != null)
             {
                 if (element is TElement match)
-                {
                     return match;
-                }
 
                 element = element.parent;
             }
@@ -281,17 +253,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private AbilityGraphProjection.Node FindNodeById(string nodeId)
         {
             if (string.IsNullOrWhiteSpace(nodeId) || _projection == null)
-            {
                 return null;
-            }
 
             for (var i = 0; i < _projection.Nodes.Count; i++)
             {
                 var node = _projection.Nodes[i];
                 if (string.Equals(node.Id, nodeId, StringComparison.Ordinal))
-                {
                     return node;
-                }
             }
 
             return null;
@@ -300,9 +268,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private GraphViewChange OnGraphViewChanged(GraphViewChange change)
         {
             if (_asset == null)
-            {
                 return change;
-            }
 
             var needsRefresh = false;
 
@@ -317,7 +283,6 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (change.elementsToRemove != null && change.elementsToRemove.Count > 0)
-            {
                 for (var i = 0; i < change.elementsToRemove.Count; i++)
                 {
                     if (change.elementsToRemove[i] is Edge removedEdge)
@@ -326,7 +291,6 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         needsRefresh = true;
                     }
                 }
-            }
 
             if (needsRefresh && _requestRefresh != null)
             {
@@ -344,14 +308,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void HandleEdgeAdded(Edge edge)
         {
             if (edge.output?.node is not AbilityGraphNodeView outputNodeView)
-            {
                 return;
-            }
 
             if (edge.input?.node is not AbilityGraphNodeView inputNodeView)
-            {
                 return;
-            }
 
             AbilityGraphAssetEditing.ConnectPort(
                 _asset,
@@ -364,9 +324,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void HandleEdgeRemoved(Edge edge)
         {
             if (edge.output?.node is not AbilityGraphNodeView outputNodeView)
-            {
                 return;
-            }
 
             AbilityGraphAssetEditing.DisconnectPort(
                 _asset,

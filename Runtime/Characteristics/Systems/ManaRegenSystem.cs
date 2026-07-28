@@ -10,9 +10,7 @@ namespace UniGame.StaticEcs.Features
         {
             var dt = World<TWorld>.GetResource<EcsTime>().DeltaTime;
             if (dt <= 0f)
-            {
                 return;
-            }
 
             foreach (
                 var entity in World<TWorld>
@@ -22,9 +20,7 @@ namespace UniGame.StaticEcs.Features
             {
                 ref readonly var regen = ref entity.Read<ManaRegenComponent>();
                 if (regen.Rate == 0f)
-                {
                     continue;
-                }
 
                 ref var mana = ref entity.Mut<CharacteristicComponent<ManaCharacteristic>>();
                 CharacteristicOperations.AddValue<TWorld, ManaCharacteristic>(

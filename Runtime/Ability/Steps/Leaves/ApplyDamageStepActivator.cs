@@ -18,9 +18,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (config.Amount <= 0f)
-            {
                 return StepStatus.Success;
-            }
 
             switch (config.Mode)
             {
@@ -41,13 +39,9 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity))
-            {
                 return StepStatus.Failed;
-            }
             if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
-            {
                 return StepStatus.Success;
-            }
 
             ref readonly var entries =
                 ref castEntity.Read<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
@@ -55,9 +49,7 @@ namespace UniGame.StaticEcs.Features
             {
                 var target = entries.Get(i).Target;
                 if (config.ExcludeCaster && target.Equals(ctx.Caster))
-                {
                     continue;
-                }
                 Raise(config, ctx.Caster, target);
             }
 
@@ -71,18 +63,12 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!target.TryUnpack<TWorld>(out _))
-            {
                 return StepStatus.Failed;
-            }
 
             if (config.Type == DamageType.Healing)
-            {
                 DamageOperations.RaiseHealing<TWorld>(source, target, config.Amount);
-            }
             else
-            {
                 DamageOperations.RaiseDamage<TWorld>(source, target, config.Amount, config.Type);
-            }
 
             return StepStatus.Success;
         }

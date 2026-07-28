@@ -75,13 +75,8 @@ namespace UniGame.StaticEcs.Features
             }
 
             ref var config = ref World<TWorld>.GetResource<AbilityConfig>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (!updateEnabled || !config.RegisterSystems)
-            {
+            if (!config.RegisterSystems)
                 return UniTask.CompletedTask;
-            }
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new AbilityCastSystem<TWorld>(),
                 config.CastOrder);

@@ -43,10 +43,7 @@ namespace UniGame.StaticEcs.Features
                 CharacteristicModifierOp.Add,
                 5f
             );
-            CharacteristicModifierExtensions.RemoveModifiersFromSource<
-                TestModifierWorld,
-                SpeedCharacteristic
-            >(target.GID, source.GID);
+            CharacteristicModifierExtensions.RemoveModifiersFromSource<TestModifierWorld, SpeedCharacteristic>(target.GID, source.GID);
 
             Assert.AreEqual(10f, target.Read<CharacteristicComponent<SpeedCharacteristic>>().Value);
         }
@@ -133,10 +130,7 @@ namespace UniGame.StaticEcs.Features
                 3f
             );
 
-            var removed = CharacteristicModifierExtensions.RemoveModifiersFromSource<
-                TestModifierWorld,
-                SpeedCharacteristic
-            >(target.GID, sourceA.GID);
+            var removed = CharacteristicModifierExtensions.RemoveModifiersFromSource<TestModifierWorld, SpeedCharacteristic>(target.GID, sourceA.GID);
 
             Assert.AreEqual(1, removed);
             Assert.AreEqual(13f, target.Read<CharacteristicComponent<SpeedCharacteristic>>().Value);

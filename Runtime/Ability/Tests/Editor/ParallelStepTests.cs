@@ -105,9 +105,7 @@ namespace UniGame.StaticEcs.Features.Tests
                 foreach (var e in receiver)
                 {
                     if (e.Value.CastEntity.Equals(parentCast))
-                    {
                         parentReason = e.Value.Reason;
-                    }
                 }
 
                 Assert.AreEqual(AbilityCompletedReason.Cancelled, parentReason);

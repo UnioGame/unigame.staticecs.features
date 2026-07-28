@@ -9,9 +9,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         public static bool ReplaceRoot(AbilityAsset asset, AbilityGraphNodeTypeRegistry.Entry entry)
         {
             if (!TryCreateNode(entry, out var node))
-            {
                 return false;
-            }
 
             Undo.RecordObject(asset, "Replace Ability Root Node");
 
@@ -34,9 +32,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (!TryCreateNode(entry, out var node))
-            {
                 return false;
-            }
 
             var serializedObject = new SerializedObject(asset);
             serializedObject.Update();
@@ -44,15 +40,11 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             var rootProperty = serializedObject.FindProperty("_root");
             var parentProperty = FindManagedReferenceProperty(rootProperty, parentNode);
             if (parentProperty == null)
-            {
                 return false;
-            }
 
             var listProperty = parentProperty.FindPropertyRelative(listFieldName);
             if (listProperty == null || !listProperty.isArray)
-            {
                 return false;
-            }
 
             Undo.RecordObject(asset, "Add Ability Graph Child Node");
             var index = listProperty.arraySize;
@@ -73,9 +65,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (!TryCreateNode(entry, out var node))
-            {
                 return false;
-            }
 
             var serializedObject = new SerializedObject(asset);
             serializedObject.Update();
@@ -83,15 +73,11 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             var rootProperty = serializedObject.FindProperty("_root");
             var parentProperty = FindManagedReferenceProperty(rootProperty, parentNode);
             if (parentProperty == null)
-            {
                 return false;
-            }
 
             var childProperty = parentProperty.FindPropertyRelative(childFieldName);
             if (childProperty == null)
-            {
                 return false;
-            }
 
             Undo.RecordObject(asset, "Assign Ability Graph Child Node");
             childProperty.managedReferenceValue = node;
@@ -104,18 +90,14 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         public static bool RemoveNodeReference(AbilityAsset asset, IAbilityStepConfig targetNode)
         {
             if (asset == null || targetNode == null)
-            {
                 return false;
-            }
 
             var serializedObject = new SerializedObject(asset);
             serializedObject.Update();
 
             var rootProperty = serializedObject.FindProperty("_root");
             if (rootProperty == null)
-            {
                 return false;
-            }
 
             if (ReferenceEquals(rootProperty.managedReferenceValue, targetNode))
             {
@@ -135,9 +117,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                     out var elementIndex
                 )
             )
-            {
                 return false;
-            }
 
             Undo.RecordObject(asset, "Remove Ability Graph Node");
             if (listProperty != null && elementIndex >= 0)
@@ -150,15 +130,11 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         candidate.propertyType == SerializedPropertyType.ManagedReference
                         && candidate.managedReferenceValue == null
                     )
-                    {
                         listProperty.DeleteArrayElementAtIndex(elementIndex);
-                    }
                 }
             }
             else
-            {
                 referenceProperty.managedReferenceValue = null;
-            }
 
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(asset);
@@ -173,9 +149,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (asset == null || parentConfig == null || childConfig == null)
-            {
                 return false;
-            }
 
             var serializedObject = new SerializedObject(asset);
             serializedObject.Update();
@@ -183,9 +157,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             var rootProperty = serializedObject.FindProperty("_root");
             var parentProperty = FindManagedReferenceProperty(rootProperty, parentConfig);
             if (parentProperty == null)
-            {
                 return false;
-            }
 
             if (
                 !TryResolvePortField(
@@ -195,26 +167,20 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                     out var arrayIndex
                 )
             )
-            {
                 return false;
-            }
 
             Undo.RecordObject(asset, "Connect Ability Graph Nodes");
 
             if (arrayIndex >= 0)
             {
                 if (arrayIndex >= targetProperty.arraySize)
-                {
                     return false;
-                }
 
                 targetProperty.GetArrayElementAtIndex(arrayIndex).managedReferenceValue =
                     childConfig;
             }
             else
-            {
                 targetProperty.managedReferenceValue = childConfig;
-            }
 
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(asset);
@@ -228,9 +194,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (asset == null || parentConfig == null)
-            {
                 return false;
-            }
 
             var serializedObject = new SerializedObject(asset);
             serializedObject.Update();
@@ -238,9 +202,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             var rootProperty = serializedObject.FindProperty("_root");
             var parentProperty = FindManagedReferenceProperty(rootProperty, parentConfig);
             if (parentProperty == null)
-            {
                 return false;
-            }
 
             if (
                 !TryResolvePortField(
@@ -250,25 +212,19 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                     out var arrayIndex
                 )
             )
-            {
                 return false;
-            }
 
             Undo.RecordObject(asset, "Disconnect Ability Graph Nodes");
 
             if (arrayIndex >= 0)
             {
                 if (arrayIndex >= targetProperty.arraySize)
-                {
                     return false;
-                }
 
                 targetProperty.GetArrayElementAtIndex(arrayIndex).managedReferenceValue = null;
             }
             else
-            {
                 targetProperty.managedReferenceValue = null;
-            }
 
             serializedObject.ApplyModifiedProperties();
             EditorUtility.SetDirty(asset);
@@ -307,32 +263,20 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 index = branchIdx - 1;
             }
             else if (portLabel == "True")
-            {
                 fieldName = "_ifTrue";
-            }
             else if (portLabel == "False")
-            {
                 fieldName = "_ifFalse";
-            }
             else if (portLabel == "Body")
-            {
                 fieldName = "_body";
-            }
             else
-            {
                 return false;
-            }
 
             property = parentProperty.FindPropertyRelative(fieldName);
             if (property == null)
-            {
                 return false;
-            }
 
             if (index >= 0 && !property.isArray)
-            {
                 return false;
-            }
 
             arrayIndex = index;
             return true;
@@ -344,17 +288,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (property == null || target == null)
-            {
                 return null;
-            }
 
             if (
                 property.propertyType == SerializedPropertyType.ManagedReference
                 && ReferenceEquals(property.managedReferenceValue, target)
             )
-            {
                 return property.Copy();
-            }
 
             var iterator = property.Copy();
             var end = iterator.GetEndProperty();
@@ -368,9 +308,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                     iterator.propertyType == SerializedPropertyType.ManagedReference
                     && ReferenceEquals(iterator.managedReferenceValue, target)
                 )
-                {
                     return iterator.Copy();
-                }
 
                 enterChildren = true;
             }
@@ -391,9 +329,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             elementIndex = -1;
 
             if (property == null || target == null)
-            {
                 return false;
-            }
 
             var iterator = property.Copy();
             var end = iterator.GetEndProperty();
@@ -443,16 +379,12 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             var arrayMarker = ".Array.data[";
             var markerIndex = propertyPath.LastIndexOf(arrayMarker, StringComparison.Ordinal);
             if (markerIndex < 0)
-            {
                 return false;
-            }
 
             var indexStart = markerIndex + arrayMarker.Length;
             var indexEnd = propertyPath.IndexOf(']', indexStart);
             if (indexEnd <= indexStart)
-            {
                 return false;
-            }
 
             var arrayPath = propertyPath.Substring(0, markerIndex);
             if (!int.TryParse(propertyPath.Substring(indexStart, indexEnd - indexStart), out index))
@@ -472,9 +404,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             node = null;
             if (entry?.Type == null)
-            {
                 return false;
-            }
 
             var instance = Activator.CreateInstance(entry.Type);
             if (instance is not IAbilityStepConfig createdNode)

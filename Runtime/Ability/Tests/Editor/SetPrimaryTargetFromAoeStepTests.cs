@@ -170,9 +170,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var entity = World<TestAbilityWorld>.NewEntity<Default>();
             entity.Set(new TransformComponent { Transform = go.transform });
             if (targetable)
-            {
                 entity.Set<TargetableTag>();
-            }
             return entity;
         }
 

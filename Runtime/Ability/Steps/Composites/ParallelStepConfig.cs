@@ -38,9 +38,7 @@ namespace UniGame.StaticEcs.Features
             _joinPolicy = joinPolicy;
             _cancelRemainingOnJoin = cancelRemainingOnJoin;
             if (children != null)
-            {
                 _children = new List<IAbilityStepConfig>(children);
-            }
         }
 
         public AbilityStepKind Kind => AbilityStepKind.Parallel;

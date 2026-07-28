@@ -55,9 +55,7 @@ namespace UniGame.StaticEcs.Features
         public AbilityDefinition GetDefinition(AbilityId id)
         {
             if (_entries.TryGetValue(id.Value, out var entry))
-            {
                 return entry.Definition;
-            }
             throw new InvalidOperationException(
                 $"AbilityRegistry<{typeof(TWorld).Name}>: ability {id} is not registered."
             );
@@ -66,9 +64,7 @@ namespace UniGame.StaticEcs.Features
         public IAbilityStepConfig GetRoot(AbilityId id)
         {
             if (_entries.TryGetValue(id.Value, out var entry))
-            {
                 return entry.Root;
-            }
             throw new InvalidOperationException(
                 $"AbilityRegistry<{typeof(TWorld).Name}>: ability {id} is not registered."
             );

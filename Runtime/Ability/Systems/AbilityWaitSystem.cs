@@ -16,18 +16,14 @@ namespace UniGame.StaticEcs.Features
         {
             var dt = World<TWorld>.GetResource<EcsTime>().DeltaTime;
             if (dt <= 0f)
-            {
                 return;
-            }
 
             foreach (var entity in World<TWorld>.Query<All<AbilityWaitComponent>>().Entities())
             {
                 ref var state = ref entity.Mut<AbilityWaitComponent>();
                 state.TimeLeft -= dt;
                 if (state.TimeLeft > 0f)
-                {
                     continue;
-                }
 
                 entity.Delete<AbilityWaitComponent>();
                 entity.Set(new AbilityStepStatusComponent { Status = StepStatus.Success });

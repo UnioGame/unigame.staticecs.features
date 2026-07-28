@@ -16,23 +16,17 @@ namespace UniGame.StaticEcs.Features
         public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (!entity.Has<ModificationEffectComponent<TStat>>())
-            {
                 return;
-            }
 
             var data = entity.Read<ModificationEffectComponent<TStat>>();
             if (previousStacks > 0)
-            {
                 CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TStat>(
                     target,
                     source
                 );
-            }
 
             CharacteristicModifierExtensions.ApplyModifier<TWorld, TStat>(
                 target,

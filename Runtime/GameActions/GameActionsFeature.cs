@@ -47,15 +47,10 @@ namespace UniGame.StaticEcs.Features
             }
 
             ref var config = ref World<TWorld>.GetResource<GameActionsConfig>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (updateEnabled && config.RegisterMaintenance)
-            {
+            if (config.RegisterMaintenance)
                 World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                     new ActionMaskMaintenanceSystem<TWorld>(),
                     config.MaintenanceOrder);
-            }
 
             return UniTask.CompletedTask;
         }

@@ -14,14 +14,10 @@ namespace UniGame.StaticEcs.Features
         public bool RollChance(float chance01)
         {
             if (chance01 <= 0f)
-            {
                 return false;
-            }
 
             if (chance01 >= 1f)
-            {
                 return true;
-            }
 
             return UnityEngine.Random.value < chance01;
         }

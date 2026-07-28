@@ -36,14 +36,8 @@ namespace UniGame.StaticEcs.Features.Tests
             new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            new CharacteristicFeature<
-                TestDamageWorld,
-                CriticalChanceCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestDamageWorld,
-                CriticalMultiplierCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestDamageWorld, CriticalChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestDamageWorld, CriticalMultiplierCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
             new DamageFeature<TestDamageWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );

@@ -3,7 +3,8 @@
 ## Capabilities
 
 This package provides feature-first gameplay families for Characteristics, Stun,
-Damage, Effects, Target Selection, Movement, Game Actions, and Ability execution.
+Damage, Effects, Target Selection, Movement, Game Actions, Ability execution,
+and View System presentation.
 Each family owns its ECS data, resource contracts, systems, Unity authoring, and
 focused tests.
 
@@ -21,7 +22,11 @@ Compose feature assets in dependency order:
 3. Target Selection and Movement;
 4. Damage and Effects;
 5. Game Actions and Ability;
-6. Ability Database.
+6. Ability Database;
+7. View Feature before game-owned presentation features.
+
+See the [View Feature README](Runtime/View/README.md) for typed view-model
+synchronization, placement, hierarchy, and View System configuration.
 
 The C# feature owns serialized configuration, resources, dependencies, and
 systems. Its asset is a declarative adapter:

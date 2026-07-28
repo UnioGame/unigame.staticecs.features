@@ -149,9 +149,7 @@ namespace UniGame.StaticEcs.Features.Tests
                 foreach (var e in stepReceiver)
                 {
                     if (e.Value.Kind == AbilityStepKind.Wait)
-                    {
                         stepCompletions++;
-                    }
                 }
                 Assert.AreEqual(3, stepCompletions);
 
@@ -195,9 +193,7 @@ namespace UniGame.StaticEcs.Features.Tests
                 foreach (var e in receiver)
                 {
                     if (e.Value.Reason == AbilityCompletedReason.Cancelled)
-                    {
                         cancelled++;
-                    }
                 }
                 Assert.AreEqual(1, cancelled);
             }

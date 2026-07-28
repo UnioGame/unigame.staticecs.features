@@ -23,9 +23,7 @@ namespace UniGame.StaticEcs.Features
         {
             var key = typeof(TEffect);
             if (_byType.TryGetValue(key, out var id))
-            {
                 return id;
-            }
 
             id = new EffectId(_next++);
             _byType[key] = id;

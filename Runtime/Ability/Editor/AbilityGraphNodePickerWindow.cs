@@ -49,9 +49,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 );
 
                 if (GUILayout.Button("Close", EditorStyles.toolbarButton, GUILayout.Width(60f)))
-                {
                     Close();
-                }
             }
         }
 
@@ -72,9 +70,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             {
                 var entry = _entries[i];
                 if (!MatchesFilter(entry))
-                {
                     continue;
-                }
 
                 shown++;
                 if (
@@ -105,20 +101,16 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (shown == 0)
-            {
                 EditorGUILayout.HelpBox(
                     "No node types match the current filter.",
                     MessageType.Info
                 );
-            }
         }
 
         private bool MatchesFilter(AbilityGraphNodeTypeRegistry.Entry entry)
         {
             if (string.IsNullOrWhiteSpace(_filter))
-            {
                 return true;
-            }
 
             return entry.SearchText.IndexOf(
                     _filter.Trim().ToLowerInvariant(),

@@ -181,9 +181,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var entity = World<TestGameActionsWorld>.NewEntity<Default>();
             entity.Set(ActionMaskComponent.AllDisabled);
 
-            var receiver = World<TestGameActionsWorld>.RegisterEventReceiver<
-                GameActionEvent<JumpAction>
-            >();
+            var receiver = World<TestGameActionsWorld>.RegisterEventReceiver<GameActionEvent<JumpAction>>();
 
             GameActionOperations.Raise<TestGameActionsWorld, JumpAction>(
                 entity.GID,
@@ -206,9 +204,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var entity = World<TestGameActionsWorld>.NewEntity<Default>();
             entity.Set(ActionMaskComponent.AllEnabled);
 
-            var receiver = World<TestGameActionsWorld>.RegisterEventReceiver<
-                GameActionEvent<JumpAction>
-            >();
+            var receiver = World<TestGameActionsWorld>.RegisterEventReceiver<GameActionEvent<JumpAction>>();
 
             GameActionOperations.Raise<TestGameActionsWorld, JumpAction>(
                 entity.GID,
@@ -233,9 +229,7 @@ namespace UniGame.StaticEcs.Features.Tests
         public void Raise_EntityWithoutMask_SendsEvent()
         {
             var entity = World<TestGameActionsWorld>.NewEntity<Default>();
-            var receiver = World<TestGameActionsWorld>.RegisterEventReceiver<
-                GameActionEvent<JumpAction>
-            >();
+            var receiver = World<TestGameActionsWorld>.RegisterEventReceiver<GameActionEvent<JumpAction>>();
 
             GameActionOperations.Raise<TestGameActionsWorld, JumpAction>(
                 entity.GID,

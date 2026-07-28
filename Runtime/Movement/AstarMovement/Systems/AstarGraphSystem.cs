@@ -20,9 +20,7 @@ namespace UniGame.StaticEcs.Features
             InitializeGraphs();
 
             if (RequiresPhysicsSync())
-            {
                 Physics.SyncTransforms();
-            }
 
             UpdateObstacles();
             FlushGraphUpdates();
@@ -40,9 +38,7 @@ namespace UniGame.StaticEcs.Features
                 ref var runtime = ref entity.Mut<AstarGridGraphComponent>();
                 var backend = entity.Read<AstarPathComponent>().Backend;
                 if (backend != null && runtime.Graph != null)
-                {
                     backend.data.RemoveGraph(runtime.Graph);
-                }
 
                 runtime.Graph = null;
             }
@@ -52,25 +48,19 @@ namespace UniGame.StaticEcs.Features
 
         private static void InitializeGraphs()
         {
+            var filter = default(And<All<AstarPathComponent, AstarGridGraphConfigComponent>,
+                None<AstarGraphInitializedTag, AstarGraphInitializationFailedTag>>);
+
             foreach (
-                var entity in World<TWorld>
-                    .Query<
-                        All<AstarPathComponent, AstarGridGraphConfigComponent>,
-                        None<AstarGraphInitializedTag, AstarGraphInitializationFailedTag>
-                    >()
-                    .Entities()
+                var entity in World<TWorld>.Query(filter).Entities()
             )
             {
                 var backend = entity.Read<AstarPathComponent>().Backend;
                 if (backend == null || backend.data == null)
-                {
                     continue;
-                }
 
                 if (AstarPath.active == null)
-                {
                     continue;
-                }
 
                 if (backend != AstarPath.active)
                 {
@@ -85,9 +75,7 @@ namespace UniGame.StaticEcs.Features
                 ref readonly var config = ref entity.Read<AstarGridGraphConfigComponent>();
                 var graph = backend.data.AddGraph(typeof(GridGraph)) as GridGraph;
                 if (graph == null)
-                {
                     continue;
-                }
 
                 graph.name = "StaticEcsGrid";
                 graph.center = config.Center;
@@ -111,9 +99,7 @@ namespace UniGame.StaticEcs.Features
                 {
                     nodeCount++;
                     if (node.Walkable)
-                    {
                         walkableNodeCount++;
-                    }
                 });
 
                 entity.Set(
@@ -149,14 +135,10 @@ namespace UniGame.StaticEcs.Features
                 ref readonly var obstacle = ref entity.Read<AstarObstacleComponent>();
                 var collider = obstacle.Collider;
                 if (collider == null || !obstacle.HasSnapshot)
-                {
                     continue;
-                }
 
                 if (collider.transform.localToWorldMatrix != obstacle.LastLocalToWorld)
-                {
                     return true;
-                }
             }
 
             return false;
@@ -171,17 +153,13 @@ namespace UniGame.StaticEcs.Features
                     !obstacle.GraphEntity.TryUnpack<TWorld>(out _)
                     && obstacle.GraphProvider != null
                 )
-                {
                     obstacle.GraphEntity = obstacle.GraphProvider.EntityGid;
-                }
 
                 if (
                     !obstacle.GraphEntity.TryUnpack<TWorld>(out var graphEntity)
                     || !graphEntity.Has<AstarGraphInitializedTag>()
                 )
-                {
                     continue;
-                }
 
                 var collider = obstacle.Collider;
                 var isActive =
@@ -199,9 +177,7 @@ namespace UniGame.StaticEcs.Features
                     obstacle.LastLocalToWorld = currentMatrix;
                     obstacle.LastBounds = currentBounds;
                     if (isActive)
-                    {
                         QueueUpdate(obstacle.GraphEntity, currentBounds);
-                    }
                     continue;
                 }
 
@@ -209,18 +185,12 @@ namespace UniGame.StaticEcs.Features
                 var transformChanged = currentMatrix != obstacle.LastLocalToWorld;
                 var boundsChanged = isActive && BoundsChanged(obstacle.LastBounds, currentBounds);
                 if (!stateChanged && !transformChanged && !boundsChanged)
-                {
                     continue;
-                }
 
                 if (obstacle.WasActive)
-                {
                     QueueUpdate(obstacle.GraphEntity, obstacle.LastBounds);
-                }
                 if (isActive)
-                {
                     QueueUpdate(obstacle.GraphEntity, currentBounds);
-                }
 
                 obstacle.WasActive = isActive;
                 obstacle.LastLocalToWorld = currentMatrix;
@@ -241,9 +211,7 @@ namespace UniGame.StaticEcs.Features
                 || !entity.Has<AstarGridGraphConfigComponent>()
                 || !entity.Read<AstarGridGraphConfigComponent>().FlushGraphUpdates
             )
-            {
                 return;
-            }
 
             _backendsToFlush.Add(backend);
         }
@@ -253,9 +221,7 @@ namespace UniGame.StaticEcs.Features
             foreach (var backend in _backendsToFlush)
             {
                 if (backend != null)
-                {
                     backend.FlushGraphUpdates();
-                }
             }
 
             _backendsToFlush.Clear();

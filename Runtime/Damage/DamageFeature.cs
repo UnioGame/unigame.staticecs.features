@@ -61,13 +61,8 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.SetResource(chain);
             }
 
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (!updateEnabled || !config.RegisterApplySystem)
-            {
+            if (!config.RegisterApplySystem)
                 return UniTask.CompletedTask;
-            }
 
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new ApplyDamageSystem<TWorld>(),

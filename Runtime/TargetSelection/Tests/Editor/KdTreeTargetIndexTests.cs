@@ -32,9 +32,7 @@ namespace UniGame.StaticEcs.Features.Tests
                 foreach (var host in _hosts)
                 {
                     if (host != null)
-                    {
                         UnityEngine.Object.DestroyImmediate(host);
-                    }
                 }
                 _hosts = null;
             }
@@ -57,9 +55,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void FillSphere_ReturnsZero_WhenIndexEmpty()
         {
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[4];
@@ -73,9 +69,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var near = Spawn(new Vector3(1, 0, 0));
             var far = Spawn(new Vector3(10, 0, 0));
 
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
             Assert.AreEqual(3, index.Count);
 
@@ -100,9 +94,7 @@ namespace UniGame.StaticEcs.Features.Tests
             {
                 Spawn(new Vector3(i * 0.1f, 0, 0));
             }
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[3];
@@ -114,9 +106,7 @@ namespace UniGame.StaticEcs.Features.Tests
         public void FillNearestSphere_SupportsLargeCallerBuffer()
         {
             var expected = Spawn(Vector3.zero);
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             var buffer = new EntityGID[1024];
@@ -132,9 +122,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var farther = Spawn(new Vector3(3f, 0f, 0f));
             var nearest = Spawn(new Vector3(1f, 0f, 0f));
             var middle = Spawn(new Vector3(2f, 0f, 0f));
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[2];
@@ -152,9 +140,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var excluded = Spawn(Vector3.zero);
             var first = Spawn(Vector3.right);
             var second = Spawn(Vector3.right * 2f);
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[2];
@@ -170,9 +156,7 @@ namespace UniGame.StaticEcs.Features.Tests
         {
             var first = Spawn(Vector3.left);
             var second = Spawn(Vector3.right);
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[2];
@@ -189,9 +173,7 @@ namespace UniGame.StaticEcs.Features.Tests
         public void Rebuild_ReflectsLatestPositions()
         {
             var moving = Spawn(new Vector3(10, 0, 0));
-            var index = World<TestTargetIndexWorld>.GetResource<
-                ITargetIndex<TestTargetIndexWorld>
-            >();
+            var index = World<TestTargetIndexWorld>.GetResource<ITargetIndex<TestTargetIndexWorld>>();
             index.Rebuild();
 
             Span<EntityGID> buffer = stackalloc EntityGID[4];

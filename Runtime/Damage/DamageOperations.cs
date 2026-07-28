@@ -21,9 +21,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
-            {
                 return false;
-            }
 
             return World<TWorld>.SendEvent(
                 new IncomingDamageEvent
@@ -41,9 +39,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
-            {
                 return false;
-            }
 
             return World<TWorld>.SendEvent(
                 new IncomingDamageEvent

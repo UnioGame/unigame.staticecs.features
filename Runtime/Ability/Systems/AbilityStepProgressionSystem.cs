@@ -20,20 +20,14 @@ namespace UniGame.StaticEcs.Features
         public void Update()
         {
             if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>())
-            {
                 return;
-            }
             if (!World<TWorld>.HasResource<AbilityStepActivatorRegistry<TWorld>>())
-            {
                 return;
-            }
 
             ProcessBranchCompletedEvents();
             CollectReadyCasts();
             if (_readyBuffer.Count == 0)
-            {
                 return;
-            }
 
             var registry = World<TWorld>.GetResource<AbilityRegistry<TWorld>>();
             var activators = World<TWorld>.GetResource<AbilityStepActivatorRegistry<TWorld>>();
@@ -57,38 +51,26 @@ namespace UniGame.StaticEcs.Features
         private void ProcessBranchCompletedEvents()
         {
             if (!_branchReceiverInitialized)
-            {
                 return;
-            }
 
             foreach (var e in _branchReceiver)
             {
                 var ev = e.Value;
                 if (!ev.ParentCast.TryUnpack<TWorld>(out var parent))
-                {
                     continue;
-                }
                 if (!parent.Has<AbilityParallelWaitingTag>())
-                {
                     continue;
-                }
                 if (!parent.Has<World<TWorld>.Multi<AbilityBranchComponent>>())
-                {
                     continue;
-                }
                 if (!parent.Has<World<TWorld>.Multi<AbilityStackComponent>>())
-                {
                     continue;
-                }
 
                 ref var branches = ref parent.Ref<World<TWorld>.Multi<AbilityBranchComponent>>();
                 var branchFound = false;
                 for (var i = 0; i < branches.Length; i++)
                 {
                     if (!branches[i].BranchCast.Equals(ev.BranchCast) || branches[i].Completed)
-                    {
                         continue;
-                    }
 
                     branches[i].Completed = true;
                     branches[i].Status = ev.Status;
@@ -97,42 +79,28 @@ namespace UniGame.StaticEcs.Features
                 }
 
                 if (!branchFound)
-                {
                     continue;
-                }
 
                 ref var frames = ref parent.Ref<World<TWorld>.Multi<AbilityStackComponent>>();
                 if (frames.Length == 0)
-                {
                     continue;
-                }
 
                 var topIndex = frames.Length - 1;
                 ref var top = ref frames[topIndex];
                 if (top.Kind != AbilityStepKind.Parallel)
-                {
                     continue;
-                }
 
                 if (ev.Status == StepStatus.Success)
-                {
                     top.SuccessCount++;
-                }
                 else
-                {
                     top.FailedCount++;
-                }
 
                 var parallel = (ParallelStepConfig)top.Composite;
                 if (!TryResolveParallelJoin(in top, parallel, out var status))
-                {
                     continue;
-                }
 
                 if (parallel.CancelRemainingOnJoin)
-                {
                     CancelRemainingBranches(in branches);
-                }
 
                 parent.Delete<AbilityParallelWaitingTag>();
                 parent.Set(new AbilityStepStatusComponent { Status = status });
@@ -185,15 +153,11 @@ namespace UniGame.StaticEcs.Features
             for (var i = 0; i < branches.Length; i++)
             {
                 if (branches[i].Completed)
-                {
                     continue;
-                }
                 if (branches[i].BranchCast.TryUnpack<TWorld>(out var branch))
-                {
                     AbilityCastTermination<TWorld>.TerminateSilently(
                         branch.GID,
                         AbilityCompletedReason.Cancelled);
-                }
             }
         }
 
@@ -217,30 +181,20 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!castGid.TryUnpack<TWorld>(out var castEntity))
-            {
                 return;
-            }
             if (!castEntity.Has<AbilityCastComponent>())
-            {
                 return;
-            }
             if (castEntity.Has<AbilityParallelWaitingTag>())
-            {
                 return;
-            }
 
             var status = castEntity.Has<AbilityStepStatusComponent>()
                 ? castEntity.Read<AbilityStepStatusComponent>().Status
                 : StepStatus.Success;
 
             if (castEntity.Has<AbilityStepStatusComponent>())
-            {
                 castEntity.Delete<AbilityStepStatusComponent>();
-            }
             if (castEntity.Has<AbilityStepReadyTag>())
-            {
                 castEntity.Delete<AbilityStepReadyTag>();
-            }
 
             CloseCurrentLeaf(castEntity, castGid, status);
 
@@ -259,9 +213,7 @@ namespace UniGame.StaticEcs.Features
                     return;
                 }
                 if (result.Kind == TraversalResultKind.RunningComposite)
-                {
                     return;
-                }
                 if (result.Kind == TraversalResultKind.NoOpSuccess)
                 {
                     status = StepStatus.Success;
@@ -312,9 +264,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!castEntity.Has<AbilityCurrentStepComponent>())
-            {
                 return;
-            }
 
             var leaf = castEntity.Read<AbilityCurrentStepComponent>().Config;
             castEntity.Delete<AbilityCurrentStepComponent>();
@@ -339,17 +289,13 @@ namespace UniGame.StaticEcs.Features
             }
 
             if (!castEntity.Has<World<TWorld>.Multi<AbilityStackComponent>>())
-            {
                 return TraversalResult.Complete();
-            }
 
             while (castEntity.Has<World<TWorld>.Multi<AbilityStackComponent>>())
             {
                 ref var frames = ref castEntity.Ref<World<TWorld>.Multi<AbilityStackComponent>>();
                 if (frames.Length == 0)
-                {
                     break;
-                }
 
                 var topIndex = frames.Length - 1;
                 ref var top = ref frames[topIndex];
@@ -387,9 +333,7 @@ namespace UniGame.StaticEcs.Features
                 {
                     frames.RemoveAtSwap(topIndex);
                     if (castEntity.Has<World<TWorld>.Multi<AbilityBranchComponent>>())
-                    {
                         castEntity.Delete<World<TWorld>.Multi<AbilityBranchComponent>>();
-                    }
                     continue;
                 }
 
@@ -406,9 +350,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (castEntity.Has<AbilityRootComponent>())
-            {
                 return castEntity.Read<AbilityRootComponent>().Root;
-            }
 
             return registry.TryGet(abilityId, out _, out var root) ? root : null;
         }
@@ -424,9 +366,7 @@ namespace UniGame.StaticEcs.Features
                 if (config is SequenceStepConfig sequence)
                 {
                     if (sequence.ChildCount == 0)
-                    {
                         return TraversalResult.NoOpSuccess();
-                    }
                     PushFrame(
                         castEntity,
                         new AbilityStackComponent
@@ -450,9 +390,7 @@ namespace UniGame.StaticEcs.Features
                     );
                     config = conditionResult ? conditional.IfTrue : conditional.IfFalse;
                     if (config == null)
-                    {
                         return TraversalResult.NoOpSuccess();
-                    }
                     continue;
                 }
 
@@ -463,9 +401,7 @@ namespace UniGame.StaticEcs.Features
                         || repeat.Body == null
                         || !ShouldRunRepeat(repeat, castEntity, castGid)
                     )
-                    {
                         return TraversalResult.NoOpSuccess();
-                    }
                     PushFrame(
                         castEntity,
                         new AbilityStackComponent
@@ -481,9 +417,7 @@ namespace UniGame.StaticEcs.Features
                 }
 
                 if (config is ParallelStepConfig parallel)
-                {
                     return StartParallel(parallel, castEntity, castGid);
-                }
 
                 return TraversalResult.NoOpSuccess();
             }
@@ -498,14 +432,10 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (parallel.ChildCount == 0)
-            {
                 return TraversalResult.NoOpSuccess();
-            }
 
             if (!castEntity.Has<World<TWorld>.Multi<AbilityBranchComponent>>())
-            {
                 castEntity.Add<World<TWorld>.Multi<AbilityBranchComponent>>();
-            }
 
             ref var branches = ref castEntity.Ref<World<TWorld>.Multi<AbilityBranchComponent>>();
             branches.Clear();
@@ -564,9 +494,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (condition == null)
-            {
                 return false;
-            }
 
             var runtime = castEntity.Read<AbilityCastComponent>();
             var ctx = new AbilityStepConditionContext<TWorld>(
@@ -597,9 +525,7 @@ namespace UniGame.StaticEcs.Features
         private static void PushFrame(World<TWorld>.Entity castEntity, AbilityStackComponent frame)
         {
             if (!castEntity.Has<World<TWorld>.Multi<AbilityStackComponent>>())
-            {
                 castEntity.Add<World<TWorld>.Multi<AbilityStackComponent>>();
-            }
             ref var frames = ref castEntity.Ref<World<TWorld>.Multi<AbilityStackComponent>>();
             frames.Add(frame);
         }
@@ -616,9 +542,7 @@ namespace UniGame.StaticEcs.Features
                 : 0f;
 
             if (!castEntity.Has<World<TWorld>.Multi<AbilityActiveStepComponent>>())
-            {
                 castEntity.Add<World<TWorld>.Multi<AbilityActiveStepComponent>>();
-            }
             ref var activeSteps =
                 ref castEntity.Ref<World<TWorld>.Multi<AbilityActiveStepComponent>>();
             activeSteps.Add(

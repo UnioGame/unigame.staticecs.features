@@ -41,13 +41,8 @@ namespace UniGame.StaticEcs.Features
             }
 
             ref var config = ref World<TWorld>.GetResource<TargetSelectionConfig>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (!updateEnabled || !config.RegisterRebuildSystem)
-            {
+            if (!config.RegisterRebuildSystem)
                 return UniTask.CompletedTask;
-            }
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new TargetIndexRebuildSystem<TWorld>(),
                 config.RebuildOrder);

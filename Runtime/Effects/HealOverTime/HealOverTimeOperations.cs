@@ -21,19 +21,13 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (healPerTick <= 0f || duration <= 0f || period <= 0f)
-            {
                 return false;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<HealOverTimeComponent>())
-            {
                 entity.Add<HealOverTimeComponent>();
-            }
 
             ref var data = ref entity.Ref<HealOverTimeComponent>();
             data.HealPerTick = healPerTick;

@@ -20,26 +20,18 @@ namespace UniGame.StaticEcs.Features
                 || config.MaxTargets <= 0
                 || config.MaxTargets > MaxStackTargets
             )
-            {
                 return StepStatus.Failed;
-            }
             if (
                 !ctx.Caster.TryUnpack<TWorld>(out var caster)
                 || !ctx.CastEntity.TryUnpack<TWorld>(out var castEntity)
             )
-            {
                 return StepStatus.Failed;
-            }
             if (!caster.Has<TransformComponent>())
-            {
                 return StepStatus.Failed;
-            }
 
             var binding = caster.Read<TransformComponent>();
             if (binding.Transform == null || !World<TWorld>.HasResource<ITargetIndex<TWorld>>())
-            {
                 return StepStatus.Failed;
-            }
 
             Span<EntityGID> buffer = stackalloc EntityGID[config.MaxTargets];
             var count = World<TWorld>
@@ -51,9 +43,7 @@ namespace UniGame.StaticEcs.Features
                     config.ExcludeCaster ? ctx.Caster : default);
 
             if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
-            {
                 castEntity.Add<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
-            }
 
             ref var entries = ref castEntity.Ref<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
             entries.Clear();

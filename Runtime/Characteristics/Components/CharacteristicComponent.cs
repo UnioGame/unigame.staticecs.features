@@ -15,9 +15,7 @@ namespace UniGame.StaticEcs.Features
         public CharacteristicComponent(float value, float minValue, float maxValue, float baseValue)
         {
             if (maxValue < minValue)
-            {
                 maxValue = minValue;
-            }
 
             MinValue = minValue;
             MaxValue = maxValue;
@@ -49,9 +47,7 @@ namespace UniGame.StaticEcs.Features
         {
             BaseValue = Clamp(value, MinValue, MaxValue);
             if (resetValue)
-            {
                 Value = BaseValue;
-            }
 
             return BaseValue;
         }
@@ -59,26 +55,20 @@ namespace UniGame.StaticEcs.Features
         public void SetLimits(float minValue, float maxValue, bool clampCurrent = true)
         {
             if (maxValue < minValue)
-            {
                 maxValue = minValue;
-            }
 
             MinValue = minValue;
             MaxValue = maxValue;
             BaseValue = Clamp(BaseValue, MinValue, MaxValue);
 
             if (clampCurrent)
-            {
                 Value = Clamp(Value, MinValue, MaxValue);
-            }
         }
 
         private static float Clamp(float value, float minValue, float maxValue)
         {
             if (value < minValue)
-            {
                 return minValue;
-            }
 
             return value > maxValue ? maxValue : value;
         }

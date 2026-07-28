@@ -17,9 +17,7 @@ namespace UniGame.StaticEcs.Features.Tests
             _world = new StaticEcsTestWorld<TestEffectsWorld>();
             var types = _world.Types;
             CharacteristicTypeRegistration.Register<TestEffectsWorld, SpeedCharacteristic>(types);
-            EffectTypeRegistration.Register<
-                TestEffectsWorld,
-                ModificationEffect<SpeedCharacteristic>>(types);
+            EffectTypeRegistration.Register<TestEffectsWorld, ModificationEffect<SpeedCharacteristic>>(types);
             types.Component<ModificationEffectComponent<SpeedCharacteristic>>();
 
             new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(

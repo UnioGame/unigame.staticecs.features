@@ -19,9 +19,7 @@ namespace UniGame.StaticEcs.Features
             where TConfig : class, IAbilityStepConfig
         {
             if (activator == null)
-            {
                 throw new ArgumentNullException(nameof(activator));
-            }
             _activators[typeof(TConfig)] = activator;
         }
 
@@ -33,9 +31,7 @@ namespace UniGame.StaticEcs.Features
         public IAbilityStepActivator<TWorld> Resolve(Type configType)
         {
             if (_activators.TryGetValue(configType, out var activator))
-            {
                 return activator;
-            }
             throw new InvalidOperationException(
                 $"AbilityStepActivatorRegistry<{typeof(TWorld).Name}>: no activator registered for {configType.Name}."
             );

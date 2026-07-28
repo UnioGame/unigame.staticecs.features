@@ -60,19 +60,15 @@ namespace UniGame.StaticEcs.Features
         {
             var attr = typeof(T).GetCustomAttribute<EffectFlagAttribute>();
             if (attr == null)
-            {
                 throw new InvalidOperationException(
                     $"{typeof(T).Name} must declare [EffectFlag(...)] to participate in effect source-cleanup."
                 );
-            }
 
             var raw = (ulong)attr.Flag;
             if (raw == 0 || (raw & (raw - 1)) != 0)
-            {
                 throw new InvalidOperationException(
                     $"{typeof(T).Name} flag {attr.Flag} must be a single power of two."
                 );
-            }
 
             return attr.Flag;
         }

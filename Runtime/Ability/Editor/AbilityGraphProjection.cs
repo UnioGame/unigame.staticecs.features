@@ -56,9 +56,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         public static AbilityGraphProjection Build(AbilityAsset asset)
         {
             if (asset == null || asset.Root == null)
-            {
                 return Empty;
-            }
 
             var nodes = new List<Node>();
             var edges = new List<Edge>();
@@ -83,9 +81,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             foreach (var entry in guidUsage)
             {
                 if (entry.Value > 1 && !string.IsNullOrWhiteSpace(entry.Key))
-                {
                     warnings.Add($"Duplicate NodeGuid detected: {entry.Key}");
-                }
             }
 
             return new AbilityGraphProjection(nodes, edges, warnings);
@@ -104,18 +100,14 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (config == null)
-            {
                 return;
-            }
 
             var nodeId = BuildNodeId(config, nodes.Count);
             if (!visited.Add(config))
             {
                 warnings.Add($"Cycle or repeated reference skipped at {nodeId}.");
                 if (!string.IsNullOrEmpty(parentId))
-                {
                     edges.Add(new Edge(parentId, nodeId, parentEdgeLabel ?? "ref"));
-                }
                 return;
             }
 
@@ -139,9 +131,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             nodes.Add(node);
 
             if (!string.IsNullOrEmpty(parentId))
-            {
                 edges.Add(new Edge(parentId, nodeId, parentEdgeLabel ?? "child"));
-            }
 
             switch (config)
             {
@@ -223,9 +213,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static string BuildNodeId(IAbilityStepConfig config, int index)
         {
             if (!string.IsNullOrWhiteSpace(config.NodeGuid))
-            {
                 return config.NodeGuid;
-            }
 
             return $"{config.Kind}:{index}";
         }
@@ -240,9 +228,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 && customTitle[0] is AbilityStepEditorAttribute metadata
                 && !string.IsNullOrWhiteSpace(metadata.DisplayName)
             )
-            {
                 return metadata.DisplayName;
-            }
 
             return config.Kind switch
             {

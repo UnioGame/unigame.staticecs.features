@@ -36,14 +36,8 @@ namespace UniGame.StaticEcs.Features.Tests
             new CharacteristicFeature<TestDamageWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            new CharacteristicFeature<
-                TestDamageWorld,
-                CriticalChanceCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestDamageWorld,
-                CriticalMultiplierCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestDamageWorld, CriticalChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestDamageWorld, CriticalMultiplierCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
             new DamageFeature<TestDamageWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
@@ -78,9 +72,7 @@ namespace UniGame.StaticEcs.Features.Tests
             target.Set(CharacteristicComponent<ShieldCharacteristic>.Create(50f, 0f, 100f));
             _rng.NextRoll = true;
 
-            ref var chain = ref World<TestDamageWorld>.GetResource<
-                DamageFilterChain<TestDamageWorld>
-            >();
+            ref var chain = ref World<TestDamageWorld>.GetResource<DamageFilterChain<TestDamageWorld>>();
             var ctx = DamageContext.FromEvent(
                 new IncomingDamageEvent
                 {
@@ -109,9 +101,7 @@ namespace UniGame.StaticEcs.Features.Tests
             target.Set(CharacteristicComponent<ShieldCharacteristic>.Create(40f, 0f, 100f));
             _rng.NextRoll = false;
 
-            ref var chain = ref World<TestDamageWorld>.GetResource<
-                DamageFilterChain<TestDamageWorld>
-            >();
+            ref var chain = ref World<TestDamageWorld>.GetResource<DamageFilterChain<TestDamageWorld>>();
             var ctx = DamageContext.FromEvent(
                 new IncomingDamageEvent
                 {
@@ -143,9 +133,7 @@ namespace UniGame.StaticEcs.Features.Tests
             target.Set(CharacteristicComponent<ShieldCharacteristic>.Create(20f, 0f, 100f));
             _rng.NextRoll = true;
 
-            ref var chain = ref World<TestDamageWorld>.GetResource<
-                DamageFilterChain<TestDamageWorld>
-            >();
+            ref var chain = ref World<TestDamageWorld>.GetResource<DamageFilterChain<TestDamageWorld>>();
             var ctx = DamageContext.FromEvent(
                 new IncomingDamageEvent
                 {

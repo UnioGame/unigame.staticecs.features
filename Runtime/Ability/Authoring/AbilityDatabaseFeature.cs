@@ -35,14 +35,6 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.SetResource(config);
             }
 
-            var systemsConfig = World<TWorld>
-                .GetResource<Unity.StaticEcsSystemsConfig>();
-            if (!systemsConfig.update)
-            {
-                throw new InvalidOperationException(
-                    "Ability database initialization requires the Static ECS Update group.");
-            }
-
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new AbilityDatabaseInitializationSystem<TWorld>(),
                 InitializationOrder);

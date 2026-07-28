@@ -30,9 +30,7 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             return entity.Has<EffectComponent<TEffect>>();
         }
@@ -42,14 +40,10 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return 0f;
-            }
 
             if (!entity.Has<EffectComponent<TEffect>>())
-            {
                 return 0f;
-            }
 
             return entity.Read<EffectComponent<TEffect>>().TimeLeft;
         }
@@ -59,14 +53,10 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return 0;
-            }
 
             if (!entity.Has<EffectComponent<TEffect>>())
-            {
                 return 0;
-            }
 
             return entity.Read<EffectComponent<TEffect>>().Stacks;
         }
@@ -90,30 +80,21 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (duration <= 0f)
-            {
                 return false;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             AssertWired<TWorld, TEffect>();
 
             if (period < 0f)
-            {
                 period = 0f;
-            }
 
             if (delay < 0f)
-            {
                 delay = 0f;
-            }
 
             var compactSource = (EntityGIDCompact)source;
             if (entity.Has<PendingEffectComponent<TEffect>>())
-            {
                 return ReapplyPending<TWorld, TEffect>(
                     entity,
                     target,
@@ -122,10 +103,8 @@ namespace UniGame.StaticEcs.Features
                     duration,
                     period,
                     delay);
-            }
 
             if (entity.Has<EffectComponent<TEffect>>())
-            {
                 return ReapplyActive<TWorld, TEffect>(
                     entity,
                     target,
@@ -133,7 +112,6 @@ namespace UniGame.StaticEcs.Features
                     compactSource,
                     duration,
                     period);
-            }
 
             EffectBackRefRegistrar.Register<TWorld>(
                 source,
@@ -182,17 +160,13 @@ namespace UniGame.StaticEcs.Features
 
             data.Stacks++;
             if (data.Stacks > config.MaxStacks)
-            {
                 data.Stacks = config.MaxStacks;
-            }
 
             data.Source = compactSource;
             if (config.RefreshOnReapply)
             {
                 if (duration > data.Duration)
-                {
                     data.Duration = duration;
-                }
 
                 data.DelayLeft = delay;
                 data.Period = period;
@@ -205,9 +179,7 @@ namespace UniGame.StaticEcs.Features
                 target);
 
             if (data.DelayLeft > 0f)
-            {
                 return true;
-            }
 
             var snapshot = data;
             entity.Delete<PendingEffectComponent<TEffect>>();
@@ -238,18 +210,14 @@ namespace UniGame.StaticEcs.Features
             var previousStacks = data.Stacks;
             var newStacks = previousStacks + 1;
             if (newStacks > config.MaxStacks)
-            {
                 newStacks = config.MaxStacks;
-            }
 
             data.Stacks = newStacks;
             data.Source = compactSource;
             if (config.RefreshOnReapply)
             {
                 if (duration > data.TimeLeft)
-                {
                     data.TimeLeft = duration;
-                }
 
                 data.Period = period;
                 data.PeriodLeft = period > 0f ? period : 0f;
@@ -320,9 +288,7 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!entity.Has<PendingEffectComponent<TEffect>>())
-            {
                 return;
-            }
 
             var pending = entity.Read<PendingEffectComponent<TEffect>>();
             EntityGID source = pending.Source;
@@ -365,9 +331,7 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (entity.Has<PendingEffectComponent<TEffect>>())
             {
@@ -376,9 +340,7 @@ namespace UniGame.StaticEcs.Features
             }
 
             if (!entity.Has<EffectComponent<TEffect>>())
-            {
                 return false;
-            }
 
             FinalizeEffect<TWorld, TEffect>(entity, target, expired: false);
             return true;
@@ -394,33 +356,25 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             var compactSource = (EntityGIDCompact)source;
             if (entity.Has<PendingEffectComponent<TEffect>>())
             {
                 ref var pending = ref entity.Ref<PendingEffectComponent<TEffect>>();
                 if (!pending.Source.Equals(compactSource))
-                {
                     return false;
-                }
 
                 FinalizePending<TWorld, TEffect>(entity, target);
                 return true;
             }
 
             if (!entity.Has<EffectComponent<TEffect>>())
-            {
                 return false;
-            }
 
             ref var data = ref entity.Ref<EffectComponent<TEffect>>();
             if (!data.Source.Equals(compactSource))
-            {
                 return false;
-            }
 
             FinalizeEffect<TWorld, TEffect>(entity, target, expired: false);
             return true;
@@ -436,29 +390,19 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (mask == EffectFlag.None)
-            {
                 return 0;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return 0;
-            }
 
             if (!World<TWorld>.HasResource<EffectRegistry>())
-            {
                 return 0;
-            }
 
             if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
-            {
                 return 0;
-            }
 
             if (!World<TWorld>.HasResource<EffectIdRegistry>())
-            {
                 return 0;
-            }
 
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             ref var registry = ref World<TWorld>.GetResource<EffectRegistry>();
@@ -476,22 +420,16 @@ namespace UniGame.StaticEcs.Features
 
             var effectiveMask = (ulong)mask & registry.RegisteredMask;
             if (effectiveMask == 0UL)
-            {
                 return 0;
-            }
 
             for (var i = 0; i < count; i++)
             {
                 if (!idRegistry.TryGetType(snapshot[i], out var type))
-                {
                     continue;
-                }
 
                 var typeFlag = ResolveFlagFor(type);
                 if (((ulong)typeFlag & effectiveMask) == 0UL)
-                {
                     continue;
-                }
 
                 registry.InvokeRemove(typeFlag, target);
                 removed++;
@@ -505,9 +443,7 @@ namespace UniGame.StaticEcs.Features
             // Read the [EffectFlag] attribute via the same path EffectFlagOf<T> uses, but on a runtime Type.
             var attrs = effectType.GetCustomAttributes(typeof(EffectFlagAttribute), inherit: false);
             if (attrs.Length == 0)
-            {
                 return EffectFlag.None;
-            }
 
             return ((EffectFlagAttribute)attrs[0]).Flag;
         }
@@ -583,14 +519,10 @@ namespace UniGame.StaticEcs.Features
         {
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             if (!idRegistry.TryGet<TEffect>(out var id))
-            {
                 return;
-            }
 
             if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
-            {
                 entity.Add<World<TWorld>.Multi<EffectSummaryComponent>>();
-            }
 
             ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
             roster.Add(
@@ -613,9 +545,7 @@ namespace UniGame.StaticEcs.Features
         {
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             if (!idRegistry.TryGet<TEffect>(out var id))
-            {
                 return;
-            }
 
             if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
             {
@@ -649,20 +579,14 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!World<TWorld>.HasResource<EffectIdRegistry>())
-            {
                 return;
-            }
 
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             if (!idRegistry.TryGet<TEffect>(out var id))
-            {
                 return;
-            }
 
             if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
-            {
                 return;
-            }
 
             ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
             for (var i = 0; i < roster.Length; i++)
@@ -681,27 +605,21 @@ namespace UniGame.StaticEcs.Features
             where TEffect : struct, IEffectType
         {
             if (!World<TWorld>.HasResource<EffectIdRegistry>())
-            {
                 throw new System.InvalidOperationException(
                     $"EffectIdRegistry is not registered for world {typeof(TWorld).Name}. "
                         + $"Did you forget to add EffectFeature<{typeof(TWorld).Name}, {typeof(TEffect).Name}>?"
                 );
-            }
 
             if (!World<TWorld>.HasResource<IEffectHandler<TWorld, TEffect>>())
-            {
                 throw new System.InvalidOperationException(
                     $"IEffectHandler<{typeof(TWorld).Name}, {typeof(TEffect).Name}> is not registered. "
                         + $"Did you forget to add EffectFeature<{typeof(TWorld).Name}, {typeof(TEffect).Name}>?"
                 );
-            }
 
             if (!World<TWorld>.HasResource<EffectConfig<TWorld, TEffect>>())
-            {
                 throw new System.InvalidOperationException(
                     $"EffectConfig<{typeof(TWorld).Name}, {typeof(TEffect).Name}> is not registered."
                 );
-            }
         }
 
         // --- Main-default overloads ---

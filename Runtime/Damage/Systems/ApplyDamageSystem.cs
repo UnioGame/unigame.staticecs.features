@@ -75,51 +75,37 @@ namespace UniGame.StaticEcs.Features
         private static void ApplyToTarget(ref DamageContext ctx)
         {
             if (!ctx.Target.TryUnpack<TWorld>(out var target))
-            {
                 return;
-            }
 
             if (!target.Has<CharacteristicComponent<HealthCharacteristic>>())
-            {
                 return;
-            }
 
             ref var health = ref target.Ref<CharacteristicComponent<HealthCharacteristic>>();
             var killing = false;
             var beforeValue = health.Value;
 
             if (ctx.Type == DamageType.Healing)
-            {
                 CharacteristicOperations.AddValue<TWorld, HealthCharacteristic>(
                     ref health,
                     ctx.Target,
                     ctx.Amount
                 );
-            }
-            else
+            else if (ctx.Amount > 0f)
             {
-                if (ctx.Amount <= 0f)
-                {
-                }
-                else
-                {
-                    var newValue = health.Value - ctx.Amount;
-                    if (newValue < health.MinValue)
-                    {
-                        newValue = health.MinValue;
-                    }
+                var newValue = health.Value - ctx.Amount;
+                if (newValue < health.MinValue)
+                    newValue = health.MinValue;
 
-                    CharacteristicOperations.SetValue<TWorld, HealthCharacteristic>(
-                        ref health,
-                        ctx.Target,
-                        newValue
-                    );
+                CharacteristicOperations.SetValue<TWorld, HealthCharacteristic>(
+                    ref health,
+                    ctx.Target,
+                    newValue
+                );
 
-                    if (health.Value <= health.MinValue && !target.Has<DeathPendingTag>())
-                    {
-                        target.Set<DeathPendingTag>();
-                        killing = true;
-                    }
+                if (health.Value <= health.MinValue && !target.Has<DeathPendingTag>())
+                {
+                    target.Set<DeathPendingTag>();
+                    killing = true;
                 }
             }
 

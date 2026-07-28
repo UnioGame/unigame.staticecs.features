@@ -24,14 +24,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             using (new EditorGUILayout.HorizontalScope())
             {
                 if (GUILayout.Button("Open Graph Editor"))
-                {
                     AbilityGraphEditorWindow.OpenTab((AbilityAsset)target);
-                }
 
                 if (GUILayout.Button("Ping In Project"))
-                {
                     EditorGUIUtility.PingObject(target);
-                }
             }
         }
     }

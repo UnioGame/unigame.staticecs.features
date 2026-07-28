@@ -44,9 +44,7 @@ namespace UniGame.StaticEcs.Features
             {
                 _filters[i].Apply(ref ctx);
                 if (ctx.Cancelled)
-                {
                     return;
-                }
             }
         }
     }

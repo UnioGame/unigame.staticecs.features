@@ -55,9 +55,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!entity.Has<AstarAIComponent>())
-            {
                 return;
-            }
 
             entity.Mut<AstarAIComponent>().GraphEntity =
                 graphProvider != null ? graphProvider.EntityGid : default;

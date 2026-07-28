@@ -18,16 +18,12 @@ namespace UniGame.StaticEcs.Features
                 || !graphEntity.Has<AstarPathComponent>()
                 || !graphEntity.Has<AstarGridGraphComponent>()
             )
-            {
                 return null;
-            }
 
             var backend = graphEntity.Read<AstarPathComponent>().Backend;
             var graph = graphEntity.Read<AstarGridGraphComponent>().Graph;
             if (backend == null || graph == null)
-            {
                 return null;
-            }
 
             backend.UpdateGraphs(new GraphUpdateObject(bounds) { updatePhysics = true });
 
@@ -38,9 +34,7 @@ namespace UniGame.StaticEcs.Features
                     && graphEntity.Read<AstarGridGraphConfigComponent>().FlushGraphUpdates
                 );
             if (shouldFlush)
-            {
                 backend.FlushGraphUpdates();
-            }
 
             return backend;
         }

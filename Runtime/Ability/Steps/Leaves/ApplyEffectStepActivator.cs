@@ -12,9 +12,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!World<TWorld>.HasResource<AbilityEffectDispatchRegistry<TWorld>>())
-            {
                 return StepStatus.Failed;
-            }
 
             switch (config.Mode)
             {
@@ -35,13 +33,9 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity))
-            {
                 return StepStatus.Failed;
-            }
             if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
-            {
                 return StepStatus.Success;
-            }
 
             ref readonly var entries =
                 ref castEntity.Read<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
@@ -49,9 +43,7 @@ namespace UniGame.StaticEcs.Features
             {
                 var target = entries.Get(i).Target;
                 if (config.ExcludeCaster && target.Equals(ctx.Caster))
-                {
                     continue;
-                }
 
                 Dispatch(config, ctx.Caster, target);
             }
@@ -66,9 +58,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!target.TryUnpack<TWorld>(out _))
-            {
                 return StepStatus.Failed;
-            }
 
             var registry = World<TWorld>.GetResource<AbilityEffectDispatchRegistry<TWorld>>();
             return registry.TryDispatch(

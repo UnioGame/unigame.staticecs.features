@@ -25,8 +25,7 @@ namespace UniGame.StaticEcs.Features.Tests
             new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            World<TestEffectsWorld>.SetResource<
-                IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
+            World<TestEffectsWorld>.SetResource<IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
             var config = new EffectConfig<TestEffectsWorld, TestEffectMarker>(
                 maxStacks: 3,
                 refreshOnReapply: true,
@@ -114,9 +113,7 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void Reapply_RaisesRefreshedEvent_WithBothStackCounts()
         {
-            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<
-                EffectRefreshedEvent<TestEffectMarker>
-            >();
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectRefreshedEvent<TestEffectMarker>>();
             try
             {
                 var source = World<TestEffectsWorld>.NewEntity<Default>();

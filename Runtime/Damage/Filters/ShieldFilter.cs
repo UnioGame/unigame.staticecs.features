@@ -13,25 +13,17 @@ namespace UniGame.StaticEcs.Features
         public void Apply(ref DamageContext ctx)
         {
             if (ctx.Cancelled || ctx.Type == DamageType.Healing || ctx.Amount <= 0f)
-            {
                 return;
-            }
 
             if (!ctx.Target.TryUnpack<TWorld>(out var target))
-            {
                 return;
-            }
 
             if (!target.Has<CharacteristicComponent<ShieldCharacteristic>>())
-            {
                 return;
-            }
 
             ref var shield = ref target.Ref<CharacteristicComponent<ShieldCharacteristic>>();
             if (shield.Value <= 0f)
-            {
                 return;
-            }
 
             var absorbed = ctx.Amount < shield.Value ? ctx.Amount : shield.Value;
             CharacteristicOperations.SetValue<TWorld, ShieldCharacteristic>(

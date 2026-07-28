@@ -17,9 +17,7 @@ namespace UniGame.StaticEcs.Features
             characteristic.SetValue(value);
 
             if (previous == characteristic.Value)
-            {
                 return false;
-            }
 
             SendChanged<TWorld, TCharacteristic>(target, previous, in characteristic);
             return true;
@@ -55,14 +53,10 @@ namespace UniGame.StaticEcs.Features
             characteristic.SetBaseValue(value, resetValue);
 
             if (previousBase == characteristic.BaseValue && previousValue == characteristic.Value)
-            {
                 return false;
-            }
 
             if (previousValue == characteristic.Value)
-            {
                 return true;
-            }
 
             SendChanged<TWorld, TCharacteristic>(target, previousValue, in characteristic);
             return true;
@@ -83,9 +77,7 @@ namespace UniGame.StaticEcs.Features
             characteristic.SetLimits(min, max, clampCurrent);
 
             if (previousValue == characteristic.Value)
-            {
                 return false;
-            }
 
             SendChanged<TWorld, TCharacteristic>(target, previousValue, in characteristic);
             return true;

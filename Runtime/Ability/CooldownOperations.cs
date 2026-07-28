@@ -15,30 +15,22 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (duration <= 0f)
-            {
                 return;
-            }
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             var now = World<TWorld>.GetResource<EcsTime>().Now;
             var expiresAt = now + duration;
 
             if (!entity.Has<World<TWorld>.Multi<CooldownComponent>>())
-            {
                 entity.Add<World<TWorld>.Multi<CooldownComponent>>();
-            }
 
             ref var cooldowns = ref entity.Ref<World<TWorld>.Multi<CooldownComponent>>();
             for (var i = 0; i < cooldowns.Length; i++)
             {
                 ref var entry = ref cooldowns[i];
                 if (entry.Id != id)
-                {
                     continue;
-                }
 
                 entry.ExpiresAt = expiresAt;
                 return;
@@ -51,22 +43,16 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
             if (!entity.Has<World<TWorld>.Multi<CooldownComponent>>())
-            {
                 return true;
-            }
 
             var now = World<TWorld>.GetResource<EcsTime>().Now;
             ref var cooldowns = ref entity.Ref<World<TWorld>.Multi<CooldownComponent>>();
             for (var i = 0; i < cooldowns.Length; i++)
             {
                 if (cooldowns[i].Id != id)
-                {
                     continue;
-                }
 
                 if (cooldowns[i].ExpiresAt <= now)
                 {
@@ -85,13 +71,9 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return 0f;
-            }
             if (!entity.Has<World<TWorld>.Multi<CooldownComponent>>())
-            {
                 return 0f;
-            }
 
             var now = World<TWorld>.GetResource<EcsTime>().Now;
             ref var cooldowns = ref entity.Ref<World<TWorld>.Multi<CooldownComponent>>();
@@ -110,13 +92,9 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
             if (!entity.Has<World<TWorld>.Multi<CooldownComponent>>())
-            {
                 return false;
-            }
 
             ref var cooldowns = ref entity.Ref<World<TWorld>.Multi<CooldownComponent>>();
             for (var i = 0; i < cooldowns.Length; i++)

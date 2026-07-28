@@ -27,42 +27,15 @@ namespace UniGame.StaticEcs.Features.Tests
             CharacteristicTypeRegistration.Register<TestAllCharacteristicsWorld, CriticalMultiplierCharacteristic>(types);
             new ModifierBackRefFeature<TestAllCharacteristicsWorld>()
                 .InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                HealthCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                ManaCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                SpeedCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                ShieldCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                ArmorResistCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                BlockChanceCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                DodgeChanceCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                CriticalChanceCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestAllCharacteristicsWorld,
-                CriticalMultiplierCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, HealthCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, ManaCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, SpeedCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, ShieldCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, BlockChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, DodgeChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, CriticalChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestAllCharacteristicsWorld, CriticalMultiplierCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
             _world.Initialize();
             _host = new GameObject(nameof(AllCharacteristicsConverterTests));
         }

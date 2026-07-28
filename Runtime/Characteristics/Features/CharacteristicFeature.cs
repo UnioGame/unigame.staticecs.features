@@ -24,10 +24,7 @@ namespace UniGame.StaticEcs.Features
                 registry,
                 (ulong)CharacteristicFlagOf<TCharacteristic>.Value,
                 static (src, tgt) =>
-                    CharacteristicModifierExtensions.RemoveModifiersFromSource<
-                        TWorld,
-                        TCharacteristic
-                    >(tgt, src));
+                    CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TCharacteristic>(tgt, src));
             return UniTask.CompletedTask;
         }
     }

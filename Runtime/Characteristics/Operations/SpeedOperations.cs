@@ -8,14 +8,10 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return fallback;
-            }
 
             if (!entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
-            {
                 return fallback;
-            }
 
             return entity.Read<CharacteristicComponent<SpeedCharacteristic>>().Value;
         }
@@ -28,25 +24,19 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var speed = ref entity.Mut<CharacteristicComponent<SpeedCharacteristic>>();
             speed.SetBaseValue(baseValue, resetCurrent);
             if (resetCurrent)
-            {
                 CharacteristicOperations.SetValue<TWorld, SpeedCharacteristic>(
                     ref speed,
                     target,
                     speed.Value
                 );
-            }
 
             return true;
         }
@@ -55,14 +45,10 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var speed = ref entity.Mut<CharacteristicComponent<SpeedCharacteristic>>();
             return CharacteristicOperations.SetValue<TWorld, SpeedCharacteristic>(
@@ -76,14 +62,10 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var speed = ref entity.Mut<CharacteristicComponent<SpeedCharacteristic>>();
             return CharacteristicOperations.SetValue<TWorld, SpeedCharacteristic>(

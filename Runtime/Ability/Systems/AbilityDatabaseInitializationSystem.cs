@@ -16,16 +16,12 @@ namespace UniGame.StaticEcs.Features
         public void Init()
         {
             if (!World<TWorld>.HasResource<AbilityDatabaseConfig>())
-            {
                 return;
-            }
 
             ref var config = ref World<TWorld>.GetResource<AbilityDatabaseConfig>();
             var database = config.Database;
             if (database == null)
-            {
                 return;
-            }
 
             var registry = World<TWorld>.GetResource<AbilityRegistry<TWorld>>();
             var ids = new HashSet<int>();
@@ -35,37 +31,27 @@ namespace UniGame.StaticEcs.Features
                 {
                     var source = database.GetAbility(i);
                     if (source == null)
-                    {
                         continue;
-                    }
 
                     var asset = config.InstantiateAssets ? Object.Instantiate(source) : source;
                     if (config.InstantiateAssets)
-                    {
                         _runtimeInstances.Add(asset);
-                    }
 
                     var id = asset.Id;
                     if (!ids.Add(id.Value))
-                    {
                         throw new InvalidOperationException(
                             $"Ability database contains duplicate ability id {id}."
                         );
-                    }
 
                     if (registry.Contains(id))
-                    {
                         throw new InvalidOperationException(
                             $"Ability registry already contains ability id {id}."
                         );
-                    }
 
                     if (asset.Root == null)
-                    {
                         throw new InvalidOperationException(
                             $"Ability asset {asset.name} has no root step."
                         );
-                    }
 
                     registry.Register(asset.BuildDefinition(), asset.Root);
                 }
@@ -89,18 +75,12 @@ namespace UniGame.StaticEcs.Features
             {
                 var asset = _runtimeInstances[i];
                 if (asset == null)
-                {
                     continue;
-                }
 
                 if (Application.isPlaying)
-                {
                     Object.Destroy(asset);
-                }
                 else
-                {
                     Object.DestroyImmediate(asset);
-                }
             }
 
             _runtimeInstances.Clear();

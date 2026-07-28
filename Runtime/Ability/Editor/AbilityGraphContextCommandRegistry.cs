@@ -30,9 +30,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             {
                 var command = commands[i];
                 if (!Matches(command.Attribute, context))
-                {
                     continue;
-                }
 
                 added = true;
                 menu.AppendAction(
@@ -43,17 +41,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (!added)
-            {
                 menu.AppendAction("No Commands", _ => { }, DropdownMenuAction.Status.Disabled);
-            }
         }
 
         private static List<CommandDefinition> GetCommands()
         {
             if (_commands != null)
-            {
                 return _commands;
-            }
 
             _commands = new List<CommandDefinition>();
             var methods = TypeCache.GetMethodsWithAttribute<AbilityGraphContextCommandAttribute>();
@@ -61,9 +55,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             {
                 var method = methods[methodIndex];
                 if (!IsValidCommandMethod(method))
-                {
                     continue;
-                }
 
                 var attributes = method.GetCustomAttributes(
                     typeof(AbilityGraphContextCommandAttribute),
@@ -72,9 +64,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 for (var attrIndex = 0; attrIndex < attributes.Length; attrIndex++)
                 {
                     if (attributes[attrIndex] is not AbilityGraphContextCommandAttribute attribute)
-                    {
                         continue;
-                    }
 
                     _commands.Add(new CommandDefinition { Attribute = attribute, Method = method });
                 }
@@ -91,9 +81,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static bool IsValidCommandMethod(MethodInfo method)
         {
             if (method.ReturnType != typeof(void))
-            {
                 return false;
-            }
 
             var parameters = method.GetParameters();
             return parameters.Length == 1
@@ -106,14 +94,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (attribute.Target != context.Target)
-            {
                 return false;
-            }
 
             if (attribute.NodeType == null)
-            {
                 return true;
-            }
 
             var nodeConfig = context.NodeConfig;
             return nodeConfig != null && attribute.NodeType.IsInstanceOfType(nodeConfig);

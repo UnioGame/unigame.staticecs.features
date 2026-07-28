@@ -19,20 +19,14 @@ namespace UniGame.StaticEcs.Features
         public void OnTick(EntityGID target, EntityGID source, int stacks)
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (!entity.Has<HealOverTimeComponent>())
-            {
                 return;
-            }
 
             var amount = entity.Read<HealOverTimeComponent>().HealPerTick;
             if (amount <= 0f)
-            {
                 return;
-            }
 
             DamageOperations.RaiseHealing<TWorld>(source, target, amount * stacks);
         }

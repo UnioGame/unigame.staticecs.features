@@ -15,6 +15,7 @@
   ],
   "dependencies": {
     "com.unigame.staticecs": "2026.0.1",
-    "com.unigame.staticecs.unity": "2026.0.1"
+    "com.unigame.staticecs.unity": "2026.0.1",
+    "com.unigame.viewsystem": "2026.0.7"
   }
 }

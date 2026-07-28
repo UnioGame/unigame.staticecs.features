@@ -14,24 +14,16 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (flag == EffectFlag.None)
-            {
                 return;
-            }
 
             if (!source.TryUnpack<TWorld>(out var src))
-            {
                 return;
-            }
 
             if (!src.Has<EffectTrackerComponent>())
-            {
                 src.Add<EffectTrackerComponent>();
-            }
 
             if (!src.Has<World<TWorld>.Multi<EffectTargetComponent>>())
-            {
                 src.Add<World<TWorld>.Multi<EffectTargetComponent>>();
-            }
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;
@@ -58,24 +50,16 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (flag == EffectFlag.None)
-            {
                 return;
-            }
 
             if (source.Status<TWorld>() != GIDStatus.Active)
-            {
                 return;
-            }
 
             if (!source.TryUnpack<TWorld>(out var src))
-            {
                 return;
-            }
 
             if (!src.Has<World<TWorld>.Multi<EffectTargetComponent>>())
-            {
                 return;
-            }
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;
@@ -87,9 +71,7 @@ namespace UniGame.StaticEcs.Features
                 {
                     entry.Mask &= ~flag;
                     if (entry.Mask == EffectFlag.None)
-                    {
                         refs.RemoveAtSwap(i);
-                    }
 
                     return;
                 }

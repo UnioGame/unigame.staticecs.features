@@ -26,19 +26,15 @@ namespace UniGame.StaticEcs.Features
                 ref var astar = ref entity.Mut<AstarAIComponent>();
 
                 if (astar.AI == null)
-                {
                     continue;
-                }
 
                 // Explicit ECS requests are the only path request source, including while the graph is initializing.
                 astar.AI.canSearch = false;
 
                 if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
-                {
                     astar.AI.maxSpeed = entity
                         .Read<CharacteristicComponent<SpeedCharacteristic>>()
                         .Value;
-                }
 
                 if (dest.IsActive)
                 {
@@ -81,9 +77,7 @@ namespace UniGame.StaticEcs.Features
                 || !graphEntity.Has<AstarPathComponent>()
                 || !graphEntity.Has<AstarGridGraphComponent>()
             )
-            {
                 return false;
-            }
 
             var backend = graphEntity.Read<AstarPathComponent>().Backend;
             var graph = graphEntity.Read<AstarGridGraphComponent>().Graph;
@@ -96,9 +90,7 @@ namespace UniGame.StaticEcs.Features
                 || !graph.isScanned
                 || System.Array.IndexOf(backend.data.graphs, graph) < 0
             )
-            {
                 return false;
-            }
 
             var graphMask = GraphMask.FromGraph(graph);
             astar.Seeker.graphMask = graphMask;

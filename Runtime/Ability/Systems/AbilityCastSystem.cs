@@ -35,21 +35,13 @@ namespace UniGame.StaticEcs.Features
             {
                 var ev = e.Value;
                 if (!ev.Caster.TryUnpack<TWorld>(out var caster))
-                {
                     continue;
-                }
                 if (caster.Has<AbilityActiveCastComponent>())
-                {
                     continue;
-                }
                 if (!AbilityOperations.HasAbility<TWorld>(ev.Caster, ev.AbilityId))
-                {
                     continue;
-                }
                 if (!registry.Contains(ev.AbilityId))
-                {
                     continue;
-                }
 
                 AbilityCastFactory.SpawnRoot<TWorld>(ev.Caster, ev.AbilityId, ev.Target);
             }

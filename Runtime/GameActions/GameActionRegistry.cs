@@ -16,33 +16,27 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (id >= 32)
-            {
                 throw new ArgumentOutOfRangeException(
                     nameof(id),
                     id,
                     "Game action IDs must be in the range 0–31.");
-            }
 
             var actionType = typeof(TAction);
             if (_typeToId.TryGetValue(actionType, out var existing))
             {
                 if (existing != id)
-                {
                     throw new InvalidOperationException(
                         $"Action `{actionType.FullName}` is already registered with ID {existing}, " +
                         $"not {id}.");
-                }
 
                 return;
             }
 
             var conflictingType = _idToType[id];
             if (conflictingType != null)
-            {
                 throw new InvalidOperationException(
                     $"Game action ID {id} is used by both `{conflictingType.FullName}` and " +
                     $"`{actionType.FullName}`.");
-            }
 
             _typeToId.Add(actionType, id);
             _idToType[id] = actionType;
@@ -53,11 +47,9 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (!_typeToId.TryGetValue(typeof(TAction), out var id))
-            {
                 throw new InvalidOperationException(
                     $"Game action `{typeof(TAction).FullName}` was not declared for world " +
                     $"`{typeof(TWorld).Name}`.");
-            }
 
             return 1u << id;
         }

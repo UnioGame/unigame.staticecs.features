@@ -13,24 +13,16 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (flag == CharacteristicFlag.None)
-            {
                 return;
-            }
 
             if (!source.TryUnpack<TWorld>(out var src))
-            {
                 return;
-            }
 
             if (!src.Has<ModifierTrackerComponent>())
-            {
                 src.Add<ModifierTrackerComponent>();
-            }
 
             if (!src.Has<World<TWorld>.Multi<ModifierTargetComponent>>())
-            {
                 src.Add<World<TWorld>.Multi<ModifierTargetComponent>>();
-            }
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<ModifierTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;

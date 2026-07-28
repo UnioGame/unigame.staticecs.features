@@ -98,9 +98,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (reason == HookReason.WorldDestroy || !HasSnapshot || !WasActive)
-            {
                 return;
-            }
 
             if (Collider != null && Collider.enabled)
             {
@@ -110,9 +108,7 @@ namespace UniGame.StaticEcs.Features
 
             var graphEntity = GraphEntity;
             if (!graphEntity.TryUnpack<TWorld>(out _) && GraphProvider != null)
-            {
                 graphEntity = GraphProvider.EntityGid;
-            }
 
             AstarGraphUpdateUtility.UpdateBounds<TWorld>(
                 graphEntity,

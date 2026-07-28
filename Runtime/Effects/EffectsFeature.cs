@@ -47,8 +47,7 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.SetResource(stunConfig);
             }
 
-            if (!World<TWorld>.HasResource<
-                    EffectConfig<TWorld, ModificationEffect<SpeedCharacteristic>>>())
+            if (!World<TWorld>.HasResource<EffectConfig<TWorld, ModificationEffect<SpeedCharacteristic>>>())
             {
                 var modificationConfig =
                     new EffectConfig<TWorld, ModificationEffect<SpeedCharacteristic>>(

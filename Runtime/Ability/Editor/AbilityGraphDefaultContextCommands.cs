@@ -13,9 +13,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void AddNode(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null)
-            {
                 return;
-            }
 
             if (context.Asset.Root != null)
             {
@@ -39,9 +37,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void AddSequenceChild(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null || context.NodeConfig is not SequenceStepConfig sequence)
-            {
                 return;
-            }
 
             AbilityGraphNodePickerWindow.Open(entry =>
             {
@@ -69,9 +65,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void AddParallelBranch(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null || context.NodeConfig is not ParallelStepConfig parallel)
-            {
                 return;
-            }
 
             AbilityGraphNodePickerWindow.Open(entry =>
             {
@@ -102,9 +96,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 context.Asset == null
                 || context.NodeConfig is not ConditionalStepConfig conditional
             )
-            {
                 return;
-            }
 
             AbilityGraphNodePickerWindow.Open(entry =>
             {
@@ -117,9 +109,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         "Cancel"
                     );
                     if (!replace)
-                    {
                         return;
-                    }
                 }
 
                 if (
@@ -149,9 +139,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 context.Asset == null
                 || context.NodeConfig is not ConditionalStepConfig conditional
             )
-            {
                 return;
-            }
 
             AbilityGraphNodePickerWindow.Open(entry =>
             {
@@ -164,9 +152,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         "Cancel"
                     );
                     if (!replace)
-                    {
                         return;
-                    }
                 }
 
                 if (
@@ -193,9 +179,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void SetRepeatBody(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null || context.NodeConfig is not RepeatStepConfig repeat)
-            {
                 return;
-            }
 
             AbilityGraphNodePickerWindow.Open(entry =>
             {
@@ -208,9 +192,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         "Cancel"
                     );
                     if (!replace)
-                    {
                         return;
-                    }
                 }
 
                 if (AbilityGraphAssetEditing.AssignChild(context.Asset, repeat, "_body", entry))
@@ -275,9 +257,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void DeleteNode(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null || context.NodeConfig == null)
-            {
                 return;
-            }
 
             var isRoot = ReferenceEquals(context.Asset.Root, context.NodeConfig);
             var confirmed = EditorUtility.DisplayDialog(
@@ -289,14 +269,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 "Cancel"
             );
             if (!confirmed)
-            {
                 return;
-            }
 
             if (!AbilityGraphAssetEditing.RemoveNodeReference(context.Asset, context.NodeConfig))
-            {
                 return;
-            }
 
             AbilityGraphEditorWindow.OpenTab(context.Asset);
             Selection.activeObject = context.Asset;
@@ -317,9 +293,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void DisconnectEdge(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null || context.NodeConfig == null)
-            {
                 return;
-            }
 
             var confirmed = EditorUtility.DisplayDialog(
                 "Disconnect Edge",
@@ -328,14 +302,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 "Cancel"
             );
             if (!confirmed)
-            {
                 return;
-            }
 
             if (!AbilityGraphAssetEditing.RemoveNodeReference(context.Asset, context.NodeConfig))
-            {
                 return;
-            }
 
             AbilityGraphEditorWindow.OpenTab(context.Asset);
             Selection.activeObject = context.Asset;
@@ -354,9 +324,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void PingAbilityAsset(AbilityGraphContextCommandContext context)
         {
             if (context.Asset == null)
-            {
                 return;
-            }
 
             EditorGUIUtility.PingObject(context.Asset);
             Selection.activeObject = context.Asset;
@@ -392,14 +360,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (asset == null || entry?.Type == null)
-            {
                 return;
-            }
 
             if (!AbilityGraphAssetEditing.ReplaceRoot(asset, entry))
-            {
                 return;
-            }
 
             AbilityGraphEditorWindow.OpenTab(asset);
             Selection.activeObject = asset;

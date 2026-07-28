@@ -14,11 +14,9 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (!World<TWorld>.HasResource<GameActionRegistry<TWorld>>())
-            {
                 throw new System.InvalidOperationException(
                     $"World `{typeof(TWorld).Name}` has no game action registry. " +
                     "Install GameActionsFeature resources before registering actions.");
-            }
 
             ref var registry = ref World<TWorld>.GetResource<GameActionRegistry<TWorld>>();
             registry.Register<TAction>(id);

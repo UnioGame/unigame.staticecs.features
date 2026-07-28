@@ -61,9 +61,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             public static void Draw(object propertyTree)
             {
                 if (propertyTree == null)
-                {
                     return;
-                }
 
                 if (DrawWithChildrenMethod != null)
                 {
@@ -77,9 +75,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             public static void ApplyChanges(object propertyTree)
             {
                 if (propertyTree == null)
-                {
                     return;
-                }
 
                 ApplyChangesMethod?.Invoke(propertyTree, null);
             }
@@ -87,9 +83,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             public static void DisposeTree(object propertyTree)
             {
                 if (propertyTree == null)
-                {
                     return;
-                }
 
                 DisposeMethod?.Invoke(propertyTree, null);
             }
@@ -139,9 +133,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         public static void OpenTab(AbilityAsset asset)
         {
             if (asset == null)
-            {
                 return;
-            }
 
             var window = GetWindow<AbilityGraphEditorWindow>();
             window.titleContent = new GUIContent("Ability Graph Workspace");
@@ -172,9 +164,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void OnSelectionChange()
         {
             if (GetActiveTab() == null)
-            {
                 return;
-            }
 
             Repaint();
         }
@@ -184,9 +174,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             for (var i = 0; i < _tabs.Count; i++)
             {
                 if (!ReferenceEquals(_tabs[i].Asset, asset))
-                {
                     continue;
-                }
 
                 _activeTabIndex = i;
                 Refresh();
@@ -270,9 +258,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             RemoveInvalidTabs();
             if (_titleLabel == null)
-            {
                 return;
-            }
 
             RefreshTabBar();
 
@@ -282,9 +268,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             {
                 _titleLabel.text = "Ability Graph Workspace";
                 if (_emptyState != null)
-                {
                     _emptyState.style.display = DisplayStyle.Flex;
-                }
                 _graphView?.Render(null, AbilityGraphProjection.Empty);
                 RefreshLayerVisibility();
                 RefreshInspectorTitle();
@@ -294,9 +278,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (_emptyState != null)
-            {
                 _emptyState.style.display = DisplayStyle.None;
-            }
 
             _titleLabel.text = activeTab.Asset.name;
             _graphView?.Render(activeTab.Asset, AbilityGraphProjection.Build(activeTab.Asset));
@@ -310,9 +292,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             var activeTab = GetActiveTab();
             if (activeTab == null || activeTab.Layer == layer)
-            {
                 return;
-            }
 
             activeTab.Layer = layer;
             if (activeTab.Layer != AbilityEditorLayer.Execution)
@@ -328,14 +308,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             var activeTab = GetActiveTab();
             if (activeTab == null)
-            {
                 return;
-            }
 
             if (!ReferenceEquals(activeTab.SelectedNodeConfig, node?.Config))
-            {
                 ResetSelectedNode(activeTab);
-            }
 
             activeTab.SelectedNodeConfig = node?.Config;
             activeTab.SelectedNodeTitle = node?.Title ?? string.Empty;
@@ -350,23 +326,17 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             var isExecution = hasTab && activeTab.Layer == AbilityEditorLayer.Execution;
 
             if (_graphView != null)
-            {
                 _graphView.style.display = isExecution ? DisplayStyle.Flex : DisplayStyle.None;
-            }
 
             if (_launchConditionsContainer != null)
-            {
                 _launchConditionsContainer.style.display =
                     hasTab && !isExecution ? DisplayStyle.Flex : DisplayStyle.None;
-            }
         }
 
         private void RefreshInspectorTitle()
         {
             if (_inspectorTitle == null)
-            {
                 return;
-            }
 
             var activeTab = GetActiveTab();
             if (activeTab == null)
@@ -390,18 +360,14 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void OpenSelectedAbility()
         {
             if (Selection.activeObject is AbilityAsset asset)
-            {
                 OpenOrFocusTab(asset);
-            }
         }
 
         private void PingAsset()
         {
             var activeTab = GetActiveTab();
             if (activeTab == null)
-            {
                 return;
-            }
 
             EditorGUIUtility.PingObject(activeTab.Asset);
             Selection.activeObject = activeTab.Asset;
@@ -410,20 +376,14 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void CloseActiveTab()
         {
             if (_activeTabIndex < 0 || _activeTabIndex >= _tabs.Count)
-            {
                 return;
-            }
 
             DisposeTabResources(_tabs[_activeTabIndex]);
             _tabs.RemoveAt(_activeTabIndex);
             if (_tabs.Count == 0)
-            {
                 _activeTabIndex = -1;
-            }
             else if (_activeTabIndex >= _tabs.Count)
-            {
                 _activeTabIndex = _tabs.Count - 1;
-            }
 
             Refresh();
         }
@@ -468,9 +428,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             var activeTab = GetActiveTab();
             if (activeTab == null)
-            {
                 return;
-            }
 
             var serializedObject = new SerializedObject(activeTab.Asset);
             serializedObject.Update();
@@ -494,9 +452,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 MessageType.Info
             );
             if (TryDrawNodeInspectorWithOdin(activeTab, nodeProperty))
-            {
                 return;
-            }
 
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(nodeProperty, includeChildren: true);
@@ -513,15 +469,11 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (!OdinNodeInspectorBridge.IsAvailable)
-            {
                 return false;
-            }
 
             var nodeTarget = nodeProperty.managedReferenceValue;
             if (nodeTarget == null)
-            {
                 return false;
-            }
 
             if (!ReferenceEquals(activeTab.OdinTarget, nodeTarget))
             {
@@ -531,18 +483,14 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (activeTab.OdinPropertyTree == null)
-            {
                 return false;
-            }
 
             EditorGUI.BeginChangeCheck();
             OdinNodeInspectorBridge.Draw(activeTab.OdinPropertyTree);
             var changed = EditorGUI.EndChangeCheck();
             OdinNodeInspectorBridge.ApplyChanges(activeTab.OdinPropertyTree);
             if (!changed)
-            {
                 return true;
-            }
 
             EditorUtility.SetDirty(activeTab.Asset);
             Refresh();
@@ -555,17 +503,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (property == null || target == null)
-            {
                 return null;
-            }
 
             if (
                 property.propertyType == SerializedPropertyType.ManagedReference
                 && ReferenceEquals(property.managedReferenceValue, target)
             )
-            {
                 return property.Copy();
-            }
 
             var iterator = property.Copy();
             var end = iterator.GetEndProperty();
@@ -579,9 +523,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                     iterator.propertyType == SerializedPropertyType.ManagedReference
                     && ReferenceEquals(iterator.managedReferenceValue, target)
                 )
-                {
                     return iterator.Copy();
-                }
 
                 enterChildren = true;
             }
@@ -624,9 +566,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private AbilityGraphTabState GetActiveTab()
         {
             if (_activeTabIndex < 0 || _activeTabIndex >= _tabs.Count)
-            {
                 return null;
-            }
 
             return _tabs[_activeTabIndex];
         }
@@ -636,9 +576,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             for (var i = _tabs.Count - 1; i >= 0; i--)
             {
                 if (_tabs[i].Asset != null)
-                {
                     continue;
-                }
 
                 DisposeTabResources(_tabs[i]);
                 _tabs.RemoveAt(i);
@@ -651,17 +589,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (_activeTabIndex >= _tabs.Count)
-            {
                 _activeTabIndex = _tabs.Count - 1;
-            }
         }
 
         private void RefreshTabBar()
         {
             if (_tabBar == null)
-            {
                 return;
-            }
 
             _tabBar.Clear();
 
@@ -707,9 +641,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void ActivateTab(int index)
         {
             if (index < 0 || index >= _tabs.Count || _activeTabIndex == index)
-            {
                 return;
-            }
 
             _activeTabIndex = index;
             Refresh();
@@ -718,24 +650,16 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private void CloseTab(int index)
         {
             if (index < 0 || index >= _tabs.Count)
-            {
                 return;
-            }
 
             DisposeTabResources(_tabs[index]);
             _tabs.RemoveAt(index);
             if (_tabs.Count == 0)
-            {
                 _activeTabIndex = -1;
-            }
             else if (_activeTabIndex > index)
-            {
                 _activeTabIndex--;
-            }
             else if (_activeTabIndex >= _tabs.Count)
-            {
                 _activeTabIndex = _tabs.Count - 1;
-            }
 
             Refresh();
         }
@@ -785,9 +709,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static string BuildTabTitle(AbilityGraphTabState tab)
         {
             if (tab.Asset == null)
-            {
                 return "<missing graph>";
-            }
 
             return string.IsNullOrWhiteSpace(tab.Asset.DisplayName)
                 ? tab.Asset.name
@@ -805,9 +727,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void DisposeTabResources(AbilityGraphTabState tab)
         {
             if (tab == null)
-            {
                 return;
-            }
 
             ResetSelectedNode(tab);
         }
@@ -815,9 +735,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static void ResetSelectedNode(AbilityGraphTabState tab)
         {
             if (tab == null)
-            {
                 return;
-            }
 
             OdinNodeInspectorBridge.DisposeTree(tab.OdinPropertyTree);
             tab.OdinPropertyTree = null;
@@ -831,14 +749,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 if (GUILayout.Button("Project", EditorStyles.toolbarButton, GUILayout.Width(64f)))
-                {
                     AbilityGraphBrowserWindow.OpenProjectBrowser();
-                }
 
                 if (GUILayout.Button("Runtime", EditorStyles.toolbarButton, GUILayout.Width(64f)))
-                {
                     AbilityGraphBrowserWindow.OpenRuntimeBrowser();
-                }
 
                 if (
                     GUILayout.Button(
@@ -847,21 +761,15 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         GUILayout.Width(92f)
                     )
                 )
-                {
                     OpenSelectedAbility();
-                }
 
                 using (new EditorGUI.DisabledScope(activeTab == null))
                 {
                     if (GUILayout.Button("Ping", EditorStyles.toolbarButton, GUILayout.Width(48f)))
-                    {
                         PingAsset();
-                    }
 
                     if (GUILayout.Button("Close", EditorStyles.toolbarButton, GUILayout.Width(52f)))
-                    {
                         CloseActiveTab();
-                    }
                 }
 
                 GUILayout.FlexibleSpace();
@@ -876,9 +784,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         GUILayout.Width(78f)
                     ) && !executionSelected
                 )
-                {
                     SetEditorLayer(AbilityEditorLayer.Execution);
-                }
 
                 var launchSelected =
                     activeTab != null && activeTab.Layer == AbilityEditorLayer.LaunchConditions;
@@ -890,9 +796,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         GUILayout.Width(68f)
                     ) && !launchSelected
                 )
-                {
                     SetEditorLayer(AbilityEditorLayer.LaunchConditions);
-                }
             }
         }
     }

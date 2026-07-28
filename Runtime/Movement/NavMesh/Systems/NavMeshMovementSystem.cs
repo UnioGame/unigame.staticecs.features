@@ -22,9 +22,7 @@ namespace UniGame.StaticEcs.Features
                 ref readonly var agent = ref entity.Read<NavMeshAgentComponent>();
 
                 if (agent.Agent == null)
-                {
                     continue;
-                }
 
                 if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
                 {
@@ -32,23 +30,17 @@ namespace UniGame.StaticEcs.Features
                         .Read<CharacteristicComponent<SpeedCharacteristic>>()
                         .Value;
                     if (!UnityEngine.Mathf.Approximately(agent.Agent.speed, speed))
-                    {
                         agent.Agent.speed = speed;
-                    }
                 }
 
                 if (dest.IsActive)
                 {
                     if (!agent.Agent.hasPath ||
                         (agent.Agent.destination - dest.Destination).sqrMagnitude > 0.0001f)
-                    {
                         agent.Agent.SetDestination(dest.Destination);
-                    }
                 }
                 else if (agent.Agent.hasPath)
-                {
                     agent.Agent.ResetPath();
-                }
             }
         }
     }

@@ -8,19 +8,13 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
-            {
                 return false;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<ShieldCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var shield = ref entity.Mut<CharacteristicComponent<ShieldCharacteristic>>();
             return CharacteristicOperations.AddValue<TWorld, ShieldCharacteristic>(
@@ -34,26 +28,18 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
-            {
                 return 0f;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return 0f;
-            }
 
             if (!entity.Has<CharacteristicComponent<ShieldCharacteristic>>())
-            {
                 return 0f;
-            }
 
             ref var shield = ref entity.Mut<CharacteristicComponent<ShieldCharacteristic>>();
             var available = shield.Value;
             if (available <= 0f)
-            {
                 return 0f;
-            }
 
             var consumed = amount > available ? available : amount;
             CharacteristicOperations.AddValue<TWorld, ShieldCharacteristic>(
@@ -68,14 +54,10 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<ShieldCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var shield = ref entity.Mut<CharacteristicComponent<ShieldCharacteristic>>();
             return CharacteristicOperations.SetValue<TWorld, ShieldCharacteristic>(

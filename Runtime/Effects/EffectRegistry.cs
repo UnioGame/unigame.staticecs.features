@@ -32,20 +32,14 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (cleanup == null)
-            {
                 throw new ArgumentNullException(nameof(cleanup));
-            }
 
             if (unconditional == null)
-            {
                 throw new ArgumentNullException(nameof(unconditional));
-            }
 
             var raw = (ulong)flag;
             if (!IsSingleBit(raw))
-            {
                 throw new ArgumentException("Flag must be a single power of two.", nameof(flag));
-            }
 
             var slot = Log2(raw);
             _slots[slot] = cleanup;
@@ -57,9 +51,7 @@ namespace UniGame.StaticEcs.Features
         {
             var raw = (ulong)flag;
             if (!IsSingleBit(raw))
-            {
                 return false;
-            }
 
             return _slots[Log2(raw)] != null;
         }
@@ -68,9 +60,7 @@ namespace UniGame.StaticEcs.Features
         {
             var raw = (ulong)flag;
             if (!IsSingleBit(raw))
-            {
                 return;
-            }
 
             _slots[Log2(raw)]?.Invoke(source, target);
         }
@@ -90,9 +80,7 @@ namespace UniGame.StaticEcs.Features
         {
             var raw = (ulong)flag;
             if (!IsSingleBit(raw))
-            {
                 return;
-            }
 
             _removeSlots[Log2(raw)]?.Invoke(target);
         }
@@ -138,9 +126,7 @@ namespace UniGame.StaticEcs.Features
                 n += 2;
             }
             if ((singleBit & 0x0000000000000002UL) != 0)
-            {
                 n += 1;
-            }
             return n;
         }
     }

@@ -100,9 +100,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var effectId = ids.Register<TestAbilityEffect>();
             World<TestAbilityWorld>.SetResource(ids);
 
-            var dispatch = World<TestAbilityWorld>.GetResource<
-                AbilityEffectDispatchRegistry<TestAbilityWorld>
-            >();
+            var dispatch = World<TestAbilityWorld>.GetResource<AbilityEffectDispatchRegistry<TestAbilityWorld>>();
             dispatch.Register(
                 effectId,
                 (source, target, duration, period, delay, magnitude) =>
@@ -127,9 +125,7 @@ namespace UniGame.StaticEcs.Features.Tests
             var entity = World<TestAbilityWorld>.NewEntity<Default>();
             entity.Set(new TransformComponent { Transform = go.transform });
             if (targetable)
-            {
                 entity.Set<TargetableTag>();
-            }
             return entity;
         }
 

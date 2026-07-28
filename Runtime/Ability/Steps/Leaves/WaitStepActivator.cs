@@ -18,13 +18,9 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (config.Duration <= 0f)
-            {
                 return StepStatus.Success;
-            }
             if (!ctx.CastEntity.TryUnpack<TWorld>(out var entity))
-            {
                 return StepStatus.Failed;
-            }
             entity.Set(new AbilityWaitComponent { TimeLeft = config.Duration });
             return StepStatus.Running;
         }
@@ -38,9 +34,7 @@ namespace UniGame.StaticEcs.Features
                 ctx.CastEntity.TryUnpack<TWorld>(out var entity)
                 && entity.Has<AbilityWaitComponent>()
             )
-            {
                 entity.Delete<AbilityWaitComponent>();
-            }
         }
     }
 }

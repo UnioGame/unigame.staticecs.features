@@ -21,13 +21,8 @@ namespace UniGame.StaticEcs.Features
             }
 
             var config = World<TWorld>.GetResource<ManaRegenConfig>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (!updateEnabled || !config.RegisterRegen)
-            {
+            if (!config.RegisterRegen)
                 return;
-            }
 
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new ManaRegenSystem<TWorld>(),

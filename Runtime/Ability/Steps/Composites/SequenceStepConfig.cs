@@ -31,9 +31,7 @@ namespace UniGame.StaticEcs.Features
         {
             _nodeGuid = nodeGuid;
             if (children != null)
-            {
                 _children = new List<IAbilityStepConfig>(children);
-            }
         }
 
         public AbilityStepKind Kind => AbilityStepKind.Sequence;

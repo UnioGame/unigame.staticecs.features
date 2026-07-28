@@ -18,9 +18,7 @@ namespace UniGame.StaticEcs.Features
         {
             var dt = World<TWorld>.GetResource<EcsTime>().DeltaTime;
             if (dt <= 0f)
-            {
                 return;
-            }
 
             ref var handler = ref World<TWorld>.GetResource<IEffectHandler<TWorld, TEffect>>();
 
@@ -40,9 +38,7 @@ namespace UniGame.StaticEcs.Features
                 }
 
                 if (data.TimeLeft <= 0f)
-                {
                     EffectOperations.Expire<TWorld, TEffect>(entity, entity.GID);
-                }
             }
 
             foreach (var entity in
@@ -51,11 +47,9 @@ namespace UniGame.StaticEcs.Features
                 ref var pending = ref entity.Mut<PendingEffectComponent<TEffect>>();
                 pending.DelayLeft -= dt;
                 if (pending.DelayLeft <= 0f)
-                {
                     EffectOperations.ActivatePending<TWorld, TEffect>(
                         entity,
                         entity.GID);
-                }
             }
         }
     }

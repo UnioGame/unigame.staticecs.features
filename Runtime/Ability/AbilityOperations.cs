@@ -22,22 +22,16 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<World<TWorld>.Multi<AbilitySlotComponent>>())
-            {
                 entity.Add<World<TWorld>.Multi<AbilitySlotComponent>>();
-            }
 
             ref var roster = ref entity.Ref<World<TWorld>.Multi<AbilitySlotComponent>>();
             for (var i = 0; i < roster.Length; i++)
             {
                 if (roster[i].Id == id)
-                {
                     return false;
-                }
             }
 
             roster.Add(new AbilitySlotComponent { Id = id });
@@ -48,13 +42,9 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
             if (!entity.Has<World<TWorld>.Multi<AbilitySlotComponent>>())
-            {
                 return false;
-            }
 
             ref var roster = ref entity.Ref<World<TWorld>.Multi<AbilitySlotComponent>>();
             for (var i = 0; i < roster.Length; i++)
@@ -72,21 +62,15 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
             if (!entity.Has<World<TWorld>.Multi<AbilitySlotComponent>>())
-            {
                 return false;
-            }
 
             ref readonly var roster = ref entity.Read<World<TWorld>.Multi<AbilitySlotComponent>>();
             for (var i = 0; i < roster.Length; i++)
             {
                 if (roster[i].Id == id)
-                {
                     return true;
-                }
             }
             return false;
         }
@@ -95,9 +79,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
             return entity.Has<AbilityActiveCastComponent>();
         }
 
@@ -110,25 +92,15 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
             if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>())
-            {
                 return false;
-            }
             if (!World<TWorld>.GetResource<AbilityRegistry<TWorld>>().Contains(id))
-            {
                 return false;
-            }
             if (entity.Has<AbilityActiveCastComponent>())
-            {
                 return false;
-            }
             if (!HasAbility<TWorld>(caster, id))
-            {
                 return false;
-            }
             return true;
         }
 
@@ -140,9 +112,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!IsReady<TWorld>(caster, id))
-            {
                 return false;
-            }
 
             return World<TWorld>.SendEvent(
                 new CastAbilityEvent
@@ -164,13 +134,9 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!caster.TryUnpack<TWorld>(out var casterEntity))
-            {
                 return false;
-            }
             if (!casterEntity.Has<AbilityActiveCastComponent>())
-            {
                 return false;
-            }
 
             var castGid = casterEntity.Read<AbilityActiveCastComponent>().Cast;
             if (!castGid.TryUnpack<TWorld>(out var castEntity))

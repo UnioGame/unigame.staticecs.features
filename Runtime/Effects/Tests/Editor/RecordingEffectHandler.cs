@@ -7,19 +7,9 @@ namespace UniGame.StaticEcs.Features.Tests
         where TWorld : struct, IWorldType
         where TEffect : struct, IEffectType
     {
-        public readonly List<(
-            EntityGID Target,
-            EntityGID Source,
-            int Stacks,
-            int PreviousStacks
-        )> Applied = new();
+        public readonly List<(EntityGID Target, EntityGID Source, int Stacks, int PreviousStacks)> Applied = new();
         public readonly List<(EntityGID Target, EntityGID Source, int Stacks)> Ticks = new();
-        public readonly List<(
-            EntityGID Target,
-            EntityGID Source,
-            int Stacks,
-            bool Expired
-        )> Removed = new();
+        public readonly List<(EntityGID Target, EntityGID Source, int Stacks, bool Expired)> Removed = new();
 
         public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)
         {

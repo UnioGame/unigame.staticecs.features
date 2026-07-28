@@ -22,14 +22,10 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (World<TWorld>.Status != WorldStatus.Initialized)
-            {
                 return false;
-            }
 
             if (!IsAvailable<TWorld, TAction>(source))
-            {
                 return false;
-            }
 
             return World<TWorld>.SendEvent(
                 new GameActionEvent<TAction> { Source = source, Payload = payload }
@@ -46,15 +42,11 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (!source.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             var actionMask = GetActionMask<TWorld, TAction>();
             if (!entity.Has<ActionMaskComponent>())
-            {
                 return true;
-            }
 
             return (entity.Read<ActionMaskComponent>().Bits & actionMask) != 0;
         }
@@ -65,14 +57,10 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (!source.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (!entity.Has<ActionMaskComponent>())
-            {
                 return;
-            }
 
             entity.Mut<ActionMaskComponent>().Bits |= GetActionMask<TWorld, TAction>();
         }
@@ -83,14 +71,10 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (!source.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (!entity.Has<ActionMaskComponent>())
-            {
                 return;
-            }
 
             entity.Mut<ActionMaskComponent>().Bits &= ~GetActionMask<TWorld, TAction>();
         }
@@ -100,10 +84,8 @@ namespace UniGame.StaticEcs.Features
             where TAction : struct, IGameAction
         {
             if (!World<TWorld>.HasResource<GameActionRegistry<TWorld>>())
-            {
                 throw new System.InvalidOperationException(
                     $"World `{typeof(TWorld).Name}` has no game action registry.");
-            }
 
             ref var registry =
                 ref World<TWorld>.GetResource<GameActionRegistry<TWorld>>();

@@ -45,14 +45,8 @@ namespace UniGame.StaticEcs.Features.Tests
             new CharacteristicFeature<TestEffectsWorld, ArmorResistCharacteristic>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            new CharacteristicFeature<
-                TestEffectsWorld,
-                CriticalChanceCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
-            new CharacteristicFeature<
-                TestEffectsWorld,
-                CriticalMultiplierCharacteristic
-            >().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestEffectsWorld, CriticalChanceCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
+            new CharacteristicFeature<TestEffectsWorld, CriticalMultiplierCharacteristic>().InstallResourcesAndRegisterTypesForTest(_world);
             new DamageFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
@@ -85,9 +79,7 @@ namespace UniGame.StaticEcs.Features.Tests
         {
             _world?.TerminateLifeTime();
             if (World<TestEffectsWorld>.Status == WorldStatus.Initialized)
-            {
                 _apply.Destroy();
-            }
 
             _world?.Dispose();
         }

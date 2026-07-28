@@ -17,9 +17,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (entity.Has<MovementDestinationComponent>())
             {
@@ -28,11 +26,9 @@ namespace UniGame.StaticEcs.Features
                 existing.IsActive = true;
             }
             else
-            {
                 entity.Set(
                     new MovementDestinationComponent { Destination = destination, IsActive = true }
                 );
-            }
         }
 
         /// <summary>
@@ -43,14 +39,10 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (entity.Has<MovementDestinationComponent>())
-            {
                 entity.Mut<MovementDestinationComponent>().IsActive = false;
-            }
         }
 
         /// <summary>
@@ -60,9 +52,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             return entity.Has<MovementDestinationComponent>()
                 && entity.Read<MovementDestinationComponent>().IsActive;

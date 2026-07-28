@@ -15,9 +15,7 @@ namespace UniGame.StaticEcs.Features
             where TCharacteristic : struct, ICharacteristicType
         {
             if (!target.TryUnpack<TWorld>(out var targetEntity))
-            {
                 return false;
-            }
 
             ref var entries = ref EnsureModifierStorage<TWorld, TCharacteristic>(targetEntity);
             entries.Add(
@@ -47,26 +45,16 @@ namespace UniGame.StaticEcs.Features
             where TCharacteristic : struct, ICharacteristicType
         {
             if (!target.TryUnpack<TWorld>(out var targetEntity))
-            {
                 return 0;
-            }
 
             if (
-                !targetEntity.Has<World<TWorld>.Multi<
-                    CharacteristicModifierComponent<TCharacteristic>
-                >>()
+                !targetEntity.Has<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>()
             )
-            {
                 return 0;
-            }
 
-            ref var entries = ref targetEntity.Ref<World<TWorld>.Multi<
-                CharacteristicModifierComponent<TCharacteristic>
-            >>();
+            ref var entries = ref targetEntity.Ref<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>();
             if (entries.IsEmpty)
-            {
                 return 0;
-            }
 
             var compactSource = (EntityGIDCompact)source;
             var removed = 0;
@@ -81,9 +69,7 @@ namespace UniGame.StaticEcs.Features
             }
 
             if (removed > 0)
-            {
                 RecomputeValueInternal<TWorld, TCharacteristic>(target, targetEntity);
-            }
 
             return removed;
         }
@@ -93,26 +79,16 @@ namespace UniGame.StaticEcs.Features
             where TCharacteristic : struct, ICharacteristicType
         {
             if (!target.TryUnpack<TWorld>(out var targetEntity))
-            {
                 return false;
-            }
 
             if (
-                !targetEntity.Has<World<TWorld>.Multi<
-                    CharacteristicModifierComponent<TCharacteristic>
-                >>()
+                !targetEntity.Has<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>()
             )
-            {
                 return false;
-            }
 
-            ref var entries = ref targetEntity.Ref<World<TWorld>.Multi<
-                CharacteristicModifierComponent<TCharacteristic>
-            >>();
+            ref var entries = ref targetEntity.Ref<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>();
             if (index < 0 || index >= entries.Length)
-            {
                 return false;
-            }
 
             entries.RemoveAtSwap(index);
             RecomputeValueInternal<TWorld, TCharacteristic>(target, targetEntity);
@@ -124,9 +100,7 @@ namespace UniGame.StaticEcs.Features
             where TCharacteristic : struct, ICharacteristicType
         {
             if (!target.TryUnpack<TWorld>(out var targetEntity))
-            {
                 return false;
-            }
 
             return RecomputeValueInternal<TWorld, TCharacteristic>(target, targetEntity);
         }
@@ -139,13 +113,9 @@ namespace UniGame.StaticEcs.Features
             where TCharacteristic : struct, ICharacteristicType
         {
             if (!targetEntity.Has<CharacteristicComponent<TCharacteristic>>())
-            {
                 return false;
-            }
 
-            ref var characteristic = ref targetEntity.Ref<
-                CharacteristicComponent<TCharacteristic>
-            >();
+            ref var characteristic = ref targetEntity.Ref<CharacteristicComponent<TCharacteristic>>();
             var previous = characteristic.Value;
             var newValue = ComputeFromModifiers<TWorld, TCharacteristic>(
                 targetEntity,
@@ -155,9 +125,7 @@ namespace UniGame.StaticEcs.Features
             characteristic.SetValue(newValue);
 
             if (previous == characteristic.Value)
-            {
                 return false;
-            }
 
             CharacteristicOperations.SendChanged<TWorld, TCharacteristic>(
                 target,
@@ -175,21 +143,13 @@ namespace UniGame.StaticEcs.Features
             where TCharacteristic : struct, ICharacteristicType
         {
             if (
-                !targetEntity.Has<World<TWorld>.Multi<
-                    CharacteristicModifierComponent<TCharacteristic>
-                >>()
+                !targetEntity.Has<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>()
             )
-            {
                 return baseValue;
-            }
 
-            ref var entries = ref targetEntity.Ref<World<TWorld>.Multi<
-                CharacteristicModifierComponent<TCharacteristic>
-            >>();
+            ref var entries = ref targetEntity.Ref<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>();
             if (entries.IsEmpty)
-            {
                 return baseValue;
-            }
 
             var addSum = 0f;
             var mulProduct = 1f;
@@ -215,33 +175,23 @@ namespace UniGame.StaticEcs.Features
             }
 
             if (hasOverride)
-            {
                 return overrideValue;
-            }
 
             return (baseValue + addSum) * mulProduct;
         }
 
-        private static ref World<TWorld>.Multi<
-            CharacteristicModifierComponent<TCharacteristic>
-        > EnsureModifierStorage<TWorld, TCharacteristic>(World<TWorld>.Entity targetEntity)
+        private static ref World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>> EnsureModifierStorage<TWorld, TCharacteristic>(
+            World<TWorld>.Entity targetEntity
+        )
             where TWorld : struct, IWorldType
             where TCharacteristic : struct, ICharacteristicType
         {
             if (
-                !targetEntity.Has<World<TWorld>.Multi<
-                    CharacteristicModifierComponent<TCharacteristic>
-                >>()
+                !targetEntity.Has<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>()
             )
-            {
-                targetEntity.Add<World<TWorld>.Multi<
-                    CharacteristicModifierComponent<TCharacteristic>
-                >>();
-            }
+                targetEntity.Add<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>();
 
-            return ref targetEntity.Ref<World<TWorld>.Multi<
-                CharacteristicModifierComponent<TCharacteristic>
-            >>();
+            return ref targetEntity.Ref<World<TWorld>.Multi<CharacteristicModifierComponent<TCharacteristic>>>();
         }
 
         // --- Main-default overloads ---

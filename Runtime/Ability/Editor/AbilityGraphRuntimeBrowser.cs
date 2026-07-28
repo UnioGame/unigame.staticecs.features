@@ -34,9 +34,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             RebuildAssetIndex();
 
             if (World<Main>.Status != WorldStatus.Initialized)
-            {
                 return;
-            }
 
             CollectActiveCasts();
             CollectEquippedAbilities();
@@ -52,14 +50,10 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 var path = AssetDatabase.GUIDToAssetPath(guids[i]);
                 var asset = AssetDatabase.LoadAssetAtPath<AbilityAsset>(path);
                 if (asset == null)
-                {
                     continue;
-                }
 
                 if (!_assetById.ContainsKey(asset.Id.Value))
-                {
                     _assetById.Add(asset.Id.Value, asset);
-                }
             }
         }
 
@@ -67,9 +61,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             AbilityRegistry<Main> registry = null;
             if (World<Main>.HasResource<AbilityRegistry<Main>>())
-            {
                 registry = World<Main>.GetResource<AbilityRegistry<Main>>();
-            }
 
             foreach (
                 var entity in World<Main>
@@ -100,9 +92,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         {
             AbilityRegistry<Main> registry = null;
             if (World<Main>.HasResource<AbilityRegistry<Main>>())
-            {
                 registry = World<Main>.GetResource<AbilityRegistry<Main>>();
-            }
 
             foreach (
                 var entity in World<Main>
@@ -143,12 +133,8 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         )
         {
             if (registry != null && registry.TryGet(abilityId, out var definition, out _))
-            {
                 if (!string.IsNullOrWhiteSpace(definition.DisplayName))
-                {
                     return definition.DisplayName;
-                }
-            }
 
             return abilityId.ToString();
         }
@@ -156,16 +142,12 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static string ResolveActiveNodeGuid(World<Main>.Entity castEntity)
         {
             if (!castEntity.Has<World<Main>.Multi<AbilityActiveStepComponent>>())
-            {
                 return string.Empty;
-            }
 
             ref readonly var activeSteps =
                 ref castEntity.Read<World<Main>.Multi<AbilityActiveStepComponent>>();
             if (activeSteps.Length == 0)
-            {
                 return string.Empty;
-            }
 
             return activeSteps.Get(0).NodeGuid ?? string.Empty;
         }
@@ -173,13 +155,9 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static GameObject ResolveOwnerGameObject(EntityGID owner)
         {
             if (!owner.TryUnpack<Main>(out var ownerEntity))
-            {
                 return null;
-            }
             if (!ownerEntity.Has<TransformComponent>())
-            {
                 return null;
-            }
 
             var transform = ownerEntity.Read<TransformComponent>().Transform;
             return transform != null ? transform.gameObject : null;

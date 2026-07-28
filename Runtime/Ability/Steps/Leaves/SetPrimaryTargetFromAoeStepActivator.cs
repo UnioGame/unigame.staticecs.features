@@ -14,26 +14,18 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity))
-            {
                 return StepStatus.Failed;
-            }
             if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
-            {
                 return StepStatus.Failed;
-            }
 
             ref readonly var entries =
                 ref castEntity.Read<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
             if (entries.Length == 0)
-            {
                 return StepStatus.Failed;
-            }
 
             var selected = SelectTarget(config.Selector, in entries, ctx.Caster);
             if (!selected.TryUnpack<TWorld>(out _))
-            {
                 return StepStatus.Failed;
-            }
 
             ref var runtime = ref castEntity.Mut<AbilityCastComponent>();
             runtime.PrimaryTarget = selected;
@@ -62,19 +54,13 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (!World<TWorld>.HasResource<IAbilityRng<TWorld>>())
-            {
                 return entries.Get(0).Target;
-            }
 
             var index = World<TWorld>.GetResource<IAbilityRng<TWorld>>().Range(0, entries.Length);
             if (index < 0)
-            {
                 index = 0;
-            }
             if (index >= entries.Length)
-            {
                 index = entries.Length - 1;
-            }
 
             return entries.Get(index).Target;
         }
@@ -88,15 +74,11 @@ namespace UniGame.StaticEcs.Features
                 !caster.TryUnpack<TWorld>(out var casterEntity)
                 || !casterEntity.Has<TransformComponent>()
             )
-            {
                 return default;
-            }
 
             var casterBinding = casterEntity.Read<TransformComponent>();
             if (casterBinding.Transform == null)
-            {
                 return default;
-            }
 
             var casterPosition = casterBinding.Transform.position;
             var best = default(EntityGID);
@@ -109,15 +91,11 @@ namespace UniGame.StaticEcs.Features
                     !target.TryUnpack<TWorld>(out var targetEntity)
                     || !targetEntity.Has<TransformComponent>()
                 )
-                {
                     continue;
-                }
 
                 var binding = targetEntity.Read<TransformComponent>();
                 if (binding.Transform == null)
-                {
                     continue;
-                }
 
                 var distance = (binding.Transform.position - casterPosition).sqrMagnitude;
                 if (distance < bestDistance)

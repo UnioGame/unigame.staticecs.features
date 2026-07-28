@@ -53,9 +53,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!entity.Has<AstarObstacleComponent>())
-            {
                 return;
-            }
 
             ref var obstacle = ref entity.Mut<AstarObstacleComponent>();
             obstacle.GraphProvider = graphProvider;

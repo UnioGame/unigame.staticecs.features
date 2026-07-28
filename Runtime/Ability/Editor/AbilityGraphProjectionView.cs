@@ -28,14 +28,12 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             }
 
             if (projection.Warnings.Count > 0)
-            {
                 for (var i = 0; i < projection.Warnings.Count; i++)
                 {
                     var warning = new HelpBox(projection.Warnings[i], HelpBoxMessageType.Warning);
                     warning.style.marginBottom = 6f;
                     Add(warning);
                 }
-            }
 
             for (var i = 0; i < projection.Nodes.Count; i++)
             {

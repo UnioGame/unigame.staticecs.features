@@ -12,9 +12,7 @@ namespace UniGame.StaticEcs.Features
         public void Apply(ref DamageContext ctx)
         {
             if (ctx.Cancelled || ctx.Type == DamageType.Healing)
-            {
                 return;
-            }
 
             if (
                 !DamageCharacteristicHelper.TryReadValue<TWorld, DodgeChanceCharacteristic>(
@@ -22,20 +20,14 @@ namespace UniGame.StaticEcs.Features
                     out var chance
                 )
             )
-            {
                 return;
-            }
 
             if (chance <= 0f)
-            {
                 return;
-            }
 
             ref var rng = ref World<TWorld>.GetResource<IDamageRng>();
             if (!rng.RollChance(chance))
-            {
                 return;
-            }
 
             ctx.Cancelled = true;
             ctx.CancelReason = DamageCancelReason.Dodged;

@@ -140,18 +140,14 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             port.portName = label;
             port.portColor = new Color(0.62f, 0.76f, 0.95f, 1f);
             if (direction == Direction.Input)
-            {
                 port.edgeConnector?.activators.Clear();
-            }
             return port;
         }
 
         private void OnNodeMouseDown(MouseDownEvent evt)
         {
             if (evt.button != 0)
-            {
                 return;
-            }
 
             _nodeSelected?.Invoke(ProjectionNode);
         }

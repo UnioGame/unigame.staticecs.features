@@ -84,9 +84,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         EditorStyles.toolbarButton
                     )
                 )
-                {
                     _sourceMode = GraphSourceMode.Project;
-                }
 
                 if (
                     GUILayout.Toggle(
@@ -95,33 +93,25 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         EditorStyles.toolbarButton
                     )
                 )
-                {
                     _sourceMode = GraphSourceMode.Runtime;
-                }
 
                 GUILayout.FlexibleSpace();
 
                 if (_sourceMode == GraphSourceMode.Project)
-                {
                     _projectAssetFilter = GUILayout.TextField(
                         _projectAssetFilter ?? string.Empty,
                         EditorStyles.toolbarSearchField,
                         GUILayout.Width(260f)
                     );
-                }
                 else
-                {
                     _runtimeFilter = GUILayout.TextField(
                         _runtimeFilter ?? string.Empty,
                         EditorStyles.toolbarSearchField,
                         GUILayout.Width(260f)
                     );
-                }
 
                 if (GUILayout.Button("Refresh", EditorStyles.toolbarButton, GUILayout.Width(70f)))
-                {
                     RefreshData();
-                }
             }
         }
 
@@ -143,9 +133,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 {
                     var asset = _projectAssets[i];
                     if (asset == null || !MatchesProjectAssetFilter(asset))
-                    {
                         continue;
-                    }
 
                     shown++;
                     using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -162,30 +150,22 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         using (new EditorGUILayout.HorizontalScope())
                         {
                             if (GUILayout.Button("Open Graph", GUILayout.Width(95f)))
-                            {
                                 AbilityGraphEditorWindow.OpenTab(asset);
-                            }
 
                             if (GUILayout.Button("Ping", GUILayout.Width(70f)))
-                            {
                                 EditorGUIUtility.PingObject(asset);
-                            }
 
                             if (GUILayout.Button("Select", GUILayout.Width(70f)))
-                            {
                                 Selection.activeObject = asset;
-                            }
                         }
                     }
                 }
 
                 if (shown == 0)
-                {
                     EditorGUILayout.HelpBox(
                         "No project AbilityAsset matches the current filter.",
                         MessageType.None
                     );
-                }
             }
         }
 
@@ -227,9 +207,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
             {
                 var entry = entries[i];
                 if (!MatchesRuntimeFilter(entry))
-                {
                     continue;
-                }
 
                 shown++;
                 using (new EditorGUILayout.VerticalScope(EditorStyles.helpBox))
@@ -248,9 +226,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                     {
                         EditorGUILayout.LabelField($"Cast: {entry.Cast}");
                         if (!string.IsNullOrWhiteSpace(entry.ActiveNodeGuid))
-                        {
                             EditorGUILayout.LabelField($"Active node: {entry.ActiveNodeGuid}");
-                        }
                     }
 
                     using (new EditorGUILayout.HorizontalScope())
@@ -258,43 +234,33 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                         using (new EditorGUI.DisabledScope(entry.Asset == null))
                         {
                             if (GUILayout.Button("Open Graph", GUILayout.Width(95f)))
-                            {
                                 AbilityGraphEditorWindow.OpenTab(entry.Asset);
-                            }
                         }
 
                         using (new EditorGUI.DisabledScope(entry.OwnerGameObject == null))
                         {
                             if (GUILayout.Button("Ping Owner", GUILayout.Width(90f)))
-                            {
                                 EditorGUIUtility.PingObject(entry.OwnerGameObject);
-                            }
 
                             if (GUILayout.Button("Select Owner", GUILayout.Width(95f)))
-                            {
                                 Selection.activeGameObject = entry.OwnerGameObject;
-                            }
                         }
                     }
                 }
             }
 
             if (shown == 0)
-            {
                 EditorGUILayout.HelpBox(
                     "No runtime entries match the current filter.",
                     MessageType.None
                 );
-            }
         }
 
         private void RefreshData()
         {
             RefreshProjectAssets();
             if (_sourceMode == GraphSourceMode.Runtime)
-            {
                 _runtimeBrowser.Refresh();
-            }
         }
 
         private void RefreshProjectAssets()
@@ -307,9 +273,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 var path = AssetDatabase.GUIDToAssetPath(guids[i]);
                 var asset = AssetDatabase.LoadAssetAtPath<AbilityAsset>(path);
                 if (asset == null)
-                {
                     continue;
-                }
 
                 _projectAssets.Add(asset);
             }
@@ -323,9 +287,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private bool MatchesProjectAssetFilter(AbilityAsset asset)
         {
             if (string.IsNullOrWhiteSpace(_projectAssetFilter))
-            {
                 return true;
-            }
 
             var filter = _projectAssetFilter.Trim();
             var rootType = asset.Root != null ? asset.Root.GetType().Name : string.Empty;
@@ -338,9 +300,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private bool MatchesRuntimeFilter(AbilityGraphRuntimeBrowser.RuntimeAbilityEntry entry)
         {
             if (string.IsNullOrWhiteSpace(_runtimeFilter))
-            {
                 return true;
-            }
 
             var filter = _runtimeFilter.Trim();
             return ContainsIgnoreCase(entry.DisplayName, filter)

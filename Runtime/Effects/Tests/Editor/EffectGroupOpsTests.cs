@@ -28,13 +28,11 @@ namespace UniGame.StaticEcs.Features.Tests
             new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            World<TestEffectsWorld>.SetResource<
-                IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handlerA);
+            World<TestEffectsWorld>.SetResource<IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handlerA);
             var configA =
                 new EffectConfig<TestEffectsWorld, TestEffectMarker>(
                     registerTickSystem: false);
-            World<TestEffectsWorld>.SetResource<
-                IEffectHandler<TestEffectsWorld, TestEffectMarkerB>>(_handlerB);
+            World<TestEffectsWorld>.SetResource<IEffectHandler<TestEffectsWorld, TestEffectMarkerB>>(_handlerB);
             var configB =
                 new EffectConfig<TestEffectsWorld, TestEffectMarkerB>(
                     registerTickSystem: false);

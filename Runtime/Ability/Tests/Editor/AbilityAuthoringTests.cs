@@ -23,14 +23,11 @@ namespace UniGame.StaticEcs.Features.Tests
             {
                 _world?.TerminateLifeTime();
                 if (World<TestAbilityWorld>.Status != WorldStatus.NotCreated)
-                {
                     if (_systemsCreated)
                     {
                         World<TestAbilityWorld>.Systems<StaticEcsUpdateSystems>.Destroy();
                         _systemsCreated = false;
                     }
-
-                }
 
                 _world?.Dispose();
             }
@@ -157,9 +154,7 @@ namespace UniGame.StaticEcs.Features.Tests
         private static void DestroyObject(UnityEngine.Object asset)
         {
             if (asset != null)
-            {
                 UnityEngine.Object.DestroyImmediate(asset);
-            }
         }
     }
 }

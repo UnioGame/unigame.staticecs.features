@@ -14,9 +14,7 @@ namespace UniGame.StaticEcs.Features
             var castEntity = SpawnBase<TWorld>(casterGid, casterGid, abilityId, target);
 
             if (casterGid.TryUnpack<TWorld>(out var casterEntity))
-            {
                 casterEntity.Set(new AbilityActiveCastComponent { Cast = castEntity.GID });
-            }
 
             World<TWorld>.SendEvent(
                 new AbilityStartedEvent

@@ -13,9 +13,7 @@ namespace UniGame.StaticEcs.Features
         public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)
         {
             if (previousStacks > 0)
-            {
                 return;
-            }
 
             StunOperations.AddSource<TWorld>(target, source);
         }

@@ -13,9 +13,7 @@ namespace UniGame.StaticEcs.Features
         public void Update()
         {
             if (!World<TWorld>.HasResource<ITargetIndex<TWorld>>())
-            {
                 return;
-            }
             World<TWorld>.GetResource<ITargetIndex<TWorld>>().Rebuild();
         }
     }

@@ -40,9 +40,7 @@ namespace UniGame.StaticEcs.Features
             {
                 ref readonly var binding = ref entity.Read<TransformComponent>();
                 if (binding.Transform == null)
-                {
                     continue;
-                }
 
                 _ids.Add(entity.GID);
                 _positions.Add(binding.Transform.position);
@@ -50,14 +48,10 @@ namespace UniGame.StaticEcs.Features
 
             var n = _ids.Count;
             if (_indices.Length < n)
-            {
                 _indices = new int[System.Math.Max(8, n)];
-            }
 
             if (_nodes.Length < n)
-            {
                 _nodes = new KdNode[System.Math.Max(8, n)];
-            }
 
             for (var i = 0; i < n; i++)
             {
@@ -71,9 +65,7 @@ namespace UniGame.StaticEcs.Features
         public int FillSphere(Vector3 center, float radius, Span<EntityGID> output)
         {
             if (output.Length == 0 || _ids.Count == 0 || _root < 0)
-            {
                 return 0;
-            }
 
             var written = 0;
             var radiusSq = radius * radius;
@@ -89,9 +81,7 @@ namespace UniGame.StaticEcs.Features
             EntityGID excluded = default)
         {
             if (output.Length == 0 || _ids.Count == 0 || _root < 0)
-            {
                 return 0;
-            }
 
             float[] rentedDistances = null;
             Span<float> distances = output.Length <= StackDistanceCapacity
@@ -116,18 +106,14 @@ namespace UniGame.StaticEcs.Features
             finally
             {
                 if (rentedDistances != null)
-                {
                     ArrayPool<float>.Shared.Return(rentedDistances);
-                }
             }
         }
 
         private int Build(int from, int to, int depth)
         {
             if (from > to)
-            {
                 return -1;
-            }
 
             var axis = depth % 3;
             var mid = (from + to) >> 1;
@@ -150,18 +136,12 @@ namespace UniGame.StaticEcs.Features
             {
                 var pivotIndex = Partition(left, right, axis);
                 if (pivotIndex == k)
-                {
                     return;
-                }
 
                 if (k < pivotIndex)
-                {
                     right = pivotIndex - 1;
-                }
                 else
-                {
                     left = pivotIndex + 1;
-                }
             }
         }
 
@@ -197,9 +177,7 @@ namespace UniGame.StaticEcs.Features
         )
         {
             if (nodeIndex < 0 || written >= output.Length)
-            {
                 return;
-            }
 
             ref var node = ref _nodes[nodeIndex];
             var pos = _positions[node.PointIndex];
@@ -210,9 +188,7 @@ namespace UniGame.StaticEcs.Features
             {
                 output[written++] = _ids[node.PointIndex];
                 if (written >= output.Length)
-                {
                     return;
-                }
             }
 
             var centerAxis = node.Axis == 0 ? center.x : (node.Axis == 1 ? center.y : center.z);
@@ -223,17 +199,13 @@ namespace UniGame.StaticEcs.Features
             {
                 QuerySphere(node.Left, center, radiusSq, output, ref written);
                 if (diff * diff <= radiusSq)
-                {
                     QuerySphere(node.Right, center, radiusSq, output, ref written);
-                }
             }
             else
             {
                 QuerySphere(node.Right, center, radiusSq, output, ref written);
                 if (diff * diff <= radiusSq)
-                {
                     QuerySphere(node.Left, center, radiusSq, output, ref written);
-                }
             }
         }
 
@@ -247,9 +219,7 @@ namespace UniGame.StaticEcs.Features
             ref int written)
         {
             if (nodeIndex < 0)
-            {
                 return;
-            }
 
             ref var node = ref _nodes[nodeIndex];
             var pos = _positions[node.PointIndex];
@@ -259,9 +229,7 @@ namespace UniGame.StaticEcs.Features
             var distanceSq = dx * dx + dy * dy + dz * dz;
             var id = _ids[node.PointIndex];
             if (distanceSq <= radiusSq && !id.Equals(excluded))
-            {
                 InsertNearest(id, distanceSq, output, distances, ref written);
-            }
 
             var centerAxis = node.Axis == 0 ? center.x : (node.Axis == 1 ? center.y : center.z);
             var pointAxis = node.Axis == 0 ? pos.x : (node.Axis == 1 ? pos.y : pos.z);
@@ -278,7 +246,6 @@ namespace UniGame.StaticEcs.Features
                     distances,
                     ref written);
                 if (diff * diff <= radiusSq)
-                {
                     QueryNearestSphere(
                         node.Right,
                         center,
@@ -287,7 +254,6 @@ namespace UniGame.StaticEcs.Features
                         output,
                         distances,
                         ref written);
-                }
             }
             else
             {
@@ -300,7 +266,6 @@ namespace UniGame.StaticEcs.Features
                     distances,
                     ref written);
                 if (diff * diff <= radiusSq)
-                {
                     QueryNearestSphere(
                         node.Left,
                         center,
@@ -309,7 +274,6 @@ namespace UniGame.StaticEcs.Features
                         output,
                         distances,
                         ref written);
-                }
             }
         }
 
@@ -332,9 +296,7 @@ namespace UniGame.StaticEcs.Features
             }
 
             if (insertAt >= output.Length)
-            {
                 return;
-            }
 
             var newWritten = written < output.Length ? written + 1 : written;
             for (var i = newWritten - 1; i > insertAt; i--)

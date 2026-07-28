@@ -33,19 +33,13 @@ namespace UniGame.StaticEcs.Features
             {
                 ref readonly var ev = ref e.Value;
                 if (!ev.BecameActive && !ev.BecameInactive)
-                {
                     continue;
-                }
 
                 if (!ev.Target.TryUnpack<TWorld>(out var entity))
-                {
                     continue;
-                }
 
                 if (!entity.Has<ActionMaskComponent>())
-                {
                     continue;
-                }
 
                 entity.Mut<ActionMaskComponent>().Bits = ev.BecameActive ? 0u : uint.MaxValue;
             }

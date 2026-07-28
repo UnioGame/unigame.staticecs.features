@@ -16,13 +16,9 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!ctx.CastEntity.TryUnpack<TWorld>(out var castEntity))
-            {
                 return false;
-            }
             if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
-            {
                 return false;
-            }
 
             return castEntity.Read<World<TWorld>.Multi<AbilityAoeTargetComponent>>().Length > 0;
         }

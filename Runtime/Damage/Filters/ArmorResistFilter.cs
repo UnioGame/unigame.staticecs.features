@@ -13,9 +13,7 @@ namespace UniGame.StaticEcs.Features
         public void Apply(ref DamageContext ctx)
         {
             if (ctx.Cancelled || ctx.Type != DamageType.Physical || ctx.Amount <= 0f)
-            {
                 return;
-            }
 
             if (
                 !DamageCharacteristicHelper.TryReadValue<TWorld, ArmorResistCharacteristic>(
@@ -23,19 +21,13 @@ namespace UniGame.StaticEcs.Features
                     out var resist
                 )
             )
-            {
                 return;
-            }
 
             if (resist <= 0f)
-            {
                 return;
-            }
 
             if (resist > 1f)
-            {
                 resist = 1f;
-            }
 
             ctx.Amount *= 1f - resist;
         }

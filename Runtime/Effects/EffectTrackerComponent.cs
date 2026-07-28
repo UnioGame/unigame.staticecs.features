@@ -17,25 +17,17 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (reason == HookReason.WorldDestroy)
-            {
                 return;
-            }
 
             if (!self.Has<World<TWorld>.Multi<EffectTargetComponent>>())
-            {
                 return;
-            }
 
             if (!World<TWorld>.HasResource<EffectRegistry>())
-            {
                 return;
-            }
 
             ref var refs = ref self.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             if (refs.IsEmpty)
-            {
                 return;
-            }
 
             ref var registry = ref World<TWorld>.GetResource<EffectRegistry>();
             EntityGID sourceGid = self.GID;

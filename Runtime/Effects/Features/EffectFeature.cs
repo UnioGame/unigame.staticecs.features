@@ -39,11 +39,9 @@ namespace UniGame.StaticEcs.Features
             {
                 var handler = CreateDefaultHandler();
                 if (handler == null)
-                {
                     throw new System.InvalidOperationException(
                         $"Effect `{typeof(TEffect).FullName}` requires an " +
                         $"`IEffectHandler<{typeof(TWorld).Name}, {typeof(TEffect).Name}>` resource.");
-                }
 
                 World<TWorld>.SetResource<IEffectHandler<TWorld, TEffect>>(handler);
             }
@@ -61,29 +59,20 @@ namespace UniGame.StaticEcs.Features
 
             if (!World<TWorld>.HasResource<EffectIdRegistry>() ||
                 !World<TWorld>.HasResource<EffectRegistry>())
-            {
                 throw new System.InvalidOperationException(
                     $"Effect `{typeof(TEffect).FullName}` requires EffectsCoreFeature " +
                     "to install its registries first.");
-            }
 
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             idRegistry.Register<TEffect>();
             ref var effectRegistry = ref World<TWorld>.GetResource<EffectRegistry>();
             var flag = EffectFlagOf<TEffect>.Value;
             if (!effectRegistry.IsRegistered(flag))
-            {
                 effectRegistry.Register(flag, RemoveOnSourceCleanup, RemoveUnconditional);
-            }
 
             ref var config = ref World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (!updateEnabled || !config.RegisterTickSystem)
-            {
+            if (!config.RegisterTickSystem)
                 return UniTask.CompletedTask;
-            }
 
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new EffectTickSystem<TWorld, TEffect>(),

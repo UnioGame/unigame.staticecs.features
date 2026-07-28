@@ -16,9 +16,7 @@ namespace UniGame.StaticEcs.Features
         public void Apply(ref DamageContext ctx)
         {
             if (ctx.Cancelled || ctx.Type == DamageType.Healing || ctx.Amount <= 0f)
-            {
                 return;
-            }
 
             var roll = ctx.ForceCritical;
             if (!roll)
@@ -29,23 +27,17 @@ namespace UniGame.StaticEcs.Features
                         out var chance
                     )
                 )
-                {
                     return;
-                }
 
                 if (chance <= 0f)
-                {
                     return;
-                }
 
                 ref var rng = ref World<TWorld>.GetResource<IDamageRng>();
                 roll = rng.RollChance(chance);
             }
 
             if (!roll)
-            {
                 return;
-            }
 
             var multiplier = DefaultMultiplier;
             if (
@@ -55,9 +47,7 @@ namespace UniGame.StaticEcs.Features
                 )
                 && configured > 0f
             )
-            {
                 multiplier = configured;
-            }
 
             var baseAmount = ctx.Amount;
             ctx.Amount *= multiplier;

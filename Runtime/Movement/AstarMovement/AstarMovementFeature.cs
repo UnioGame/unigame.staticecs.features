@@ -46,26 +46,14 @@ namespace UniGame.StaticEcs.Features
             }
 
             ref var config = ref World<TWorld>.GetResource<AstarMovementConfig>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (!updateEnabled)
-            {
-                return UniTask.CompletedTask;
-            }
-
             if (config.RegisterGraphSystem)
-            {
                 World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                     new AstarGraphSystem<TWorld>(),
                     config.GraphOrder);
-            }
             if (config.RegisterMovementSystem)
-            {
                 World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                     new AstarMovementSystem<TWorld>(),
                     config.MovementOrder);
-            }
             return UniTask.CompletedTask;
         }
     }

@@ -21,9 +21,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         public static IReadOnlyList<Entry> GetEntries()
         {
             if (_entries != null)
-            {
                 return _entries;
-            }
 
             _entries = new List<Entry>();
             var assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -34,9 +32,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
                 {
                     var type = types[typeIndex];
                     if (!IsCreatableNodeType(type))
-                    {
                         continue;
-                    }
 
                     var metadata = type.GetCustomAttribute<AbilityStepEditorAttribute>(false);
                     var displayName = !string.IsNullOrWhiteSpace(metadata?.DisplayName)
@@ -72,19 +68,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private static bool IsCreatableNodeType(Type type)
         {
             if (type == null || !typeof(IAbilityStepConfig).IsAssignableFrom(type))
-            {
                 return false;
-            }
 
             if (type.IsAbstract || type.IsInterface || type.IsGenericTypeDefinition)
-            {
                 return false;
-            }
 
             if (!type.IsDefined(typeof(SerializableAttribute), false))
-            {
                 return false;
-            }
 
             return type.GetConstructor(Type.EmptyTypes) != null;
         }

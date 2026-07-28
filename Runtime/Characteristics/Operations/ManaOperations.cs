@@ -8,25 +8,17 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
-            {
                 return false;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<ManaCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var mana = ref entity.Mut<CharacteristicComponent<ManaCharacteristic>>();
             if (mana.Value < amount)
-            {
                 return false;
-            }
 
             CharacteristicOperations.AddValue<TWorld, ManaCharacteristic>(
                 ref mana,
@@ -40,19 +32,13 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (amount <= 0f)
-            {
                 return false;
-            }
 
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return false;
-            }
 
             if (!entity.Has<CharacteristicComponent<ManaCharacteristic>>())
-            {
                 return false;
-            }
 
             ref var mana = ref entity.Mut<CharacteristicComponent<ManaCharacteristic>>();
             return CharacteristicOperations.AddValue<TWorld, ManaCharacteristic>(
@@ -66,9 +52,7 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (!target.TryUnpack<TWorld>(out var entity))
-            {
                 return;
-            }
 
             if (entity.Has<ManaRegenComponent>())
             {

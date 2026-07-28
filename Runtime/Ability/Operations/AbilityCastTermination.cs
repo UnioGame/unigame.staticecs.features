@@ -46,9 +46,7 @@ namespace UniGame.StaticEcs.Features
         {
             if (!castGid.TryUnpack<TWorld>(out var castEntity) ||
                 !castEntity.Has<AbilityCastComponent>())
-            {
                 return false;
-            }
 
             var runtime = castEntity.Read<AbilityCastComponent>();
             CancelBranches(castEntity, reason);
@@ -58,7 +56,6 @@ namespace UniGame.StaticEcs.Features
                 castEntity.Has<AbilityBranchSubcastTag>() &&
                 castEntity.Has<AbilityParentCastComponent>();
             if (notifyParent && isBranch)
-            {
                 World<TWorld>.SendEvent(
                     new AbilityBranchCompletedEvent
                     {
@@ -71,13 +68,11 @@ namespace UniGame.StaticEcs.Features
                                 ? StepStatus.Success
                                 : StepStatus.Failed,
                     });
-            }
 
             ClearForegroundCast(runtime.Caster, castGid);
             castEntity.Destroy();
 
             if (emitRootCompletion && !isBranch)
-            {
                 World<TWorld>.SendEvent(
                     new AbilityCompletedEvent
                     {
@@ -86,7 +81,6 @@ namespace UniGame.StaticEcs.Features
                         CastEntity = castGid,
                         Reason = reason,
                     });
-            }
 
             return true;
         }
@@ -96,9 +90,7 @@ namespace UniGame.StaticEcs.Features
             AbilityCompletedReason reason)
         {
             if (!castEntity.Has<World<TWorld>.Multi<AbilityBranchComponent>>())
-            {
                 return;
-            }
 
             ref var branches =
                 ref castEntity.Ref<World<TWorld>.Multi<AbilityBranchComponent>>();
@@ -106,9 +98,7 @@ namespace UniGame.StaticEcs.Features
             {
                 ref var branch = ref branches[i];
                 if (branch.Completed)
-                {
                     continue;
-                }
 
                 TerminateSilently(branch.BranchCast, reason);
             }
@@ -121,22 +111,16 @@ namespace UniGame.StaticEcs.Features
         {
             if (!castEntity.Has<AbilityCurrentStepComponent>() ||
                 !World<TWorld>.HasResource<AbilityStepActivatorRegistry<TWorld>>())
-            {
                 return;
-            }
 
             var current = castEntity.Read<AbilityCurrentStepComponent>().Config;
             if (current == null)
-            {
                 return;
-            }
 
             ref var activators =
                 ref World<TWorld>.GetResource<AbilityStepActivatorRegistry<TWorld>>();
             if (!activators.TryResolve(current.GetType(), out var activator))
-            {
                 return;
-            }
 
             var owner = castEntity.Has<AbilityCastOwnerComponent>()
                 ? castEntity.Read<AbilityCastOwnerComponent>().Owner
@@ -153,14 +137,10 @@ namespace UniGame.StaticEcs.Features
         {
             if (!caster.TryUnpack<TWorld>(out var casterEntity) ||
                 !casterEntity.Has<AbilityActiveCastComponent>())
-            {
                 return;
-            }
 
             if (casterEntity.Read<AbilityActiveCastComponent>().Cast.Equals(castGid))
-            {
                 casterEntity.Delete<AbilityActiveCastComponent>();
-            }
         }
     }
 }

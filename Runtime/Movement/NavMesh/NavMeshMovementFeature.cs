@@ -36,15 +36,10 @@ namespace UniGame.StaticEcs.Features
             }
 
             ref var config = ref World<TWorld>.GetResource<NavMeshMovementConfig>();
-            var updateEnabled =
-                World<TWorld>.HasResource<Unity.StaticEcsSystemsConfig>() &&
-                World<TWorld>.GetResource<Unity.StaticEcsSystemsConfig>().update;
-            if (updateEnabled && config.RegisterMovementSystem)
-            {
+            if (config.RegisterMovementSystem)
                 World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                     new NavMeshMovementSystem<TWorld>(),
                     config.MovementOrder);
-            }
 
             return UniTask.CompletedTask;
         }
