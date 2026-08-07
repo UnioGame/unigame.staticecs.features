@@ -31,7 +31,12 @@ namespace UniGame.StaticEcs.Features
                 // Explicit ECS requests are the only path request source, including while the graph is initializing.
                 astar.AI.canSearch = false;
 
-                if (entity.Has<CharacteristicComponent<SpeedCharacteristic>>())
+                if (
+                    World<TWorld>.IsComponentTypeRegistered<
+                        CharacteristicComponent<SpeedCharacteristic>
+                    >()
+                    && entity.Has<CharacteristicComponent<SpeedCharacteristic>>()
+                )
                     astar.AI.maxSpeed = entity
                         .Read<CharacteristicComponent<SpeedCharacteristic>>()
                         .Value;

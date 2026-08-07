@@ -8,7 +8,7 @@ namespace UniGame.StaticEcs.Features
     /// <summary>Converts a collider into an ECS obstacle linked to a graph entity provider.</summary>
     [DisallowMultipleComponent]
     [RequireComponent(typeof(Collider))]
-    public class AstarObstacleConverter<TWorld> : EcsMonoConverter<TWorld>, IEcsLinkResolver<TWorld>
+    public class AstarObstacleConverter<TWorld> : EcsMonoConverter<TWorld>, IEcsLinkResolver<TWorld>, IEcsConverterDependency<TWorld>
         where TWorld : struct, IWorldType
     {
         [SerializeField]
@@ -25,6 +25,10 @@ namespace UniGame.StaticEcs.Features
         {
             AstarObstacleConverterUtility.ResolveLinks(entity, _graphProvider);
         }
+
+        /// <inheritdoc/>
+        public bool IsReady(GameObject host, out string reason) =>
+            AstarGraphDependencyUtility.IsReady<TWorld>(_graphProvider, out reason);
     }
 
     internal static class AstarObstacleConverterUtility

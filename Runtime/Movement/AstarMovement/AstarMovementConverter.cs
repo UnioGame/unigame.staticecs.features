@@ -10,7 +10,7 @@ namespace UniGame.StaticEcs.Features
     /// Sets <see cref="AstarAIComponent"/> on conversion by reading <see cref="IAstarAI"/>
     /// from the host <see cref="GameObject"/>.
     /// </summary>
-    public class AstarMovementConverter<TWorld> : EcsMonoConverter<TWorld>, IEcsLinkResolver<TWorld>
+    public class AstarMovementConverter<TWorld> : EcsMonoConverter<TWorld>, IEcsLinkResolver<TWorld>, IEcsConverterDependency<TWorld>
         where TWorld : struct, IWorldType
     {
         [SerializeField]
@@ -27,6 +27,10 @@ namespace UniGame.StaticEcs.Features
         {
             AstarMovementConverterUtility.ResolveLinks(entity, _graphProvider);
         }
+
+        /// <inheritdoc/>
+        public bool IsReady(GameObject host, out string reason) =>
+            AstarGraphDependencyUtility.IsReady<TWorld>(_graphProvider, out reason);
     }
 
     internal static class AstarMovementConverterUtility
@@ -59,6 +63,29 @@ namespace UniGame.StaticEcs.Features
 
             entity.Mut<AstarAIComponent>().GraphEntity =
                 graphProvider != null ? graphProvider.EntityGid : default;
+        }
+    }
+
+    internal static class AstarGraphDependencyUtility
+    {
+        internal static bool IsReady<TWorld>(AbstractStaticEcsEntityProvider graphProvider,
+            out string reason) where TWorld : struct, IWorldType
+        {
+            if (graphProvider == null)
+            {
+                reason = "A graph provider is required.";
+                return false;
+            }
+            if (World<TWorld>.Status != WorldStatus.Initialized ||
+                !graphProvider.EntityGid.TryUnpack<TWorld>(out var graph) ||
+                !graph.Has<AstarPathComponent>() ||
+                !graph.Has<AstarGridGraphConfigComponent>())
+            {
+                reason = "The graph provider is not active in the authority world.";
+                return false;
+            }
+            reason = string.Empty;
+            return true;
         }
     }
 }

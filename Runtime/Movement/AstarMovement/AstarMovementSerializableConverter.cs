@@ -10,7 +10,8 @@ namespace UniGame.StaticEcs.Features
     [Serializable]
     public class AstarMovementSerializableConverter<TWorld>
         : EcsSerializableConverter<TWorld>,
-            IEcsLinkResolver<TWorld>
+            IEcsLinkResolver<TWorld>,
+            IEcsConverterDependency<TWorld>
         where TWorld : struct, IWorldType
     {
         [SerializeField]
@@ -34,5 +35,9 @@ namespace UniGame.StaticEcs.Features
         {
             AstarMovementConverterUtility.ResolveLinks(entity, _graphProvider);
         }
+
+        /// <inheritdoc />
+        public bool IsReady(GameObject host, out string reason) =>
+            AstarGraphDependencyUtility.IsReady<TWorld>(_graphProvider, out reason);
     }
 }
