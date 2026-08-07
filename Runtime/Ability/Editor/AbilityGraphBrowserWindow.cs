@@ -21,13 +21,13 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private string _runtimeFilter = string.Empty;
         private Vector2 _scrollPosition;
 
-        [MenuItem("UniGame/Static ECS/Ability Graphs/Open Project Graph...")]
+        [MenuItem("Game/Static ECS/Ability Graphs/Open Project Graph...")]
         public static void OpenProjectBrowser()
         {
             OpenBrowser(GraphSourceMode.Project);
         }
 
-        [MenuItem("UniGame/Static ECS/Ability Graphs/Open Runtime Graph...")]
+        [MenuItem("Game/Static ECS/Ability Graphs/Open Runtime Graph...")]
         public static void OpenRuntimeBrowser()
         {
             OpenBrowser(GraphSourceMode.Runtime);

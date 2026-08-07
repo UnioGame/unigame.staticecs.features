@@ -116,7 +116,7 @@ namespace UniGame.StaticEcs.Features.Editor.AbilityGraph
         private VisualElement _tabBar;
         private int _activeTabIndex = -1;
 
-        [MenuItem("UniGame/Static ECS/Ability Graph")]
+        [MenuItem("Game/Static ECS/Ability Graph")]
         public static void OpenEmpty()
         {
             var window = GetWindow<AbilityGraphEditorWindow>();
