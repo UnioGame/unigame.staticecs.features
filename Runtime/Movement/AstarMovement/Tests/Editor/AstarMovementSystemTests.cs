@@ -7,11 +7,11 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
     using Pathfinding;
     using Pathfinding.Graphs.Grid;
     using UniGame.StaticEcs.Tests;
+    using UniGame.StaticEcs.Unity;
     using UnityEngine;
 
     [TestFixture]
     [Category("StaticEcsAstar")]
-    [Explicit("Run separately when STATIC_ECS_ASTAR and its backend are available.")]
     public sealed class AstarMovementSystemTests
     {
         private GameObject _host;
@@ -20,12 +20,20 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
         private AstarPath _backend;
         private World<TestAstarWorld>.Entity _graphEntity;
         private AstarMovementSystem<TestAstarWorld> _system;
+        private bool _systemsCreated;
         private StaticEcsTestWorld<TestAstarWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
             _world = new StaticEcsTestWorld<TestAstarWorld>();
+            var systems = StaticEcsSystemsConfig.Default;
+            World<TestAstarWorld>.SetResource(systems);
+            World<TestAstarWorld>.Systems<StaticEcsUpdateSystems>.Create(
+                systems.baseSize,
+                StaticEcsSystemGroupIds.Update);
+            _systemsCreated = true;
+            _world.Types.RegisterAll(typeof(MovementDestinationComponent).Assembly);
             CharacteristicTypeRegistration.Register<TestAstarWorld, SpeedCharacteristic>(
                 _world.Types);
             new AstarMovementFeature<TestAstarWorld>()
@@ -62,6 +70,11 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
         [TearDown]
         public void TearDown()
         {
+            if (_systemsCreated && World<TestAstarWorld>.Status != WorldStatus.NotCreated)
+            {
+                World<TestAstarWorld>.Systems<StaticEcsUpdateSystems>.Destroy();
+                _systemsCreated = false;
+            }
             _world?.Dispose();
 
             if (_host != null)
@@ -164,6 +177,22 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
 
             Assert.AreEqual(0, _ai.SearchCount);
             Assert.IsTrue(_ai.isStopped);
+        }
+
+        [Test]
+        public void Update_StartOnUnwalkableNode_RequestsPathFromNearestWalkableNode()
+        {
+            var blocked = _backend.GetNearest(
+                _host.transform.position,
+                NearestNodeConstraint.None).node;
+            Assert.IsNotNull(blocked);
+            blocked.Walkable = false;
+            CreateAgent(Vector3.left * 4f, active: true);
+
+            _system.Update();
+
+            Assert.AreEqual(1, _ai.SearchCount);
+            Assert.IsFalse(_ai.isStopped);
         }
 
         [Test]

@@ -13,18 +13,24 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
 
     [TestFixture]
     [Category("StaticEcsAstar")]
-    [Explicit("Run separately when STATIC_ECS_ASTAR and its backend are available.")]
     public sealed class AstarGraphSystemTests
     {
         private GameObject _graphHost;
         private AstarPath _backend;
         private AstarGraphSystem<TestAstarWorld> _system;
+        private bool _systemsCreated;
         private StaticEcsTestWorld<TestAstarWorld> _world;
 
         [SetUp]
         public void SetUp()
         {
             _world = new StaticEcsTestWorld<TestAstarWorld>();
+            var systems = StaticEcsSystemsConfig.Default;
+            World<TestAstarWorld>.SetResource(systems);
+            World<TestAstarWorld>.Systems<StaticEcsUpdateSystems>.Create(
+                systems.baseSize,
+                StaticEcsSystemGroupIds.Update);
+            _systemsCreated = true;
             new AstarMovementFeature<TestAstarWorld>()
                 .InstallResourcesAndRegisterTypesForTest(_world);
             _world.Initialize();
@@ -37,6 +43,11 @@ namespace UniGame.StaticEcs.Features.Tests.Movement.Astar
         [TearDown]
         public void TearDown()
         {
+            if (_systemsCreated && World<TestAstarWorld>.Status != WorldStatus.NotCreated)
+            {
+                World<TestAstarWorld>.Systems<StaticEcsUpdateSystems>.Destroy();
+                _systemsCreated = false;
+            }
             _world?.Dispose();
 
             if (_graphHost != null)

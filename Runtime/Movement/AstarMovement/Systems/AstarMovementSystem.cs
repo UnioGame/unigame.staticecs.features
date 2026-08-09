@@ -104,10 +104,13 @@ namespace UniGame.StaticEcs.Features
             // initialized for disabled authoring/test components. Seeker is already required
             // and provides the same agent transform without that lifecycle coupling.
             var agentPosition = astar.Seeker.transform.position;
-            // Use the backend query so its max-nearest-node distance remains authoritative.
-            // The graph index check keeps this feature isolated to its configured graph.
-            var nearest = backend.GetNearest(agentPosition, NearestNodeConstraint.None).node;
-            return nearest != null && nearest.Walkable && nearest.GraphIndex == graph.graphIndex;
+            // An agent may temporarily overlap an unwalkable node after collision or a
+            // graph update. Find the nearest walkable recovery node instead of blocking
+            // all future path requests from that position.
+            var constraint = NearestNodeConstraint.Walkable;
+            constraint.graphMask = graphMask;
+            var nearest = backend.GetNearest(agentPosition, constraint).node;
+            return nearest != null && nearest.GraphIndex == graph.graphIndex;
         }
     }
 }
