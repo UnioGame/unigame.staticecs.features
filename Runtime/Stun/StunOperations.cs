@@ -32,8 +32,7 @@ namespace UniGame.StaticEcs.Features
             if (!target.TryUnpack<TWorld>(out var entity))
                 return 0;
 
-            if (!entity.Has<World<TWorld>.Multi<StunSourceComponent>>())
-                entity.Add<World<TWorld>.Multi<StunSourceComponent>>();
+            entity.Add<World<TWorld>.Multi<StunSourceComponent>>();
 
             ref var sources = ref entity.Ref<World<TWorld>.Multi<StunSourceComponent>>();
             var previous = sources.Length;

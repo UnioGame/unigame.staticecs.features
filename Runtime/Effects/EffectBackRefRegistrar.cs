@@ -19,11 +19,8 @@ namespace UniGame.StaticEcs.Features
             if (!source.TryUnpack<TWorld>(out var src))
                 return;
 
-            if (!src.Has<EffectTrackerComponent>())
-                src.Add<EffectTrackerComponent>();
-
-            if (!src.Has<World<TWorld>.Multi<EffectTargetComponent>>())
-                src.Add<World<TWorld>.Multi<EffectTargetComponent>>();
+            src.Add<EffectTrackerComponent>();
+            src.Add<World<TWorld>.Multi<EffectTargetComponent>>();
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;

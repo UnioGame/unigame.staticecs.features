@@ -25,8 +25,7 @@ namespace UniGame.StaticEcs.Features
             if (!target.TryUnpack<TWorld>(out var entity))
                 return false;
 
-            if (!entity.Has<ModificationEffectComponent<TStat>>())
-                entity.Add<ModificationEffectComponent<TStat>>();
+            entity.Add<ModificationEffectComponent<TStat>>();
 
             ref var data = ref entity.Ref<ModificationEffectComponent<TStat>>();
             data.Op = op;

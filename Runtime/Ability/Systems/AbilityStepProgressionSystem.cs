@@ -434,8 +434,7 @@ namespace UniGame.StaticEcs.Features
             if (parallel.ChildCount == 0)
                 return TraversalResult.NoOpSuccess();
 
-            if (!castEntity.Has<World<TWorld>.Multi<AbilityBranchComponent>>())
-                castEntity.Add<World<TWorld>.Multi<AbilityBranchComponent>>();
+            castEntity.Add<World<TWorld>.Multi<AbilityBranchComponent>>();
 
             ref var branches = ref castEntity.Ref<World<TWorld>.Multi<AbilityBranchComponent>>();
             branches.Clear();
@@ -524,8 +523,7 @@ namespace UniGame.StaticEcs.Features
 
         private static void PushFrame(World<TWorld>.Entity castEntity, AbilityStackComponent frame)
         {
-            if (!castEntity.Has<World<TWorld>.Multi<AbilityStackComponent>>())
-                castEntity.Add<World<TWorld>.Multi<AbilityStackComponent>>();
+            castEntity.Add<World<TWorld>.Multi<AbilityStackComponent>>();
             ref var frames = ref castEntity.Ref<World<TWorld>.Multi<AbilityStackComponent>>();
             frames.Add(frame);
         }
@@ -541,8 +539,7 @@ namespace UniGame.StaticEcs.Features
                 ? World<TWorld>.GetResource<EcsTime>().Now
                 : 0f;
 
-            if (!castEntity.Has<World<TWorld>.Multi<AbilityActiveStepComponent>>())
-                castEntity.Add<World<TWorld>.Multi<AbilityActiveStepComponent>>();
+            castEntity.Add<World<TWorld>.Multi<AbilityActiveStepComponent>>();
             ref var activeSteps =
                 ref castEntity.Ref<World<TWorld>.Multi<AbilityActiveStepComponent>>();
             activeSteps.Add(

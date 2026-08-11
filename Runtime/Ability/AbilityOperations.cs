@@ -24,8 +24,7 @@ namespace UniGame.StaticEcs.Features
             if (!caster.TryUnpack<TWorld>(out var entity))
                 return false;
 
-            if (!entity.Has<World<TWorld>.Multi<AbilitySlotComponent>>())
-                entity.Add<World<TWorld>.Multi<AbilitySlotComponent>>();
+            entity.Add<World<TWorld>.Multi<AbilitySlotComponent>>();
 
             ref var roster = ref entity.Ref<World<TWorld>.Multi<AbilitySlotComponent>>();
             for (var i = 0; i < roster.Length; i++)

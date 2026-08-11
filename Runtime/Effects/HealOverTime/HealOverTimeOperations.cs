@@ -26,8 +26,7 @@ namespace UniGame.StaticEcs.Features
             if (!target.TryUnpack<TWorld>(out var entity))
                 return false;
 
-            if (!entity.Has<HealOverTimeComponent>())
-                entity.Add<HealOverTimeComponent>();
+            entity.Add<HealOverTimeComponent>();
 
             ref var data = ref entity.Ref<HealOverTimeComponent>();
             data.HealPerTick = healPerTick;

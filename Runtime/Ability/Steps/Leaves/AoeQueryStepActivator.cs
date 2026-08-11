@@ -42,8 +42,7 @@ namespace UniGame.StaticEcs.Features
                     buffer,
                     config.ExcludeCaster ? ctx.Caster : default);
 
-            if (!castEntity.Has<World<TWorld>.Multi<AbilityAoeTargetComponent>>())
-                castEntity.Add<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
+            castEntity.Add<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
 
             ref var entries = ref castEntity.Ref<World<TWorld>.Multi<AbilityAoeTargetComponent>>();
             entries.Clear();

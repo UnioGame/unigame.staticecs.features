@@ -22,8 +22,7 @@ namespace UniGame.StaticEcs.Features
             var now = World<TWorld>.GetResource<EcsTime>().Now;
             var expiresAt = now + duration;
 
-            if (!entity.Has<World<TWorld>.Multi<CooldownComponent>>())
-                entity.Add<World<TWorld>.Multi<CooldownComponent>>();
+            entity.Add<World<TWorld>.Multi<CooldownComponent>>();
 
             ref var cooldowns = ref entity.Ref<World<TWorld>.Multi<CooldownComponent>>();
             for (var i = 0; i < cooldowns.Length; i++)

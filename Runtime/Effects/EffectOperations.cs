@@ -521,8 +521,7 @@ namespace UniGame.StaticEcs.Features
             if (!idRegistry.TryGet<TEffect>(out var id))
                 return;
 
-            if (!entity.Has<World<TWorld>.Multi<EffectSummaryComponent>>())
-                entity.Add<World<TWorld>.Multi<EffectSummaryComponent>>();
+            entity.Add<World<TWorld>.Multi<EffectSummaryComponent>>();
 
             ref var roster = ref entity.Ref<World<TWorld>.Multi<EffectSummaryComponent>>();
             roster.Add(
