@@ -17,10 +17,8 @@ namespace UniGame.StaticEcs.Features
             if (!ctx.Target.TryUnpack<TWorld>(out var target))
                 return;
 
-            if (!target.Has<BlockableTag>())
-                return;
-
-            if (!target.Has<CharacteristicComponent<BlockChanceCharacteristic>>())
+            if (!target.Has<BlockableTag,
+                    CharacteristicComponent<BlockChanceCharacteristic>>())
                 return;
 
             var chance = target.Read<CharacteristicComponent<BlockChanceCharacteristic>>().Value;

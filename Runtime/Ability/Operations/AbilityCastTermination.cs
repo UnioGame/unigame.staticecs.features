@@ -52,9 +52,8 @@ namespace UniGame.StaticEcs.Features
             CancelBranches(castEntity, reason);
             CancelCurrentLeaf(castEntity, castGid, runtime);
 
-            var isBranch =
-                castEntity.Has<AbilityBranchSubcastTag>() &&
-                castEntity.Has<AbilityParentCastComponent>();
+            var isBranch = castEntity.Has<AbilityBranchSubcastTag,
+                AbilityParentCastComponent>();
             if (notifyParent && isBranch)
                 World<TWorld>.SendEvent(
                     new AbilityBranchCompletedEvent

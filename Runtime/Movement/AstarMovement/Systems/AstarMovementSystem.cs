@@ -78,9 +78,9 @@ namespace UniGame.StaticEcs.Features
             if (
                 astar.Seeker == null
                 || !astar.GraphEntity.TryUnpack<TWorld>(out var graphEntity)
-                || !graphEntity.Has<AstarGraphInitializedTag>()
-                || !graphEntity.Has<AstarPathComponent>()
-                || !graphEntity.Has<AstarGridGraphComponent>()
+                || !graphEntity.Has<AstarGraphInitializedTag,
+                    AstarPathComponent,
+                    AstarGridGraphComponent>()
             )
                 return false;
 

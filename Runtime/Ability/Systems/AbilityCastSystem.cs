@@ -25,7 +25,7 @@ namespace UniGame.StaticEcs.Features
         {
             if (!World<TWorld>.HasResource<AbilityRegistry<TWorld>>())
             {
-                foreach (var _ in _receiver) { }
+                _receiver.MarkAsReadAll();
                 return;
             }
 

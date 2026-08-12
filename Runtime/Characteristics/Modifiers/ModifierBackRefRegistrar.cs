@@ -18,8 +18,8 @@ namespace UniGame.StaticEcs.Features
             if (!source.TryUnpack<TWorld>(out var src))
                 return;
 
-            src.Add<ModifierTrackerComponent>();
-            src.Add<World<TWorld>.Multi<ModifierTargetComponent>>();
+            src.Add<ModifierTrackerComponent,
+                World<TWorld>.Multi<ModifierTargetComponent>>();
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<ModifierTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;

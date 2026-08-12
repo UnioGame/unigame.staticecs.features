@@ -58,11 +58,9 @@ namespace UniGame.StaticEcs.Features
                 var ev = e.Value;
                 if (!ev.ParentCast.TryUnpack<TWorld>(out var parent))
                     continue;
-                if (!parent.Has<AbilityParallelWaitingTag>())
-                    continue;
-                if (!parent.Has<World<TWorld>.Multi<AbilityBranchComponent>>())
-                    continue;
-                if (!parent.Has<World<TWorld>.Multi<AbilityStackComponent>>())
+                if (!parent.Has<AbilityParallelWaitingTag,
+                        World<TWorld>.Multi<AbilityBranchComponent>,
+                        World<TWorld>.Multi<AbilityStackComponent>>())
                     continue;
 
                 ref var branches = ref parent.Ref<World<TWorld>.Multi<AbilityBranchComponent>>();
@@ -191,10 +189,7 @@ namespace UniGame.StaticEcs.Features
                 ? castEntity.Read<AbilityStepStatusComponent>().Status
                 : StepStatus.Success;
 
-            if (castEntity.Has<AbilityStepStatusComponent>())
-                castEntity.Delete<AbilityStepStatusComponent>();
-            if (castEntity.Has<AbilityStepReadyTag>())
-                castEntity.Delete<AbilityStepReadyTag>();
+            castEntity.Delete<AbilityStepStatusComponent, AbilityStepReadyTag>();
 
             CloseCurrentLeaf(castEntity, castGid, status);
 

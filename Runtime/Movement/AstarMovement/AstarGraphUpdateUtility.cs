@@ -15,8 +15,7 @@ namespace UniGame.StaticEcs.Features
         {
             if (
                 !graphGid.TryUnpack<TWorld>(out var graphEntity)
-                || !graphEntity.Has<AstarPathComponent>()
-                || !graphEntity.Has<AstarGridGraphComponent>()
+                || !graphEntity.Has<AstarPathComponent, AstarGridGraphComponent>()
             )
                 return null;
 

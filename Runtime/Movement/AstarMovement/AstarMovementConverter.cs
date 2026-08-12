@@ -78,8 +78,7 @@ namespace UniGame.StaticEcs.Features
             }
             if (World<TWorld>.Status != WorldStatus.Initialized ||
                 !graphProvider.EntityGid.TryUnpack<TWorld>(out var graph) ||
-                !graph.Has<AstarPathComponent>() ||
-                !graph.Has<AstarGridGraphConfigComponent>())
+                !graph.Has<AstarPathComponent, AstarGridGraphConfigComponent>())
             {
                 reason = "The graph provider is not active in the authority world.";
                 return false;

@@ -19,8 +19,8 @@ namespace UniGame.StaticEcs.Features
             if (!source.TryUnpack<TWorld>(out var src))
                 return;
 
-            src.Add<EffectTrackerComponent>();
-            src.Add<World<TWorld>.Multi<EffectTargetComponent>>();
+            src.Add<EffectTrackerComponent,
+                World<TWorld>.Multi<EffectTargetComponent>>();
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
             var compactTarget = (EntityGIDCompact)target;
@@ -47,9 +47,6 @@ namespace UniGame.StaticEcs.Features
             where TWorld : struct, IWorldType
         {
             if (flag == EffectFlag.None)
-                return;
-
-            if (source.Status<TWorld>() != GIDStatus.Active)
                 return;
 
             if (!source.TryUnpack<TWorld>(out var src))
