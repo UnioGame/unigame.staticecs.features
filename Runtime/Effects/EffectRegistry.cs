@@ -21,9 +21,8 @@ namespace UniGame.StaticEcs.Features
         private readonly EffectUnconditionalRemove[] _removeSlots = new EffectUnconditionalRemove[
             MaxSlots
         ];
-        private ulong _registeredMask;
-
-        public ulong RegisteredMask => _registeredMask;
+        /// <summary>Bit mask of effect handlers registered in this world.</summary>
+        public ulong RegisteredMask;
 
         public void Register(
             EffectFlag flag,
@@ -44,7 +43,7 @@ namespace UniGame.StaticEcs.Features
             var slot = Log2(raw);
             _slots[slot] = cleanup;
             _removeSlots[slot] = unconditional;
-            _registeredMask |= raw;
+            RegisteredMask |= raw;
         }
 
         public bool IsRegistered(EffectFlag flag)
@@ -89,7 +88,7 @@ namespace UniGame.StaticEcs.Features
         {
             Array.Clear(_slots, 0, _slots.Length);
             Array.Clear(_removeSlots, 0, _removeSlots.Length);
-            _registeredMask = 0;
+            RegisteredMask = 0;
         }
 
         private static bool IsSingleBit(ulong value)
