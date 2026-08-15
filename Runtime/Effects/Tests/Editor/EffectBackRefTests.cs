@@ -118,6 +118,31 @@ namespace UniGame.StaticEcs.Features.Tests
         }
 
         [Test]
+        public void DestroyingSource_RemovesEffectsBeyondStackSnapshotThreshold()
+        {
+            const int targetCount = 65;
+            var source = World<TestEffectsWorld>.NewEntity<Default>();
+            var targets = new EntityGID[targetCount];
+            for (var i = 0; i < targetCount; i++)
+            {
+                var target = World<TestEffectsWorld>.NewEntity<Default>();
+                targets[i] = target.GID;
+                EffectOperations.Apply<TestEffectsWorld, TestEffectMarker>(
+                    target.GID, source.GID, 10f);
+            }
+
+            source.Destroy();
+
+            for (var i = 0; i < targetCount; i++)
+            {
+                Assert.That(targets[i].TryUnpack<TestEffectsWorld>(out var target),
+                    Is.True);
+                Assert.That(target.Has<EffectComponent<TestEffectMarker>>(), Is.False);
+            }
+            Assert.That(_handlerA.Removed.Count, Is.EqualTo(targetCount));
+        }
+
+        [Test]
         public void DestroyingSource_OnlyAffectsItsOwnEffects()
         {
             var sourceA = World<TestEffectsWorld>.NewEntity<Default>();

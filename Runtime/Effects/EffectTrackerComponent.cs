@@ -1,6 +1,7 @@
 namespace UniGame.StaticEcs.Features
 {
     using System;
+    using System.Buffers;
     using FFS.Libraries.StaticEcs;
 
     /// <summary>
@@ -32,17 +33,27 @@ namespace UniGame.StaticEcs.Features
             ref var registry = ref World<TWorld>.GetResource<EffectRegistry>();
             EntityGID sourceGid = self.GID;
 
-            System.Span<EffectTargetComponent> snapshot = stackalloc EffectTargetComponent[64];
-            var count = refs.Length < snapshot.Length ? refs.Length : snapshot.Length;
-            for (var i = 0; i < count; i++)
+            int count = refs.Length;
+            EffectTargetComponent[] rented = null;
+            Span<EffectTargetComponent> snapshot = count <= 64
+                ? stackalloc EffectTargetComponent[count]
+                : (rented = ArrayPool<EffectTargetComponent>.Shared.Rent(count));
+            try
             {
-                snapshot[i] = refs[i];
-            }
+                snapshot = snapshot[..count];
+                for (var i = 0; i < count; i++)
+                    snapshot[i] = refs[i];
 
-            for (var i = 0; i < count; i++)
+                for (var i = 0; i < count; i++)
+                {
+                    var entry = snapshot[i];
+                    registry.InvokeMask(entry.Mask, sourceGid, entry.Target);
+                }
+            }
+            finally
             {
-                var entry = snapshot[i];
-                registry.InvokeMask(entry.Mask, sourceGid, entry.Target);
+                if (rented != null)
+                    ArrayPool<EffectTargetComponent>.Shared.Return(rented);
             }
         }
     }
