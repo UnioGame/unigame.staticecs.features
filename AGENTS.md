@@ -83,7 +83,12 @@ Use only directories that contain real files:
 
 - Each feature family has an English README with Capabilities / Usage / Configuration.
 - Public docs describe the current package without migration history and link to shared/upstream Static ECS documentation rather than restating it.
-- Every public type and member has at least a one-line XML summary.
+- Keep a short English XML summary on each public feature type. Document public
+  members only when ownership, lifetime, units, zero/null meaning, ordering,
+  failure, or wire semantics are not clear from the name and type. Explain why and
+  constraints, not signatures or the next line.
+- Remove stale TODOs and commented-out code. Review enforces this policy without a
+  dedicated analyzer.
 
 ## Tests
 
