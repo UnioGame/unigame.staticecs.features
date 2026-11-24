@@ -14,6 +14,9 @@ namespace UniGame.StaticEcs.Features
         /// <summary>Matches a View System identifier.</summary>
         public string ViewId;
 
+        /// <summary>Exact assembly-qualified view type, including accepted requests still opening or queued.</summary>
+        public string ViewType;
+
         /// <summary>Matches a layout identifier.</summary>
         public string Layout;
 

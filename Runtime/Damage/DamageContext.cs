@@ -25,6 +25,8 @@ namespace UniGame.StaticEcs.Features
         public float Amount;
         public DamageType Type;
         public bool ForceCritical;
+        public bool CriticalRolled;
+        public AttackType AttackType;
         public bool IsCritical;
         public bool Cancelled;
         public DamageCancelReason CancelReason;
@@ -40,6 +42,8 @@ namespace UniGame.StaticEcs.Features
                 Amount = evt.Amount,
                 Type = evt.Type,
                 ForceCritical = evt.ForceCritical,
+                CriticalRolled = evt.CriticalRolled,
+                AttackType = evt.AttackType,
                 IsCritical = false,
                 Cancelled = false,
                 CancelReason = DamageCancelReason.None,

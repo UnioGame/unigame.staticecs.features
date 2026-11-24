@@ -26,7 +26,7 @@ namespace UniGame.StaticEcs.Features
         /// <summary>Current lifecycle state.</summary>
         public ViewLifecycleStatus Status;
 
-        /// <summary>Sibling order.</summary>
+        /// <summary>Requested presentation sorting order.</summary>
         public int Order;
     }
 }

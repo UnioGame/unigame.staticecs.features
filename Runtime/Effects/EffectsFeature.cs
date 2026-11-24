@@ -5,7 +5,7 @@ namespace UniGame.StaticEcs.Features
     using UniGame.Core.Runtime;
     using UniGame.StaticEcs.Time;
 
-    /// <summary>Composes the standard heal-over-time, stun, and speed-modification effects.</summary>
+    /// <summary>Composes the standard heal-over-time, stun, immobilize, dash, and speed-modification effects.</summary>
     public class EffectsFeature<TWorld> : StaticEcsFeature<TWorld>
         where TWorld : struct, IWorldType
     {
@@ -47,6 +47,28 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.SetResource(stunConfig);
             }
 
+            if (!World<TWorld>.HasResource<EffectConfig<TWorld, ImmobilizeEffect>>())
+            {
+                var immobilizeConfig = new EffectConfig<TWorld, ImmobilizeEffect>(
+                    1,
+                    refreshOnReapply,
+                    tickOrder,
+                    registerTickSystems);
+
+                World<TWorld>.SetResource(immobilizeConfig);
+            }
+
+            if (!World<TWorld>.HasResource<EffectConfig<TWorld, DashEffect>>())
+            {
+                var dashConfig = new EffectConfig<TWorld, DashEffect>(
+                    1,
+                    false,
+                    tickOrder,
+                    registerTickSystems);
+
+                World<TWorld>.SetResource(dashConfig);
+            }
+
             if (!World<TWorld>.HasResource<EffectConfig<TWorld, ModificationEffect<SpeedCharacteristic>>>())
             {
                 var modificationConfig =
@@ -62,6 +84,9 @@ namespace UniGame.StaticEcs.Features
             await new EffectsCoreFeature<TWorld>().InitializeAsync(lifeTime);
             await new HealOverTimeFeature<TWorld>().InitializeAsync(lifeTime);
             await new StunEffectFeature<TWorld>().InitializeAsync(lifeTime);
+            await new ImmobilizeFeature<TWorld>().InitializeAsync(lifeTime);
+            await new ImmobilizeEffectFeature<TWorld>().InitializeAsync(lifeTime);
+            await new DashEffectFeature<TWorld>().InitializeAsync(lifeTime);
             await new ModificationEffectFeature<TWorld, SpeedCharacteristic>()
                 .InitializeAsync(lifeTime);
         }

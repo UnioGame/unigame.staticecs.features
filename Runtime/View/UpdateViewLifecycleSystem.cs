@@ -8,7 +8,12 @@ namespace UniGame.StaticEcs.Features
     using FFS.Libraries.StaticEcs;
     using UniGame.StaticEcs.Unity;
     using UniGame.ViewSystem.Runtime;
+    using UniGame.UiSystem.Runtime;
+    using UniGame.UiSystem.Runtime.UiToolkit;
+    using UniGame.UiSystem.Runtime.WindowStackControllers;
+    using UniModules.UniGame.ViewSystem.Runtime.Extensions;
     using UnityEngine;
+    using UnityEngine.UIElements;
 
     /// <summary>Orchestrates View System requests and mirrors their lifecycle into ECS.</summary>
     public class UpdateViewLifecycleSystem<TWorld> : ISystem
@@ -132,16 +137,17 @@ namespace UniGame.StaticEcs.Features
             bool ownsView,
             bool ownsEntity)
         {
-            var queued = !string.IsNullOrWhiteSpace(request.Queue);
+            var resolvedRequest = ViewRequest.WithDefaultPlacement(request);
+            var queued = !string.IsNullOrWhiteSpace(resolvedRequest.Queue);
             var status = queued ? ViewLifecycleStatus.Queued : ViewLifecycleStatus.Opening;
-            entity.Set(CreateComponent(key, request, status));
-            AttachRelations(entity, request);
+            entity.Set(CreateComponent(key, resolvedRequest, status));
+            AttachRelations(entity, resolvedRequest);
 
             var runtime = new RuntimeView
             {
                 key = key,
                 entity = entity.GID,
-                request = request,
+                request = resolvedRequest,
                 view = existingView,
                 ownsView = ownsView,
                 ownsEntity = ownsEntity,
@@ -251,13 +257,11 @@ namespace UniGame.StaticEcs.Features
                     ? await _viewSystem.Open(
                         request.ViewId,
                         placement.Layout,
-                        request.Skin,
-                        request.Name)
+                        request.Skin)
                     : await _viewSystem.Create(
                         request.ViewId,
                         placement.Layout,
-                        request.Skin,
-                        request.Name);
+                        request.Skin);
 
             var parent = ResolveParent(placement);
             if (placement.Mode == ViewPlacementMode.Container)
@@ -281,7 +285,7 @@ namespace UniGame.StaticEcs.Features
                 request.ViewId,
                 request.Skin,
                 parent,
-                request.Name,
+                null,
                 placement.StayWorldPosition);
         }
 
@@ -342,7 +346,36 @@ namespace UniGame.StaticEcs.Features
                     continue;
                 }
 
+                if (!string.IsNullOrWhiteSpace(runtime.request.ExpectedViewType) &&
+                    !runtime.request.MatchesExpectedView(completion.view.GetType()))
+                {
+                    if (runtime.ownsView)
+                        completion.view.Close();
+
+                    Fail(
+                        runtime,
+                        $"View ID '{runtime.request.ViewId}' resolved " +
+                        $"'{completion.view.GetType().AssemblyQualifiedName}', but the request " +
+                        $"expects '{runtime.request.ExpectedViewType}'.");
+                    continue;
+                }
+
                 var model = completion.view.ViewModel;
+                if (!string.IsNullOrWhiteSpace(runtime.request.ExpectedViewModelType) &&
+                    (model == null ||
+                     !runtime.request.MatchesExpectedViewModel(model.GetType())))
+                {
+                    if (runtime.ownsView)
+                        completion.view.Close();
+
+                    var actualType = model?.GetType().AssemblyQualifiedName ?? "<null>";
+                    Fail(
+                        runtime,
+                        $"View '{runtime.request.ViewId}' resolved model '{actualType}', " +
+                        $"but the request expects '{runtime.request.ExpectedViewModelType}'.");
+                    continue;
+                }
+
                 if (model == null ||
                     !_binders.TryGet(model.GetType(), out var binder) ||
                     !binder.Attach(entity, model))
@@ -356,9 +389,31 @@ namespace UniGame.StaticEcs.Features
 
                 runtime.view = completion.view;
                 runtime.binder = binder;
-                ApplyPlacement(runtime);
+                try
+                {
+                    ApplyPlacement(runtime);
+                }
+                catch (Exception exception)
+                {
+                    if (runtime.ownsView)
+                        completion.view.Close();
+                    Fail(runtime, exception.Message);
+                    continue;
+                }
                 var status = MapStatus(completion.view.Status.CurrentValue);
+                if (runtime.request.ShowOnOpen && status == ViewLifecycleStatus.Opening)
+                {
+                    completion.view.Show();
+                    status = MapStatus(completion.view.Status.CurrentValue);
+                }
+
                 SetStatus(runtime, status);
+                if (completion.view is IUiToolkitView toolkitView &&
+                    World<TWorld>.HasResource<UiToolkitElementRegistryResource<TWorld>>())
+                {
+                    World<TWorld>.GetResource<UiToolkitElementRegistryResource<TWorld>>()
+                        .Register(runtime.key, runtime.entity, toolkitView);
+                }
                 World<TWorld>.SendEvent(new ViewOpenedEvent
                 {
                     Key = runtime.key,
@@ -389,7 +444,25 @@ namespace UniGame.StaticEcs.Features
             if (placement.ApplyScale)
                 transform.localScale = placement.Scale;
 
-            transform.SetSiblingIndex(Mathf.Max(0, runtime.request.Order));
+            if (!runtime.request.HasOrder)
+                return;
+
+            var gameObject = runtime.view.GameObject;
+            if (gameObject == null ||
+                gameObject.GetComponent<PanelRenderer>() == null &&
+                gameObject.GetComponent<Canvas>() == null)
+                throw new InvalidOperationException(
+                    $"View '{runtime.request.ViewId}' has an explicit Order but no root PanelRenderer or Canvas.");
+
+            var adapter = gameObject.GetComponent<UiToolkitMixedOrderAdapter>() ??
+                          gameObject.AddComponent<UiToolkitMixedOrderAdapter>();
+            var layerType = UniModules.UniGame.UiSystem.Runtime.ViewType.None;
+            if (placement.Mode == ViewPlacementMode.Layout &&
+                _viewSystem.GetLayout(placement.Layout) is ViewSystemLayoutComponent layoutComponent &&
+                layoutComponent.LayoutController is ViewLayout layout)
+                layerType = layout.LayerType;
+
+            adapter.SetRequestedOrder(runtime.request.Order, layerType);
         }
 
         private void ProcessCommands()
@@ -524,6 +597,15 @@ namespace UniGame.StaticEcs.Features
 
         private void Release(RuntimeView runtime, bool destroyOwnedEntity)
         {
+            if (World<TWorld>.HasResource<UiToolkitElementRegistryResource<TWorld>>())
+            {
+                World<TWorld>.GetResource<UiToolkitElementRegistryResource<TWorld>>()
+                    .Unregister(runtime.key);
+            }
+
+            if (runtime.request.HasOrder && runtime.view?.GameObject != null)
+                runtime.view.GameObject.GetComponent<UiToolkitMixedOrderAdapter>()?.ClearRequestedOrder();
+
             if (runtime.containerReserved &&
                 World<TWorld>.HasResource<ViewContainerRegistryResource<TWorld>>())
             {
@@ -625,7 +707,7 @@ namespace UniGame.StaticEcs.Features
             return owner != default && !owner.TryUnpack<TWorld>(out _);
         }
 
-        private static bool Matches(RuntimeView runtime, in ViewCloseFilter filter)
+        private bool Matches(RuntimeView runtime, in ViewCloseFilter filter)
         {
             if (filter.All)
                 return true;
@@ -640,6 +722,10 @@ namespace UniGame.StaticEcs.Features
                 filter.ViewId != runtime.request.ViewId)
                 return false;
 
+            if (!string.IsNullOrEmpty(filter.ViewType) &&
+                !MatchesViewType(runtime, filter.ViewType))
+                return false;
+
             if (!string.IsNullOrEmpty(filter.Layout) &&
                 filter.Layout != runtime.request.Placement.Layout)
                 return false;
@@ -647,7 +733,38 @@ namespace UniGame.StaticEcs.Features
             return filter.Owner != default ||
                    filter.Source != default ||
                    !string.IsNullOrEmpty(filter.ViewId) ||
+                   !string.IsNullOrEmpty(filter.ViewType) ||
                    !string.IsNullOrEmpty(filter.Layout);
+        }
+
+        private bool MatchesViewType(RuntimeView runtime, string expectedType)
+        {
+            if (runtime.view != null)
+            {
+                return string.Equals(
+                    runtime.view.GetType().AssemblyQualifiedName,
+                    expectedType,
+                    StringComparison.Ordinal);
+            }
+
+            if (!string.IsNullOrWhiteSpace(runtime.request.ExpectedViewType))
+            {
+                return string.Equals(
+                    runtime.request.ExpectedViewType,
+                    expectedType,
+                    StringComparison.Ordinal);
+            }
+
+            var references = _viewSystem.ModelTypeMap?.FindViews(runtime.request.ViewId);
+            if (references == null)
+                return false;
+
+            var reference = references.SelectReference(runtime.request.Skin);
+            var viewType = reference == null ? null : (Type)reference.Type;
+            return viewType != null && string.Equals(
+                viewType.AssemblyQualifiedName,
+                expectedType,
+                StringComparison.Ordinal);
         }
 
         private void NotifyStatus(RuntimeView runtime, ViewLifecycleStatus status)

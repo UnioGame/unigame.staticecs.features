@@ -1,0 +1,16 @@
+{
+  "name": "unigame.staticecs.features.uitoolkitdrag",
+  "rootNamespace": "UniGame.StaticEcs.Features",
+  "references": [
+    "unigame.staticecs",
+    "unigame.staticecs.unity",
+    "unigame.staticecs.features.view",
+    "unigame.staticecs.features.uitoolkitpointer",
+    "unigame.unicore.runtime",
+    "FFS.StaticEcs",
+    "UniTask",
+    "Unity.InputSystem",
+    "UnityEngine.UIElementsModule"
+  ],
+  "autoReferenced": true
+}

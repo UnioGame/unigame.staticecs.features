@@ -23,9 +23,7 @@ namespace UniGame.StaticEcs.Features.Tests
             new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
-                _world
-            );
+            World<TestEffectsWorld>.SetResource(EcsTime.Default());
             new ModifierBackRefFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );

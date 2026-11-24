@@ -23,19 +23,18 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.Multi<EffectTargetComponent>>();
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
-            var compactTarget = (EntityGIDCompact)target;
 
             for (var i = 0; i < refs.Length; i++)
             {
                 ref var entry = ref refs[i];
-                if (entry.Target.Equals(compactTarget))
+                if (entry.Target.Equals(target))
                 {
                     entry.Mask |= flag;
                     return;
                 }
             }
 
-            refs.Add(new EffectTargetComponent { Target = compactTarget, Mask = flag });
+            refs.Add(new EffectTargetComponent { Target = target, Mask = flag });
         }
 
         /// <summary>
@@ -56,12 +55,11 @@ namespace UniGame.StaticEcs.Features
                 return;
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<EffectTargetComponent>>();
-            var compactTarget = (EntityGIDCompact)target;
 
             for (var i = 0; i < refs.Length; i++)
             {
                 ref var entry = ref refs[i];
-                if (entry.Target.Equals(compactTarget))
+                if (entry.Target.Equals(target))
                 {
                     entry.Mask &= ~flag;
                     if (entry.Mask == EffectFlag.None)

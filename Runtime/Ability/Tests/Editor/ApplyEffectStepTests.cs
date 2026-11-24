@@ -32,7 +32,8 @@ namespace UniGame.StaticEcs.Features.Tests
             new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            _world.Types.Component<TransformComponent>();
+            if (!World<TestAbilityWorld>.IsComponentTypeRegistered<TransformComponent>())
+                _world.Types.Component<TransformComponent>();
             _world.Initialize();
 
             _castSystem = new AbilityCastSystem<TestAbilityWorld>();

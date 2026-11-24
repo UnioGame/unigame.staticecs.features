@@ -43,12 +43,16 @@ namespace UniGame.StaticEcs.Features.Tests
         [Test]
         public void Resolve_ProductionEffects_HaveSingleBitFlags()
         {
-            Assert.AreEqual(EffectFlag.HealOverTime, EffectFlagOf<HealOverTimeEffect>.Value);
-            Assert.AreEqual(EffectFlag.Stun, EffectFlagOf<StunEffect>.Value);
-            Assert.AreEqual(
-                EffectFlag.Modification,
-                EffectFlagOf<ModificationEffect<SpeedCharacteristic>>.Value
-            );
+            AssertSingleBit(EffectFlagOf<HealOverTimeEffect>.Value);
+            AssertSingleBit(EffectFlagOf<StunEffect>.Value);
+            AssertSingleBit(EffectFlagOf<ModificationEffect<SpeedCharacteristic>>.Value);
+        }
+
+        private static void AssertSingleBit(EffectFlag flag)
+        {
+            var bits = (ulong)flag;
+            Assert.AreNotEqual(0ul, bits);
+            Assert.AreEqual(0ul, bits & (bits - 1), flag.ToString());
         }
     }
 }

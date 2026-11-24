@@ -15,6 +15,7 @@ namespace UniGame.StaticEcs.Features
     {
         private readonly IReadOnlyList<Type> _modelTypes;
         private readonly ViewFeatureConfig _config;
+        private readonly IGameViewSystem _viewSystem;
 
         /// <summary>Creates a View Feature from its flattened View System model catalog.</summary>
         public ViewFeature(
@@ -23,6 +24,16 @@ namespace UniGame.StaticEcs.Features
         {
             _modelTypes = modelTypes ?? throw new ArgumentNullException(nameof(modelTypes));
             _config = config;
+        }
+
+        /// <summary>Creates a View Feature bound to a specific View System instance.</summary>
+        public ViewFeature(
+            IReadOnlyList<Type> modelTypes,
+            ViewFeatureConfig config,
+            IGameViewSystem viewSystem)
+            : this(modelTypes, config)
+        {
+            _viewSystem = viewSystem ?? throw new ArgumentNullException(nameof(viewSystem));
         }
 
         /// <inheritdoc />
@@ -37,15 +48,30 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.SetResource(containers);
             }
 
-            var context = StaticEcsContext.Get<TWorld>();
-            var viewSystem = await context
-                .ReceiveFirstAsync<IGameViewSystem>(lifeTime)
-                .AttachExternalCancellation(lifeTime.Token);
+            if (!World<TWorld>.HasResource<UiToolkitElementRegistryResource<TWorld>>())
+            {
+                var elements = new UiToolkitElementRegistryResource<TWorld>();
+                World<TWorld>.SetResource(elements);
+            }
+
+            var viewSystem = _viewSystem;
+            if (viewSystem == null)
+            {
+                var context = StaticEcsContext.Get<TWorld>();
+                viewSystem = await context
+                    .ReceiveFirstAsync<IGameViewSystem>(lifeTime)
+                    .AttachExternalCancellation(lifeTime.Token);
+            }
             var binders = ViewModelTypeRegistration.CreateBinders<TWorld>(_modelTypes);
 
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new UpdateViewLifecycleSystem<TWorld>(viewSystem, binders),
                 _config.lifecycleOrder);
+            World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
+                new SyncUiToolkitElementsSystem<TWorld>(),
+                _config.lifecycleOrder < short.MaxValue
+                    ? (short)(_config.lifecycleOrder + 1)
+                    : _config.lifecycleOrder);
         }
     }
 }

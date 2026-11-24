@@ -10,12 +10,14 @@ namespace UniGame.StaticEcs.Features
     public class StunEffectHandler<TWorld> : IEffectHandler<TWorld, StunEffect>
         where TWorld : struct, IWorldType
     {
-        public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)
+        public bool CanApply(in EffectApplyContext context) => true;
+
+        public void OnApplied(in EffectApplyContext context)
         {
-            if (previousStacks > 0)
+            if (context.PreviousStacks > 0)
                 return;
 
-            StunOperations.AddSource<TWorld>(target, source);
+            StunOperations.AddSource<TWorld>(context.Target, context.Source);
         }
 
         public void OnTick(EntityGID target, EntityGID source, int stacks) { }

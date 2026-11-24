@@ -4,14 +4,15 @@ namespace UniGame.StaticEcs.Features
 
     /// <summary>
     /// Cancels the damage event when the target carries <see cref="BlockableTag"/> and a roll
-    /// against <see cref="BlockChanceCharacteristic"/> succeeds. Healing events bypass the filter.
+    /// against <see cref="BlockChanceCharacteristic"/> succeeds. Healing events and attacks of a type that does not roll hit checks
+    /// (<see cref="AttackType.Area"/>) bypass the filter.
     /// </summary>
     public class BlockFilter<TWorld> : IDamageFilter<TWorld>
         where TWorld : struct, IWorldType
     {
         public void Apply(ref DamageContext ctx)
         {
-            if (ctx.Cancelled || ctx.Type == DamageType.Healing)
+            if (ctx.Cancelled || !ctx.AttackType.RollsHitChecks() || ctx.Type == DamageType.Healing)
                 return;
 
             if (!ctx.Target.TryUnpack<TWorld>(out var target))

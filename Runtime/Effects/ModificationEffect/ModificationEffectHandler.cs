@@ -13,24 +13,26 @@ namespace UniGame.StaticEcs.Features
         where TWorld : struct, IWorldType
         where TStat : struct, ICharacteristicType
     {
-        public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)
+        public bool CanApply(in EffectApplyContext context) => true;
+
+        public void OnApplied(in EffectApplyContext context)
         {
-            if (!target.TryUnpack<TWorld>(out var entity))
+            if (!context.Target.TryUnpack<TWorld>(out var entity))
                 return;
 
             if (!entity.Has<ModificationEffectComponent<TStat>>())
                 return;
 
             var data = entity.Read<ModificationEffectComponent<TStat>>();
-            if (previousStacks > 0)
+            if (context.PreviousStacks > 0)
                 CharacteristicModifierExtensions.RemoveModifiersFromSource<TWorld, TStat>(
-                    target,
-                    source
+                    context.Target,
+                    context.Source
                 );
 
             CharacteristicModifierExtensions.ApplyModifier<TWorld, TStat>(
-                target,
-                source,
+                context.Target,
+                context.Source,
                 data.Op,
                 data.Value
             );

@@ -65,12 +65,34 @@ namespace UniGame.StaticEcs.Features
 
             ref var idRegistry = ref World<TWorld>.GetResource<EffectIdRegistry>();
             idRegistry.Register<TEffect>();
+
+            // An instant effect is removed in the call that applies it, so it needs no source cleanup, conflicts or ticks.
+            if (World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>().DurationMode ==
+                EffectDurationMode.Instant)
+                return UniTask.CompletedTask;
+
             ref var effectRegistry = ref World<TWorld>.GetResource<EffectRegistry>();
             var flag = EffectFlagOf<TEffect>.Value;
             if (!effectRegistry.IsRegistered(flag))
                 effectRegistry.Register(flag, RemoveOnSourceCleanup, RemoveUnconditional);
 
             ref var config = ref World<TWorld>.GetResource<EffectConfig<TWorld, TEffect>>();
+            if (!string.IsNullOrEmpty(config.ConflictGroup) &&
+                World<TWorld>.HasResource<EffectConflictRegistry>())
+            {
+                ref var conflicts = ref World<TWorld>.GetResource<EffectConflictRegistry>();
+                conflicts.Register(
+                    idRegistry.Get<TEffect>(),
+                    config.ConflictGroup,
+                    config.ConflictPriority,
+                    flag);
+            }
+
+            if (!World<TWorld>.HasResource<IEffectCondition<TWorld, TEffect>>() &&
+                config.ActivationMode == EffectActivationMode.Condition)
+                World<TWorld>.SetResource<IEffectCondition<TWorld, TEffect>>(
+                    new UnimplementedEffectCondition<TWorld, TEffect>());
+
             if (!config.RegisterTickSystem)
                 return UniTask.CompletedTask;
 

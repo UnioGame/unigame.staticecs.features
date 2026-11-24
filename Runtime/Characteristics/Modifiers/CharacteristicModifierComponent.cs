@@ -9,7 +9,7 @@ namespace UniGame.StaticEcs.Features
         where TCharacteristic : struct, ICharacteristicType
     {
         /// <summary>The entity that owns the modifier.</summary>
-        public EntityGIDCompact Source;
+        public EntityGID Source;
 
         /// <summary>The modifier operand.</summary>
         public float Value;

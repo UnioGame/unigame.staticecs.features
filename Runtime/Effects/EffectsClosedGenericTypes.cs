@@ -14,6 +14,8 @@ namespace UniGame.StaticEcs.Features
         {
             EffectTypeRegistration.Register<HealOverTimeEffect>(types);
             EffectTypeRegistration.Register<StunEffect>(types);
+            EffectTypeRegistration.Register<ImmobilizeEffect>(types);
+            EffectTypeRegistration.Register<DashEffect>(types);
             EffectTypeRegistration.Register<ModificationEffect<SpeedCharacteristic>>(types);
             types.Component<ModificationEffectComponent<SpeedCharacteristic>>();
         }
@@ -31,7 +33,6 @@ namespace UniGame.StaticEcs.Features
             types.Component<EffectComponent<TEffect>>();
             types.Component<PendingEffectComponent<TEffect>>();
             types.Event<EffectAppliedEvent<TEffect>>();
-            types.Event<EffectRefreshedEvent<TEffect>>();
             types.Event<EffectRemovedEvent<TEffect>>();
         }
 

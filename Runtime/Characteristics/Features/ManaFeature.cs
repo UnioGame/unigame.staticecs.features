@@ -2,8 +2,12 @@ namespace UniGame.StaticEcs.Features
 {
     using Cysharp.Threading.Tasks;
     using FFS.Libraries.StaticEcs;
+    using Time;
     using UniGame.Core.Runtime;
+    using UniGame.StaticEcs.Unity;
 
+    /// <summary>Mana characteristic with the optional mana regeneration system.</summary>
+    /// <remarks>Regeneration requires <c>EcsTimeFeature</c> in the same world.</remarks>
     public class ManaFeature<TWorld>
         : CharacteristicFeature<TWorld, ManaCharacteristic>
         where TWorld : struct, IWorldType
@@ -23,6 +27,9 @@ namespace UniGame.StaticEcs.Features
             var config = World<TWorld>.GetResource<ManaRegenConfig>();
             if (!config.RegisterRegen)
                 return;
+
+            World<TWorld>.Resource<EcsTime> time = default;
+            await time.GetAsync(lifeTime);
 
             World<TWorld>.Systems<StaticEcsUpdateSystems>.Add(
                 new ManaRegenSystem<TWorld>(),

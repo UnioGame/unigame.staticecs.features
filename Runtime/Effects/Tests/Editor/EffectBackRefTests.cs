@@ -25,9 +25,7 @@ namespace UniGame.StaticEcs.Features.Tests
             new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
-                _world
-            );
+            World<TestEffectsWorld>.SetResource(EcsTime.Default());
             World<TestEffectsWorld>.SetResource<IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handlerA);
             var configA =
                 new EffectConfig<TestEffectsWorld, TestEffectMarker>(

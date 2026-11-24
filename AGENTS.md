@@ -53,6 +53,7 @@ Use only directories that contain real files:
   feature's `Systems/` directory. Do not declare systems inside feature, asset,
   authoring, or configuration files.
 - Struct and class systems are both supported. Never add reference-type constraints and never implement unused `ISystem` methods.
+- Gameplay logic lives in systems. `Operations` are narrow helpers as defined in `docs/knowledge/static-ecs-system-standard.md`, section 3: no gameplay decisions, event sends, or stage chains, even with explicitly passed entities.
 - Use native events for transient streams; retain components for persistent/queryable workflow state. Receiver cleanup belongs in system `Destroy`.
 - Prefer family-local serializable converters. Use Mono converters only for behavior that genuinely needs a MonoBehaviour, and use converter preset assets for repeated or configuration-created entity recipes.
 
@@ -83,21 +84,10 @@ Use only directories that contain real files:
 
 - Each feature family has an English README with Capabilities / Usage / Configuration.
 - Public docs describe the current package without migration history and link to shared/upstream Static ECS documentation rather than restating it.
-- Keep a short English XML summary on every public type in the package. Document
-  public members only when ownership, lifetime, units, zero/null meaning, ordering,
-  failure, or wire semantics are not clear from the name and type. Explain why and
-  constraints, not signatures or the next line.
-- Remove stale TODOs and commented-out code. Review enforces this policy without a
-  dedicated analyzer.
+- XML summaries and comments follow the repository-wide rules.
 
 ## Tests
 
-- Feature tests use a dedicated isolated `IWorldType` by default. Install resources and
-  register types explicitly, then initialize only the systems required by the scenario.
-- Do not route a feature test through `EcsService` unless the startup pipeline itself is
-  under test.
-- Prefer `StaticEcsTestWorld<TWorld>` for deterministic world cleanup. The helper owns
-  lifecycle only; the test remains responsible for visible feature/resource composition.
-- Do not encode production inventories or expected alias lists in fixtures. Derive
-  architecture assertions from compilations, source declarations, asmdefs, manifests, or
-  runtime discovery.
+- Tests follow the repository-wide Static ECS test rules. Prefer `StaticEcsTestWorld<TWorld>`
+  for deterministic world cleanup; the helper owns lifecycle only, and the test remains
+  responsible for visible feature/resource composition.

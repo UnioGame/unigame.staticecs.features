@@ -21,110 +21,13 @@ namespace UniGame.StaticEcs.Features
 
         public void Update()
         {
-            ref var chain = ref World<TWorld>.GetResource<DamageFilterChain<TWorld>>();
-
             foreach (var e in _receiver)
-            {
-                var ctx = DamageContext.FromEvent(in e.Value);
-                chain.Apply(ref ctx);
-
-                if (ctx.Cancelled)
-                {
-                    EmitCancellation(in ctx);
-                    continue;
-                }
-
-                ApplyToTarget(ref ctx);
-            }
+                DamageOperations.Resolve<TWorld>(in e.Value);
         }
 
         public void Destroy()
         {
             World<TWorld>.DeleteEventReceiver(ref _receiver);
-        }
-
-        private static void EmitCancellation(in DamageContext ctx)
-        {
-            switch (ctx.CancelReason)
-            {
-                case DamageCancelReason.Dodged:
-                    World<TWorld>.SendEvent(
-                        new DamageDodgedEvent
-                        {
-                            Source = ctx.Source,
-                            Target = ctx.Target,
-                            Amount = ctx.OriginalAmount,
-                            Type = ctx.Type,
-                        }
-                    );
-                    break;
-                case DamageCancelReason.Blocked:
-                    World<TWorld>.SendEvent(
-                        new DamageBlockedEvent
-                        {
-                            Source = ctx.Source,
-                            Target = ctx.Target,
-                            BlockedAmount = ctx.OriginalAmount,
-                            Type = ctx.Type,
-                        }
-                    );
-                    break;
-            }
-        }
-
-        private static void ApplyToTarget(ref DamageContext ctx)
-        {
-            if (!ctx.Target.TryUnpack<TWorld>(out var target))
-                return;
-
-            if (!target.Has<CharacteristicComponent<HealthCharacteristic>>())
-                return;
-
-            ref var health = ref target.Ref<CharacteristicComponent<HealthCharacteristic>>();
-            var killing = false;
-            var beforeValue = health.Value;
-
-            if (ctx.Type == DamageType.Healing)
-                CharacteristicOperations.AddValue<TWorld, HealthCharacteristic>(
-                    ref health,
-                    ctx.Target,
-                    ctx.Amount
-                );
-            else if (ctx.Amount > 0f)
-            {
-                var newValue = health.Value - ctx.Amount;
-                if (newValue < health.MinValue)
-                    newValue = health.MinValue;
-
-                CharacteristicOperations.SetValue<TWorld, HealthCharacteristic>(
-                    ref health,
-                    ctx.Target,
-                    newValue
-                );
-
-                if (health.Value <= health.MinValue && !target.Has<DeathPendingTag>())
-                {
-                    target.Set<DeathPendingTag>();
-                    killing = true;
-                }
-            }
-
-            var appliedAmount = ctx.Type == DamageType.Healing
-                ? health.Value - beforeValue
-                : beforeValue - health.Value;
-
-            World<TWorld>.SendEvent(
-                new DamageAppliedEvent
-                {
-                    Source = ctx.Source,
-                    Target = ctx.Target,
-                    Amount = ctx.Amount,
-                    AppliedAmount = appliedAmount,
-                    Type = ctx.Type,
-                    IsCritical = ctx.IsCritical,
-                    KillingBlow = killing,
-                }
-            );
         }
     }
 }

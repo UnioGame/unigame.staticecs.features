@@ -20,9 +20,24 @@ namespace UniGame.StaticEcs.Features
         HealOverTime = 1ul << 0,
         Stun = 1ul << 1,
         Modification = 1ul << 2,
+        Poison = 1ul << 3,
+        Immobilize = 1ul << 4,
+        Dash = 1ul << 5,
 
-        /// <summary>Convenience group: every CC-style effect (currently only <see cref="Stun"/>).</summary>
-        CrowdControl = Stun,
+        /// <summary>Project protection status that blocks new negative timed effects on its holder.</summary>
+        ProtectionNegative = 1ul << 6,
+
+        /// <summary>Project protection status that blocks every new timed effect on its holder.</summary>
+        ProtectionAll = 1ul << 7,
+
+        /// <summary>Project status whose charges make the next timed ability casts of its holder instant.</summary>
+        SigilOfRighteous = 1ul << 8,
+
+        /// <summary>Project marker status held by the source of a damage request for the rest of the tick after a critical hit.</summary>
+        CriticalHit = 1ul << 9,
+
+        /// <summary>Convenience group: every CC-style effect (<see cref="Stun"/> and <see cref="Immobilize"/>).</summary>
+        CrowdControl = Stun | Immobilize,
 
         /// <summary>
         /// Reserved single-bit slots for project-side or test-only effects.
@@ -55,6 +70,11 @@ namespace UniGame.StaticEcs.Features
         where T : struct
     {
         public static readonly EffectFlag Value = Resolve();
+
+        // An explicit static constructor keeps the type lazy: an instant effect declares no flag and must never touch Value.
+        static EffectFlagOf()
+        {
+        }
 
         private static EffectFlag Resolve()
         {

@@ -17,10 +17,19 @@ namespace UniGame.StaticEcs.Features
     public struct EffectComponent<TEffect> : IComponent
         where TEffect : struct, IEffectType
     {
-        public EntityGIDCompact Source;
+        public EntityGID Source;
         public float TimeLeft;
         public float PeriodLeft;
         public float Period;
         public int Stacks;
+
+        /// <summary>Activations left; used by <see cref="EffectDurationMode.Charges"/> effects.</summary>
+        public int ChargesLeft;
+
+        /// <summary>Strength given at the first application, for example damage per activation.</summary>
+        public float Magnitude;
+
+        /// <summary>Name of the source captured at the last application; history only, may outlive the source.</summary>
+        public string SourceName;
     }
 }

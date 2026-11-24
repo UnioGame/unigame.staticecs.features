@@ -1,0 +1,21 @@
+{
+  "name": "unigame.staticecs.features.uitoolkitpointer",
+  "rootNamespace": "UniGame.StaticEcs.Features",
+  "references": [
+    "unigame.staticecs",
+    "unigame.staticecs.unity",
+    "unigame.staticecs.features.view",
+    "unigame.unicore.runtime",
+    "FFS.StaticEcs",
+    "UniTask"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

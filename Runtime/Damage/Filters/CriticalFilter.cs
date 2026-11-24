@@ -4,7 +4,9 @@ namespace UniGame.StaticEcs.Features
 
     /// <summary>
     /// Amplifies the damage amount when <see cref="DamageContext.ForceCritical"/> is set or the
-    /// crit roll succeeds against the source's <see cref="CriticalChanceCharacteristic"/>. The
+    /// crit roll succeeds against the source's <see cref="CriticalChanceCharacteristic"/>. The roll is skipped
+    /// when <see cref="DamageContext.CriticalRolled"/> says the caller decided, and an attack of a type that
+    /// does not roll hit checks never crits (<see cref="AttackType.Area"/>). The
     /// multiplier is read from <see cref="CriticalMultiplierCharacteristic"/> on the source and
     /// falls back to <see cref="DefaultMultiplier"/> when the source has no value configured.
     /// </summary>
@@ -15,11 +17,11 @@ namespace UniGame.StaticEcs.Features
 
         public void Apply(ref DamageContext ctx)
         {
-            if (ctx.Cancelled || ctx.Type == DamageType.Healing || ctx.Amount <= 0f)
+            if (ctx.Cancelled || !ctx.AttackType.RollsHitChecks() || ctx.Type == DamageType.Healing || ctx.Amount <= 0f)
                 return;
 
             var roll = ctx.ForceCritical;
-            if (!roll)
+            if (!roll && !ctx.CriticalRolled)
             {
                 if (
                     !DamageCharacteristicHelper.TryReadValue<TWorld, CriticalChanceCharacteristic>(

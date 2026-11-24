@@ -12,7 +12,7 @@ namespace UniGame.StaticEcs.Features
     public struct EffectTargetComponent : IMultiComponent
     {
         /// <summary>The affected target entity.</summary>
-        public EntityGIDCompact Target;
+        public EntityGID Target;
 
         /// <summary>The effect types applied to the target by this source.</summary>
         public EffectFlag Mask;

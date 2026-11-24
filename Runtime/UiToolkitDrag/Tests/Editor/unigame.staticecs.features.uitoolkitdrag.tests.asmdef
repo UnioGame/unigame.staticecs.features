@@ -1,0 +1,14 @@
+{
+  "name": "unigame.staticecs.features.uitoolkitdrag.tests",
+  "rootNamespace": "UniGame.StaticEcs.Features.Tests",
+  "references": [
+    "unigame.staticecs.features.uitoolkitdrag",
+    "unigame.staticecs.features.uitoolkitpointer",
+    "unigame.staticecs.features.view",
+    "FFS.StaticEcs"
+  ],
+  "includePlatforms": ["Editor"],
+  "defineConstraints": ["UNITY_INCLUDE_TESTS"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "noEngineReferences": false
+}

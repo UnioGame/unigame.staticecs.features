@@ -38,6 +38,8 @@ namespace UniGame.StaticEcs.Features
             await new ModifierBackRefFeature<TWorld>().InitializeAsync(lifeTime);
             await new HealthFeature<TWorld>().InitializeAsync(lifeTime);
             await new ManaFeature<TWorld>().InitializeAsync(lifeTime);
+            await new CharacteristicFeature<TWorld, ManaRegenCharacteristic>()
+                .InitializeAsync(lifeTime);
             await new SpeedFeature<TWorld>().InitializeAsync(lifeTime);
             await new ShieldFeature<TWorld>().InitializeAsync(lifeTime);
             await new CharacteristicFeature<TWorld, BlockChanceCharacteristic>()
@@ -50,7 +52,6 @@ namespace UniGame.StaticEcs.Features
                 .InitializeAsync(lifeTime);
             await new CharacteristicFeature<TWorld, CriticalMultiplierCharacteristic>()
                 .InitializeAsync(lifeTime);
-
         }
     }
 }

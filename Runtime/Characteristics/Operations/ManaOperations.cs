@@ -47,21 +47,5 @@ namespace UniGame.StaticEcs.Features
                 amount
             );
         }
-
-        public static void SetRegenRate<TWorld>(EntityGID target, float rate)
-            where TWorld : struct, IWorldType
-        {
-            if (!target.TryUnpack<TWorld>(out var entity))
-                return;
-
-            if (entity.Has<ManaRegenComponent>())
-            {
-                ref var regen = ref entity.Mut<ManaRegenComponent>();
-                regen.Rate = rate;
-                return;
-            }
-
-            entity.Set(new ManaRegenComponent { Rate = rate });
-        }
     }
 }

@@ -17,10 +17,15 @@ The feature supports:
 - named containers with capacity and optional busy-container reuse;
 - FIFO request queues;
 - lifecycle status and completion events;
+- one ECS entity per `EcsUiToolkitElement` in a UI Toolkit view;
 - generic worlds and adjacent Main-world operations.
 
-ECS components never store `GameObject`, `Transform`, or `IView`. Unity and View
-System handles remain inside the lifecycle system.
+`UiToolkitElementRegistryResource<TWorld>.TryGetView` provides read-only access
+to a live UI Toolkit view by its `ViewKey` for presentation adapters.
+
+ECS components never store `GameObject`, `Transform`, or `IView`. The
+`UiToolkitElementComponent` stores the live child element as a presentation
+reference; View System handles remain inside the View Feature runtime.
 
 ## Usage
 
@@ -33,10 +38,141 @@ System handles remain inside the lifecycle system.
 5. Presentation systems copy gameplay data into public reactive model fields.
 6. The view renders those fields and writes user intent into typed model signals.
 
+### ECS-backed UI Toolkit elements
+
+Derive a custom `[UxmlElement]` from `EcsUiToolkitElement` and place it inside
+the UXML tree of an active `UiToolkitView`. Once the view root is available, the
+View Feature creates a child entity with `UiToolkitElementComponent` and
+`Link<UiToolkitElementParent>`. Deriving from
+`EcsUiToolkitElement<TElement>` also adds a queryable
+`UiToolkitElementComponent<TElement>` marker. Register each closed marker type
+before world initialization in the owning feature's type registrar. Optional
+`UiToolkitElementConverter` UXML objects can configure the new entity and
+release converter-owned state when it is destroyed. The view entity exposes reverse
+`Links<UiToolkitChildElements>`. The element's `Entity` is its stable
+`EntityGID` while registered. Systems can query the component, use the visual
+element for presentation, and attach their own ECS components to the entity.
+Ordinary `VisualElement` descendants do not create entities.
+
+The View Feature rebuilds the element entities when the view root is replaced
+and deletes them when the view is released. An element added to an active panel
+requests registration when it attaches. After adding an element to a view root
+that is not attached to a panel, call `RequestEntityRegistration()` on it.
+Removing an element from the view root or disposing it releases its entity on
+the next ECS update. Reparenting inside the same view keeps the entity; moving to
+another view transfers registration to that view.
+
 `TryOpenNew`, `TryOpenOn`, and `TryBindExistingOn` confirm that the request event
 was sent. They do not mean that asynchronous creation has completed. Observe
 `ViewOpenedEvent`, `ViewOpenFailedEvent`, or `ViewComponent.Status` when the
 completion result matters.
+
+### Open and close by view class
+
+Use the view class when the caller does not need a catalog ID or a compile-time
+model type. View System resolves the prefab and model from its registered view
+references, including entries whose `ViewName` is an alias:
+
+```csharp
+var request = ViewRequest.For<InventoryView>();
+request.Owner = player.GID;
+request.Source = player.GID;
+request.Skin = "Default";
+
+ViewOperations.TryOpenNewByType<Main, InventoryView>(request, out var key);
+ViewOperations.CloseAllByType<Main, InventoryView>();
+```
+
+For a visible view that only needs placement, pass `ViewPlacement` directly:
+
+```csharp
+ViewOperations.TryOpenNewByType<Main, InventoryView>(
+    ViewPlacement.InLayout(ViewType.Screen), out _);
+ViewOperations.TryOpenOnByType<Main, InventoryView>(
+    existingEntity, ViewPlacement.InLayout(ViewType.Overlay), out _);
+```
+
+`For<TView>()` uses the class name as `ViewId`, defaults to a visible Window,
+and checks the created view's exact type. `TryOpenNewByType<TWorld, TView>` and
+`TryOpenOnByType<TWorld, TView>` also have overloads without request options or
+with placement alone. Placement can also select a registered container or a
+valid parent. Use a full request when skin, owner, source, queue, order, or
+visibility must be specified.
+`Order` controls presentation sorting rather than the Transform sibling index.
+Leave it unset to use the View System stack position. For built-in Screen,
+Window, and Overlay layouts, an explicit value from 0 to 99 is an offset within
+that layout's reserved range: Window `Order = 10` produces sorting order 210.
+For custom layouts and parent or container placement, the value is used directly.
+Setting `Order = 0` explicitly is different from leaving it unset.
+Absolute values must fit Unity's sorting order range (-32768 to 32767). An
+explicit order requires a root `PanelRenderer` or `Canvas`; otherwise opening
+fails with `ViewOpenFailedEvent`.
+When options are supplied, their `ShowOnOpen` value is retained; create them
+with `For<TView>()` for the visible default. The type operation replaces an
+options `ViewId` with the class name and leaves placement, skin, owner,
+source, queue, and order intact. Use a typed request with an explicit `ViewId`
+when a specific catalog alias is required.
+
+Requests created manually also default to the `Window` layout when `Placement`
+is unset or selects a layout with no name. Opening operations normalize the
+request before sending its event, and the lifecycle normalizes directly sent
+events when accepting them. Explicit layouts, containers, and parents are
+preserved. `ShowOnOpen` remains independent: a manually constructed request
+must set it to `true` to show the view immediately.
+
+`CloseAllByType` closes every exact-type instance in the selected world,
+including pending queue items and instances opened through an alias. Use
+`Close(key)` to address only one instance. Both close operations return whether
+their event was sent, not a count of matching views.
+
+### Open a screen from a typed request component
+
+Register one screen system for each request component in its owning feature.
+The generic arguments keep the request component, view, and expected model
+together. The request component is consumed after the open event is sent; its
+entity becomes the default owner and source. Async creation failures are
+reported through `ViewOpenFailedEvent`.
+
+```csharp
+public struct OpenInventoryRequestComponent : IComponent
+{
+}
+
+var request = ViewRequest.For<InventoryView, InventoryViewModel>();
+request.Skin = "Default";
+request.Placement = ViewPlacement.InLayout(ViewType.Window);
+
+World<Main>.Systems<StaticEcsUpdateSystems>.Add(
+    new ShowScreenSystem<
+        OpenInventoryRequestComponent,
+        InventoryView,
+        InventoryViewModel>(request),
+    openInventoryOrder);
+```
+
+Add `OpenInventoryRequestComponent` to an entity to request the screen. The
+system uses `nameof(InventoryView)` as the default View System ID; pass an ID to
+`ViewRequest.For<InventoryView, InventoryViewModel>("inventory-screen")` when
+the content catalog uses an alias. The View System settings must map that ID to
+the requested view and `InventoryViewModel`, and the model must be present in the
+View Feature model catalog. A mismatch fails the view lifecycle with a diagnostic.
+The system uses `TryOpenNew`, so multiple view requests can be owned by the same
+source.
+
+### Open a registered View by type
+
+Use the View and ViewModel types when both are known to the caller:
+
+```csharp
+var request = ViewRequest.For<InventoryView, InventoryViewModel>();
+request.Owner = player.GID;
+request.Source = player.GID;
+request.Placement = ViewPlacement.InLayout(ViewType.Window);
+ViewOperations.TryOpenNew(request, out var viewKey);
+```
+
+The View System catalog indexes registered views by C# type name as well as by
+configured alias. Keep type names unique within a catalog when opening by type.
 
 ### Define a view and its model
 
@@ -357,6 +493,15 @@ ViewOperations.Close(viewKey);
 ViewOperations.CloseOwned(owner);
 ```
 
+An initialized `IView` also exposes `Close()` and `CloseAsync()`. The standard
+`ViewModel.Close()` emits `CloseCommand`, which `View<TModel>` binds to the
+view's `Close()` method, including for UI Toolkit views. A presentation system
+with an attached `ViewModelComponent<TModel>` may call `model.Close()` to
+close that instance without its key. ECS lifecycle observes the view closing
+and sends `ViewClosedEvent`. Use `ViewOperations.Close(key)` for queued or
+still-opening requests, before a bound model exists. Calling `model.Close()`
+does not emit an application-specific input signal such as `CloseRequested`.
+
 Close matching views:
 
 ```csharp
@@ -376,7 +521,29 @@ ViewOperations.CloseAll(new ViewCloseFilter
 });
 ```
 
-An empty `ViewCloseFilter` matches nothing.
+`CloseAll<TWorld>(filter)` only examines views managed by that ECS world. It
+also covers accepted requests that are queued or still opening. Filter fields
+compare against the original opening request, except `ViewType`, which uses
+the created view's exact assembly-qualified class name. Before creation it
+uses the request's expected type, or resolves the registered type using the
+request's view ID and skin.
+
+| Field | Match |
+| --- | --- |
+| `Owner` | Exact `request.Owner`; equivalent to `CloseOwned<TWorld>(owner)` when used alone. |
+| `Source` | Exact `request.Source`, independent of `Owner`. |
+| `ViewId` | Exact, case-sensitive `request.ViewId`; an alias differs from the class-name ID. |
+| `ViewType` | Exact class, including assembly; use `CloseAllByType<TWorld, TView>()` to avoid constructing the string. |
+| `Layout` | Exact, case-sensitive `request.Placement.Layout`; container and parent placement factories leave it empty. |
+| `All` | `true` matches every view in the selected world and ignores other fields. |
+
+Specified fields are combined with AND. Default `EntityGID` and null or empty
+string fields do not restrict the selection; an empty filter matches nothing.
+This API cannot select views with no owner or no source by setting those fields
+to default. There is no skin or queue field in `ViewCloseFilter`. Use `Close(key)`
+for one instance, especially when several instances share the same type and
+owner. Group-close methods report event submission, not a match count;
+observe `ViewClosedEvent` for actual completion.
 
 Systems may receive:
 

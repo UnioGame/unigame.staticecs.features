@@ -9,12 +9,9 @@ namespace UniGame.StaticEcs.Features
     public class HealOverTimeHandler<TWorld> : IEffectHandler<TWorld, HealOverTimeEffect>
         where TWorld : struct, IWorldType
     {
-        public void OnApplied(
-            EntityGID target,
-            EntityGID source,
-            int stacks,
-            int previousStacks
-        ) { }
+        public bool CanApply(in EffectApplyContext context) => true;
+
+        public void OnApplied(in EffectApplyContext context) { }
 
         public void OnTick(EntityGID target, EntityGID source, int stacks)
         {

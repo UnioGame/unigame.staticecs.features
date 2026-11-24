@@ -8,10 +8,13 @@ namespace UniGame.StaticEcs.Features
     public struct PendingEffectComponent<TEffect> : IComponent
         where TEffect : struct, IEffectType
     {
-        public EntityGIDCompact Source;
+        public EntityGID Source;
         public float DelayLeft;
         public float Duration;
         public float Period;
         public int Stacks;
+        public int Charges;
+        public float Magnitude;
+        public string SourceName;
     }
 }

@@ -22,9 +22,7 @@ namespace UniGame.StaticEcs.Features.Tests
             new EffectsCoreFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            new EcsTimeFeature<TestEffectsWorld>().InstallResourcesAndRegisterTypesForTest(
-                _world
-            );
+            World<TestEffectsWorld>.SetResource(EcsTime.Default());
             World<TestEffectsWorld>.SetResource<IEffectHandler<TestEffectsWorld, TestEffectMarker>>(_handler);
             var config = new EffectConfig<TestEffectsWorld, TestEffectMarker>(
                 maxStacks: 3,
@@ -111,9 +109,9 @@ namespace UniGame.StaticEcs.Features.Tests
         }
 
         [Test]
-        public void Reapply_RaisesRefreshedEvent_WithBothStackCounts()
+        public void EveryApplication_RaisesOneAppliedEvent_WithBothStackCounts()
         {
-            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectRefreshedEvent<TestEffectMarker>>();
+            var receiver = World<TestEffectsWorld>.RegisterEventReceiver<EffectAppliedEvent<TestEffectMarker>>();
             try
             {
                 var source = World<TestEffectsWorld>.NewEntity<Default>();
@@ -130,15 +128,13 @@ namespace UniGame.StaticEcs.Features.Tests
                     duration: 5f
                 );
 
-                var found = false;
+                var stacks = new System.Collections.Generic.List<(int Stacks, int PreviousStacks)>();
                 foreach (var e in receiver)
-                {
-                    Assert.AreEqual(1, e.Value.PreviousStacks);
-                    Assert.AreEqual(2, e.Value.Stacks);
-                    found = true;
-                }
+                    stacks.Add((e.Value.Stacks, e.Value.PreviousStacks));
 
-                Assert.IsTrue(found);
+                Assert.AreEqual(2, stacks.Count);
+                Assert.Contains((1, 0), stacks, "a new effect has no previous stacks");
+                Assert.Contains((2, 1), stacks, "a reapplication reports both stack counts");
             }
             finally
             {

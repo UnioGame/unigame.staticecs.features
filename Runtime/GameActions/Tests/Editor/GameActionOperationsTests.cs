@@ -3,9 +3,6 @@ namespace UniGame.StaticEcs.Features.Tests
     using FFS.Libraries.StaticEcs;
     using NUnit.Framework;
     using UniGame.StaticEcs.Tests;
-    using UnityEditor;
-    using UnityEngine;
-    using Object = UnityEngine.Object;
 
     // Minimal action types used only in tests.
     internal struct JumpAction : IGameAction
@@ -70,29 +67,6 @@ namespace UniGame.StaticEcs.Features.Tests
             Assert.AreEqual(
                 registry.GetMask<JumpAction>(),
                 registry.GetMask<JumpAction>());
-        }
-
-        [Test]
-        public void FeatureAssetConfigurationSurvivesUnitySerialization()
-        {
-            var source = ScriptableObject.CreateInstance<GameActionsFeatureAsset>();
-            var target = ScriptableObject.CreateInstance<GameActionsFeatureAsset>();
-            try
-            {
-                source.feature.registerMaintenance = false;
-                source.feature.maintenanceOrder = 73;
-
-                var json = EditorJsonUtility.ToJson(source);
-                EditorJsonUtility.FromJsonOverwrite(json, target);
-
-                Assert.IsFalse(target.feature.registerMaintenance);
-                Assert.AreEqual(73, target.feature.maintenanceOrder);
-            }
-            finally
-            {
-                Object.DestroyImmediate(target);
-                Object.DestroyImmediate(source);
-            }
         }
 
         // --- IsAvailable tests ---

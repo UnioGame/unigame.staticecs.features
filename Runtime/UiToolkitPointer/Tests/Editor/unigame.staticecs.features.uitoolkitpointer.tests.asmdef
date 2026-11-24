@@ -1,0 +1,12 @@
+{
+  "name": "unigame.staticecs.features.uitoolkitpointer.tests",
+  "rootNamespace": "UniGame.StaticEcs.Features.Tests",
+  "references": [
+    "unigame.staticecs.features.uitoolkitpointer",
+    "unigame.staticecs.features.view",
+    "FFS.StaticEcs"
+  ],
+  "includePlatforms": ["Editor"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "noEngineReferences": false
+}

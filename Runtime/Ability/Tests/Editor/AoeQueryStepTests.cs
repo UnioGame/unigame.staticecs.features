@@ -34,7 +34,8 @@ namespace UniGame.StaticEcs.Features.Tests
             new AbilityFeature<TestAbilityWorld>().InstallResourcesAndRegisterTypesForTest(
                 _world
             );
-            _world.Types.Component<TransformComponent>();
+            if (!World<TestAbilityWorld>.IsComponentTypeRegistered<TransformComponent>())
+                _world.Types.Component<TransformComponent>();
             _world.Initialize();
 
             _castSystem = new AbilityCastSystem<TestAbilityWorld>();
@@ -48,8 +49,8 @@ namespace UniGame.StaticEcs.Features.Tests
         public void TearDown()
         {
             _world?.TerminateLifeTime();
-            _progressionSystem.Destroy();
-            _castSystem.Destroy();
+            _progressionSystem?.Destroy();
+            _castSystem?.Destroy();
             foreach (var go in _objects)
             {
                 Object.DestroyImmediate(go);

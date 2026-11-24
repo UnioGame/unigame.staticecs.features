@@ -15,6 +15,7 @@ namespace UniGame.StaticEcs.Features
         {
             CharacteristicTypeRegistration.Register<HealthCharacteristic>(types);
             CharacteristicTypeRegistration.Register<ManaCharacteristic>(types);
+            CharacteristicTypeRegistration.Register<ManaRegenCharacteristic>(types);
             CharacteristicTypeRegistration.Register<SpeedCharacteristic>(types);
             CharacteristicTypeRegistration.Register<ShieldCharacteristic>(types);
             CharacteristicTypeRegistration.Register<BlockChanceCharacteristic>(types);

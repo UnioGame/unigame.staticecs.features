@@ -22,19 +22,18 @@ namespace UniGame.StaticEcs.Features
                 World<TWorld>.Multi<ModifierTargetComponent>>();
 
             ref var refs = ref src.Ref<World<TWorld>.Multi<ModifierTargetComponent>>();
-            var compactTarget = (EntityGIDCompact)target;
 
             for (var i = 0; i < refs.Length; i++)
             {
                 ref var entry = ref refs[i];
-                if (entry.Target.Equals(compactTarget))
+                if (entry.Target.Equals(target))
                 {
                     entry.StatMask |= flag;
                     return;
                 }
             }
 
-            refs.Add(new ModifierTargetComponent { Target = compactTarget, StatMask = flag });
+            refs.Add(new ModifierTargetComponent { Target = target, StatMask = flag });
         }
 
         // --- Main-default overloads ---

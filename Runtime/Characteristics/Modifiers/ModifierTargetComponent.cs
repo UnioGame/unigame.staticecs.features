@@ -8,7 +8,7 @@ namespace UniGame.StaticEcs.Features
     public struct ModifierTargetComponent : IMultiComponent
     {
         /// <summary>The affected target entity.</summary>
-        public EntityGIDCompact Target;
+        public EntityGID Target;
 
         /// <summary>The characteristics affected on the target.</summary>
         public CharacteristicFlag StatMask;

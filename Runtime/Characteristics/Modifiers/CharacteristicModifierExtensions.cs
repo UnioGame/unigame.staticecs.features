@@ -21,7 +21,7 @@ namespace UniGame.StaticEcs.Features
             entries.Add(
                 new CharacteristicModifierComponent<TCharacteristic>
                 {
-                    Source = (EntityGIDCompact)source,
+                    Source = source,
                     Op = op,
                     Value = value,
                 }
@@ -56,12 +56,11 @@ namespace UniGame.StaticEcs.Features
             if (entries.IsEmpty)
                 return 0;
 
-            var compactSource = (EntityGIDCompact)source;
             var removed = 0;
 
             for (var i = entries.Length - 1; i >= 0; i--)
             {
-                if (entries[i].Source.Equals(compactSource))
+                if (entries[i].Source.Equals(source))
                 {
                     entries.RemoveAtSwap(i);
                     removed++;

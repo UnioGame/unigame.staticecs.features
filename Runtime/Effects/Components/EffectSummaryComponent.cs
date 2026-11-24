@@ -25,5 +25,8 @@ namespace UniGame.StaticEcs.Features
 
         /// <summary>The remaining duration captured at the latest lifecycle event.</summary>
         public float TimeLeft;
+
+        /// <summary>The remaining activations captured at the latest lifecycle event.</summary>
+        public int ChargesLeft;
     }
 }

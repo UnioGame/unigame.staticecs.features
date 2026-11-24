@@ -13,5 +13,14 @@ namespace UniGame.StaticEcs.Features
         public float Amount;
         public DamageType Type;
         public bool ForceCritical;
+
+        /// <summary>
+        /// The caller already decided whether the hit is critical (<see cref="ForceCritical"/>), so the critical
+        /// filter does not roll. Lets one roll cover every target of an area hit.
+        /// </summary>
+        public bool CriticalRolled;
+
+        /// <summary>How the damage is delivered; <see cref="AttackType.Area"/> skips dodge, block and critical.</summary>
+        public AttackType AttackType;
     }
 }

@@ -16,5 +16,7 @@ namespace UniGame.StaticEcs.Features
         ArmorResist = 1ul << 7,
         CriticalChance = 1ul << 8,
         CriticalMultiplier = 1ul << 9,
+        Immobilize = 1ul << 10,
+        ManaRegen = 1ul << 11,
     }
 }

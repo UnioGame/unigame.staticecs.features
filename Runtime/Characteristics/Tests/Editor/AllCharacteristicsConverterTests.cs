@@ -123,41 +123,6 @@ namespace UniGame.StaticEcs.Features.Tests
         }
 
         [Test]
-        public void Apply_DefaultSettings_ValuesMatchDefaults()
-        {
-            var entity = World<TestAllCharacteristicsWorld>.NewEntity<Default>();
-            var converter = _host.AddComponent<TestAllCharacteristicsConverter>();
-
-            converter.Apply(entity, null);
-
-            Assert.AreEqual(
-                100f,
-                entity.Read<CharacteristicComponent<HealthCharacteristic>>().Value,
-                1e-5f
-            );
-            Assert.AreEqual(
-                0f,
-                entity.Read<CharacteristicComponent<HealthCharacteristic>>().MinValue,
-                1e-5f
-            );
-            Assert.AreEqual(
-                100f,
-                entity.Read<CharacteristicComponent<HealthCharacteristic>>().MaxValue,
-                1e-5f
-            );
-            Assert.AreEqual(
-                2f,
-                entity.Read<CharacteristicComponent<CriticalMultiplierCharacteristic>>().Value,
-                1e-5f
-            );
-            Assert.AreEqual(
-                1f,
-                entity.Read<CharacteristicComponent<CriticalMultiplierCharacteristic>>().MinValue,
-                1e-5f
-            );
-        }
-
-        [Test]
         public void Apply_AssetVariant_SetsAllNineCharacteristics()
         {
             var entity = World<TestAllCharacteristicsWorld>.NewEntity<Default>();

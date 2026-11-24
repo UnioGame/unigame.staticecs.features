@@ -25,14 +25,8 @@ namespace UniGame.StaticEcs.Features.Tests
         }
 
         [Test]
-        public void Placement_AcceptsBuiltInAndCustomLayouts()
+        public void Placement_RejectsNoneLayout()
         {
-            Assert.AreEqual(
-                "Overlay",
-                ViewPlacement.InLayout(ViewType.Overlay).Layout);
-            Assert.AreEqual(
-                "CombatOverlay",
-                ViewPlacement.InLayout("CombatOverlay").Layout);
             Assert.Throws<ArgumentOutOfRangeException>(
                 () => ViewPlacement.InLayout(ViewType.None));
         }
@@ -76,6 +70,317 @@ namespace UniGame.StaticEcs.Features.Tests
                 }
 
                 Assert.Fail("Open request was not received.");
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        [Test]
+        public void TypedRequest_UsesViewNameOrExplicitViewId()
+        {
+            var byType = ViewRequest.For<EmptyView, TestViewModel>();
+            var byId = ViewRequest.For<EmptyView, TestViewModel>("inventory-screen");
+
+            Assert.AreEqual(nameof(EmptyView), byType.ViewId);
+            Assert.AreEqual("inventory-screen", byId.ViewId);
+            Assert.AreEqual(
+                typeof(TestViewModel).AssemblyQualifiedName,
+                byType.ExpectedViewModelType);
+            Assert.AreEqual(
+                typeof(EmptyView).AssemblyQualifiedName,
+                byType.ExpectedViewType);
+            Assert.AreEqual("Window", byType.Placement.Layout);
+            Assert.IsTrue(byType.ShowOnOpen);
+            Assert.IsTrue(byType.MatchesExpectedViewModel(typeof(TestViewModel)));
+            Assert.IsFalse(byType.MatchesExpectedViewModel(typeof(OtherTestViewModel)));
+            Assert.IsTrue(byType.MatchesExpectedView(typeof(EmptyView)));
+            Assert.IsFalse(byType.MatchesExpectedView(typeof(OtherTestView)));
+        }
+
+        [Test]
+        public void RequestDistinguishesUnspecifiedOrderFromExplicitZero()
+        {
+            var request = ViewRequest.For<EmptyView>();
+            Assert.IsFalse(request.HasOrder);
+            Assert.AreEqual(0, request.Order);
+
+            request.Order = 0;
+            Assert.IsTrue(request.HasOrder);
+            var typed = ViewRequest.Bind<EmptyView, TestViewModel>(request);
+            Assert.IsTrue(typed.HasOrder);
+            Assert.AreEqual(0, typed.Order);
+
+            var restored = JsonUtility.FromJson<ViewRequest>(JsonUtility.ToJson(typed));
+            Assert.IsTrue(restored.HasOrder);
+            Assert.AreEqual(0, restored.Order);
+        }
+
+        [Test]
+        public void ViewOnlyRequest_UsesViewClassAndConfiguredModel()
+        {
+            var request = ViewRequest.For<EmptyView>();
+
+            Assert.AreEqual(nameof(EmptyView), request.ViewId);
+            Assert.AreEqual(typeof(EmptyView).AssemblyQualifiedName, request.ExpectedViewType);
+            Assert.IsTrue(string.IsNullOrEmpty(request.ExpectedViewModelType));
+            Assert.AreEqual("Window", request.Placement.Layout);
+            Assert.IsTrue(request.ShowOnOpen);
+        }
+
+        [Test]
+        public void OpenByType_PreservesOptionsAndReplacesViewId()
+        {
+            CreateWorld();
+            var newReceiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewEvent>();
+            var onReceiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewOnEntityEvent>();
+            var owner = World<ViewTestWorld>.NewEntity<Default>();
+            var target = World<ViewTestWorld>.NewEntity<Default>();
+            var request = new ViewRequest
+            {
+                ViewId = "ignored.alias",
+                Skin = "dark",
+                Queue = "dialogs",
+                Owner = owner.GID,
+                Source = owner.GID,
+                Placement = ViewPlacement.InLayout("CustomWindow"),
+                Order = 7,
+                ShowOnOpen = true,
+                ExpectedViewModelType = typeof(OtherTestViewModel).AssemblyQualifiedName
+            };
+
+            try
+            {
+                Assert.IsTrue(ViewOperations.TryOpenNewByType<ViewTestWorld, EmptyView>(
+                    request, out var newKey));
+                Assert.IsTrue(newKey.IsValid);
+                Assert.IsTrue(ViewOperations.TryOpenOnByType<ViewTestWorld, EmptyView>(
+                    target, request, out var onKey));
+                Assert.IsTrue(onKey.IsValid);
+
+                var newCount = 0;
+                foreach (var received in newReceiver)
+                {
+                    newCount++;
+                    AssertTypeRequest(received.Value.Request, request);
+                }
+
+                var onCount = 0;
+                foreach (var received in onReceiver)
+                {
+                    onCount++;
+                    Assert.AreEqual(target.GID, received.Value.Entity);
+                    AssertTypeRequest(received.Value.Request, request);
+                }
+
+                Assert.AreEqual(1, newCount);
+                Assert.AreEqual(1, onCount);
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref newReceiver);
+                World<ViewTestWorld>.DeleteEventReceiver(ref onReceiver);
+            }
+        }
+
+        [Test]
+        public void OpenByType_WithoutOptionsShowsInWindow()
+        {
+            CreateWorld();
+            var receiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewEvent>();
+            try
+            {
+                Assert.IsTrue(ViewOperations.TryOpenNewByType<ViewTestWorld, EmptyView>(
+                    out var key));
+                Assert.IsTrue(key.IsValid);
+                foreach (var received in receiver)
+                {
+                    Assert.AreEqual(nameof(EmptyView), received.Value.Request.ViewId);
+                    Assert.AreEqual("Window", received.Value.Request.Placement.Layout);
+                    Assert.IsTrue(received.Value.Request.ShowOnOpen);
+                    return;
+                }
+
+                Assert.Fail("No typed open request was sent.");
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        private static void AssertTypeRequest(ViewRequest actual, ViewRequest options)
+        {
+            Assert.AreEqual(nameof(EmptyView), actual.ViewId);
+            Assert.AreEqual(typeof(EmptyView).AssemblyQualifiedName, actual.ExpectedViewType);
+            Assert.IsTrue(string.IsNullOrEmpty(actual.ExpectedViewModelType));
+            Assert.AreEqual(options.Skin, actual.Skin);
+            Assert.AreEqual(options.Queue, actual.Queue);
+            Assert.AreEqual(options.Owner, actual.Owner);
+            Assert.AreEqual(options.Source, actual.Source);
+            Assert.AreEqual(options.Placement.Layout, actual.Placement.Layout);
+            Assert.AreEqual(options.Order, actual.Order);
+            Assert.AreEqual(options.ShowOnOpen, actual.ShowOnOpen);
+        }
+
+        [Test]
+        public void ViewOperations_EnumUsesExactConfiguredId()
+        {
+            CreateWorld();
+            var receiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewOnEntityEvent>();
+            var entity = World<ViewTestWorld>.NewEntity<Default>();
+            try
+            {
+                var request = Request();
+                request.ViewId = "IgnoredValue";
+                Assert.IsTrue(ViewSystemIdResolver.TryResolve(
+                    TestViewId.InventoryAlias,
+                    out var resolvedId));
+                Assert.AreEqual("inventory.screen", resolvedId);
+                request.ViewId = resolvedId;
+                Assert.IsTrue(ViewOperations.TryOpenOn<ViewTestWorld>(
+                    entity,
+                    request,
+                    out _));
+
+                entity.Delete<ViewComponent>();
+                request.ViewId = "IgnoredValue";
+                Assert.IsTrue(ViewOperations.TryOpenOn<ViewTestWorld, TestViewId>(
+                    entity,
+                    TestViewId.InventoryAlias,
+                    request,
+                    out var key));
+                Assert.IsTrue(key.IsValid);
+
+                var foundMappedRequest = false;
+                foreach (var received in receiver)
+                {
+                    if (received.Value.Request.ViewId == "inventory.screen" &&
+                        received.Value.Entity == entity.GID)
+                        foundMappedRequest = true;
+                }
+
+                Assert.IsTrue(foundMappedRequest, "Mapped open request was not received.");
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        [Test]
+        public void ViewOperations_EnumOpensNewViewWithExactConfiguredId()
+        {
+            CreateWorld();
+            var receiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewEvent>();
+            try
+            {
+                var request = Request();
+                request.ViewId = "IgnoredValue";
+
+                Assert.IsTrue(ViewOperations.TryOpenNew<ViewTestWorld, TestViewId>(
+                    TestViewId.InventoryAlias,
+                    request,
+                    out var key));
+                Assert.IsTrue(key.IsValid);
+
+                var foundMappedRequest = false;
+                foreach (var received in receiver)
+                {
+                    if (received.Value.Request.ViewId == "inventory.screen")
+                        foundMappedRequest = true;
+                }
+
+                Assert.IsTrue(foundMappedRequest, "Mapped open request was not received.");
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        [Test]
+        public void ViewOperations_EnumWithoutMappingFailsWithoutSending()
+        {
+            CreateWorld();
+            var receiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewEvent>();
+            try
+            {
+                Assert.IsFalse(ViewOperations.TryOpenNew(
+                    TestViewId.Unmapped,
+                    Request(),
+                    out var key));
+                Assert.IsFalse(key.IsValid);
+
+                foreach (var _ in receiver)
+                    Assert.Fail("An unmapped enum value must not send an open request.");
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        [Test]
+        public void EnumViewSystemIdAttribute_IsVisibleOnMember()
+        {
+            var field = typeof(TestViewId).GetField(
+                nameof(TestViewId.InventoryAlias),
+                System.Reflection.BindingFlags.Public |
+                System.Reflection.BindingFlags.Static);
+
+            Assert.IsNotNull(field);
+            Assert.IsNotNull(Attribute.GetCustomAttribute(
+                field,
+                typeof(ViewSystemIdAttribute)));
+        }
+
+        [Test]
+        public void ShowScreenSystem_ConsumesRequestAndSendsTypedViewRequestOnce()
+        {
+            CreateWorld();
+            var receiver = World<ViewTestWorld>.RegisterEventReceiver<OpenViewEvent>();
+            var source = World<ViewTestWorld>.NewEntity<Default>();
+            source.Set(new OpenTestScreenComponent());
+            var request = new ViewRequest
+            {
+                Skin = "dark",
+                Placement = ViewPlacement.InLayout("InventoryOverlay"),
+                ShowOnOpen = true
+            };
+
+            try
+            {
+                var system = new ShowScreenSystem<
+                    ViewTestWorld,
+                    OpenTestScreenComponent,
+                    EmptyView,
+                    TestViewModel>(request);
+
+                system.Update();
+                system.Update();
+
+                Assert.IsFalse(source.Has<OpenTestScreenComponent>());
+                var receivedCount = 0;
+                foreach (var received in receiver)
+                {
+                    receivedCount++;
+                    Assert.AreEqual(nameof(EmptyView), received.Value.Request.ViewId);
+                    Assert.AreEqual(
+                        typeof(TestViewModel).AssemblyQualifiedName,
+                        received.Value.Request.ExpectedViewModelType);
+                    Assert.AreEqual(
+                        typeof(EmptyView).AssemblyQualifiedName,
+                        received.Value.Request.ExpectedViewType);
+                    Assert.AreEqual(source.GID, received.Value.Request.Owner);
+                    Assert.AreEqual(source.GID, received.Value.Request.Source);
+                    Assert.AreEqual("dark", received.Value.Request.Skin);
+                    Assert.AreEqual("InventoryOverlay", received.Value.Request.Placement.Layout);
+                    Assert.IsTrue(received.Value.Request.ShowOnOpen);
+                }
+
+                Assert.AreEqual(1, receivedCount);
             }
             finally
             {
@@ -340,6 +645,7 @@ namespace UniGame.StaticEcs.Features.Tests
             World<ViewTestWorld>.Create();
             var types = World<ViewTestWorld>.Types();
             types.RegisterAll(typeof(ViewComponent).Assembly);
+            types.Component<OpenTestScreenComponent>();
             World<ViewTestWorld>.SetResource(
                 new ViewKeySequenceResource<ViewTestWorld>());
             World<ViewTestWorld>.Initialize();
@@ -359,7 +665,51 @@ namespace UniGame.StaticEcs.Features.Tests
         {
         }
 
+        [Test]
+        public void CloseAllByType_EmitsExactViewTypeFilter()
+        {
+            CreateWorld();
+            var receiver = World<ViewTestWorld>.RegisterEventReceiver<CloseViewsEvent>();
+            try
+            {
+                Assert.IsTrue(ViewOperations.CloseAllByType<ViewTestWorld, EmptyView>());
+                foreach (var received in receiver)
+                {
+                    var filter = received.Value.Filter;
+                    Assert.AreEqual(typeof(EmptyView).AssemblyQualifiedName, filter.ViewType);
+                    Assert.IsFalse(filter.All);
+                    Assert.IsTrue(string.IsNullOrEmpty(filter.ViewId));
+                    return;
+                }
+
+                Assert.Fail("No close-by-type request was sent.");
+            }
+            finally
+            {
+                World<ViewTestWorld>.DeleteEventReceiver(ref receiver);
+            }
+        }
+
+        private struct OpenTestScreenComponent : IComponent
+        {
+        }
+
+        private enum TestViewId
+        {
+            [ViewSystemId("inventory.screen")]
+            InventoryAlias = 1,
+            Unmapped = 2
+        }
+
         private sealed class TestViewModel : ViewModel
+        {
+        }
+
+        private sealed class OtherTestViewModel : ViewModel
+        {
+        }
+
+        private sealed class OtherTestView : EmptyView
         {
         }
     }

@@ -8,12 +8,23 @@ namespace UniGame.StaticEcs.Features.Tests
         where TEffect : struct, IEffectType
     {
         public readonly List<(EntityGID Target, EntityGID Source, int Stacks, int PreviousStacks)> Applied = new();
+        public readonly List<float> Magnitudes = new();
         public readonly List<(EntityGID Target, EntityGID Source, int Stacks)> Ticks = new();
+
+        public bool RejectApply;
+        public readonly List<(int Stacks, int PreviousStacks)> Checked = new();
         public readonly List<(EntityGID Target, EntityGID Source, int Stacks, bool Expired)> Removed = new();
 
-        public void OnApplied(EntityGID target, EntityGID source, int stacks, int previousStacks)
+        public bool CanApply(in EffectApplyContext context)
         {
-            Applied.Add((target, source, stacks, previousStacks));
+            Checked.Add((context.Stacks, context.PreviousStacks));
+            return !RejectApply;
+        }
+
+        public void OnApplied(in EffectApplyContext context)
+        {
+            Applied.Add((context.Target, context.Source, context.Stacks, context.PreviousStacks));
+            Magnitudes.Add(context.Magnitude);
         }
 
         public void OnTick(EntityGID target, EntityGID source, int stacks)
@@ -29,6 +40,8 @@ namespace UniGame.StaticEcs.Features.Tests
         public void Clear()
         {
             Applied.Clear();
+            Checked.Clear();
+            Magnitudes.Clear();
             Ticks.Clear();
             Removed.Clear();
         }
